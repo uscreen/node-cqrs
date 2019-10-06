@@ -1,9 +1,9 @@
-'use strict';
+'use strict'
 
-const { getHandler } = require('./utils');
-const getHandledMessageTypes = require('./utils/getHandledMessageTypes');
+const { getHandler } = require('./utils')
+const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
 
-const unique = arr => [...new Set(arr)];
+const unique = arr => [...new Set(arr)]
 
 /**
  * Subscribe observer to observable
@@ -13,33 +13,40 @@ const unique = arr => [...new Set(arr)];
  * @param {TSubscribeOptions} [options]
  */
 function subscribe(observable, observer, options = {}) {
-	if (typeof observable !== 'object' || !observable)
-		throw new TypeError('observable argument must be an Object');
-	if (typeof observable.on !== 'function')
-		throw new TypeError('observable.on must be a Function');
-	if (typeof observer !== 'object' || !observer)
-		throw new TypeError('observer argument must be an Object');
+  if (typeof observable !== 'object' || !observable)
+    throw new TypeError('observable argument must be an Object')
+  if (typeof observable.on !== 'function')
+    throw new TypeError('observable.on must be a Function')
+  if (typeof observer !== 'object' || !observer)
+    throw new TypeError('observer argument must be an Object')
 
-	const { masterHandler, messageTypes, queueName } = options;
-	if (masterHandler && typeof masterHandler !== 'function')
-		throw new TypeError('masterHandler parameter, when provided, must be a Function');
-	if (queueName && typeof observable.queue !== 'function')
-		throw new TypeError('observable.queue, when queueName is specified, must be a Function');
+  const { masterHandler, messageTypes, queueName } = options
+  if (masterHandler && typeof masterHandler !== 'function')
+    throw new TypeError(
+      'masterHandler parameter, when provided, must be a Function'
+    )
+  if (queueName && typeof observable.queue !== 'function')
+    throw new TypeError(
+      'observable.queue, when queueName is specified, must be a Function'
+    )
 
-	const subscribeTo = messageTypes || getHandledMessageTypes(observer);
-	if (!Array.isArray(subscribeTo))
-		throw new TypeError('either options.messageTypes, observer.handles or ObserverType.handles is required');
+  const subscribeTo = messageTypes || getHandledMessageTypes(observer)
+  if (!Array.isArray(subscribeTo))
+    throw new TypeError(
+      'either options.messageTypes, observer.handles or ObserverType.handles is required'
+    )
 
-	for (const messageType of unique(subscribeTo)) {
-		const handler = masterHandler || getHandler(observer, messageType);
-		if (!handler)
-			throw new Error(`'${messageType}' handler is not defined or not a function`);
+  for (const messageType of unique(subscribeTo)) {
+    const handler = masterHandler || getHandler(observer, messageType)
+    if (!handler)
+      throw new Error(
+        `'${messageType}' handler is not defined or not a function`
+      )
 
-		if (queueName)
-			observable.queue(queueName).on(messageType, handler.bind(observer));
-		else
-			observable.on(messageType, handler.bind(observer));
-	}
+    if (queueName)
+      observable.queue(queueName).on(messageType, handler.bind(observer))
+    else observable.on(messageType, handler.bind(observer))
+  }
 }
 
-module.exports = subscribe;
+module.exports = subscribe

@@ -1,21 +1,15 @@
-'use strict';
+'use strict'
 
-const KNOWN_METHOD_NAMES = new Set([
-	'subscribe'
-]);
+const KNOWN_METHOD_NAMES = new Set(['subscribe'])
 
 function getInheritedPropertyNames(prototype) {
-	const parentPrototype = prototype && Object.getPrototypeOf(prototype);
-	if (!parentPrototype)
-		return [];
+  const parentPrototype = prototype && Object.getPrototypeOf(prototype)
+  if (!parentPrototype) return []
 
-	const propDescriptors = Object.getOwnPropertyDescriptors(parentPrototype);
-	const propNames = Object.keys(propDescriptors);
+  const propDescriptors = Object.getOwnPropertyDescriptors(parentPrototype)
+  const propNames = Object.keys(propDescriptors)
 
-	return [
-		...propNames,
-		...getInheritedPropertyNames(parentPrototype)
-	];
+  return [...propNames, ...getInheritedPropertyNames(parentPrototype)]
 }
 
 /**
@@ -26,26 +20,28 @@ function getInheritedPropertyNames(prototype) {
  * @returns {string[]}
  */
 function getMessageHandlerNames(observerInstanceOrClass) {
-	if (!observerInstanceOrClass)
-		throw new TypeError('observerInstanceOrClass argument required');
+  if (!observerInstanceOrClass)
+    throw new TypeError('observerInstanceOrClass argument required')
 
-	const prototype = typeof observerInstanceOrClass === 'function' ?
-		observerInstanceOrClass.prototype :
-		Object.getPrototypeOf(observerInstanceOrClass);
+  const prototype =
+    typeof observerInstanceOrClass === 'function'
+      ? observerInstanceOrClass.prototype
+      : Object.getPrototypeOf(observerInstanceOrClass)
 
-	if (!prototype)
-		throw new TypeError('prototype cannot be resolved');
+  if (!prototype) throw new TypeError('prototype cannot be resolved')
 
-	const inheritedProperties = new Set(getInheritedPropertyNames(prototype));
+  const inheritedProperties = new Set(getInheritedPropertyNames(prototype))
 
-	const propDescriptors = Object.getOwnPropertyDescriptors(prototype);
-	const propNames = Object.keys(propDescriptors);
+  const propDescriptors = Object.getOwnPropertyDescriptors(prototype)
+  const propNames = Object.keys(propDescriptors)
 
-	return propNames.filter(key =>
-		!key.startsWith('_') &&
-		!inheritedProperties.has(key) &&
-		!KNOWN_METHOD_NAMES.has(key) &&
-		typeof propDescriptors[key].value === 'function');
+  return propNames.filter(
+    key =>
+      !key.startsWith('_') &&
+      !inheritedProperties.has(key) &&
+      !KNOWN_METHOD_NAMES.has(key) &&
+      typeof propDescriptors[key].value === 'function'
+  )
 }
 
-module.exports = getMessageHandlerNames;
+module.exports = getMessageHandlerNames

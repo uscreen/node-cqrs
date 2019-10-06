@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /**
  * In-memory storage for aggregate snapshots.
@@ -8,34 +8,33 @@
  * @implements {IAggregateSnapshotStorage}
  */
 module.exports = class InMemorySnapshotStorage {
+  /**
+   * Creates an instance of InMemorySnapshotStorage
+   * @memberof InMemorySnapshotStorage
+   */
+  constructor() {
+    /** @type {Map<Identifier, IEvent>} */
+    this._snapshots = new Map()
+  }
 
-	/**
-	 * Creates an instance of InMemorySnapshotStorage
-	 * @memberof InMemorySnapshotStorage
-	 */
-	constructor() {
-		/** @type {Map<Identifier, IEvent>} */
-		this._snapshots = new Map();
-	}
+  /**
+   * Get latest aggregate snapshot
+   *
+   * @param {Identifier} aggregateId
+   * @returns {Promise<IEvent>}
+   * @memberof InMemorySnapshotStorage
+   */
+  async getAggregateSnapshot(aggregateId) {
+    return this._snapshots.get(aggregateId)
+  }
 
-	/**
-	 * Get latest aggregate snapshot
-	 *
-	 * @param {Identifier} aggregateId
-	 * @returns {Promise<IEvent>}
-	 * @memberof InMemorySnapshotStorage
-	 */
-	async getAggregateSnapshot(aggregateId) {
-		return this._snapshots.get(aggregateId);
-	}
-
-	/**
-	 * Save new aggregate snapshot
-	 *
-	 * @param {IEvent} snapshotEvent
-	 * @memberof InMemorySnapshotStorage
-	 */
-	async saveAggregateSnapshot(snapshotEvent) {
-		this._snapshots.set(snapshotEvent.aggregateId, snapshotEvent);
-	}
-};
+  /**
+   * Save new aggregate snapshot
+   *
+   * @param {IEvent} snapshotEvent
+   * @memberof InMemorySnapshotStorage
+   */
+  async saveAggregateSnapshot(snapshotEvent) {
+    this._snapshots.set(snapshotEvent.aggregateId, snapshotEvent)
+  }
+}

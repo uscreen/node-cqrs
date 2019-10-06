@@ -5,41 +5,14 @@
 # top-most EditorConfig file
 root = true
 
-# Unix-style newlines with a newline ending every file
 [*]
+charset = utf-8
+indent_style = space
+indent_size = 2
 end_of_line = lf
-indent_style = tab
 insert_final_newline = true
-
-[{Dockerfile,Procfile}]
 trim_trailing_whitespace = true
 
-# Standard at: https://github.com/felixge/node-style-guide
-[{*.js,*.json}]
-trim_trailing_whitespace = true
-quote_type = single
-curly_bracket_next_line = false
-spaces_around_operators = true
-space_after_control_statements = true
-space_after_anonymous_functions = false
-spaces_in_brackets = false
-
-[Dockerfile]
-indent_style = space
-indent_size = 4
-
-[*.md]
-indent_style = space
-indent_size = 2
-
-[*.json]
-indent_style = space
-indent_size = 4
-
-[*.yml]
-indent_style = space
-indent_size = 2
-
-[package.json]
-indent_style = space
-indent_size = 2
+[{Makefile,**.mk}]
+# Use tabs for indentation (Makefiles require tabs)
+indent_style = tab

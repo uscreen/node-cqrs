@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /**
  * Get instance class name
@@ -7,5 +7,5 @@
  * @returns {string}
  */
 module.exports = function getClassName(instance) {
-	return Object.getPrototypeOf(instance).constructor.name;
-};
+  return Object.getPrototypeOf(instance).constructor.name
+}

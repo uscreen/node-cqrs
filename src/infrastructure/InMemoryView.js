@@ -1,7 +1,7 @@
-'use strict';
+'use strict'
 
-const EventEmitter = require('events');
-const { sizeOf } = require('../utils');
+const EventEmitter = require('events')
+const { sizeOf } = require('../utils')
 
 /**
  * Update given value with an update Cb and return updated value.
@@ -13,11 +13,9 @@ const { sizeOf } = require('../utils');
  * @returns TValue
  */
 const applyUpdate = (view, update) => {
-	const valueReturnedByUpdate = update(view);
-	return valueReturnedByUpdate === undefined ?
-		view :
-		valueReturnedByUpdate;
-};
+  const valueReturnedByUpdate = update(view)
+  return valueReturnedByUpdate === undefined ? view : valueReturnedByUpdate
+}
 
 /**
  * In-memory Projection View, which suspends get()'s until it is ready
@@ -26,245 +24,244 @@ const applyUpdate = (view, update) => {
  * @implements {IInMemoryView<any>}
  */
 module.exports = class InMemoryView {
+  /**
+   * Whether the view is restored
+   * @type {boolean}
+   */
+  get ready() {
+    return this._ready
+  }
 
-	/**
-	 * Whether the view is restored
-	 * @type {boolean}
-	 */
-	get ready() {
-		return this._ready;
-	}
+  /**
+   * Number of records in the View
+   *
+   * @type {number}
+   * @readonly
+   */
+  get size() {
+    return this._map.size
+  }
 
-	/**
-	 * Number of records in the View
-	 *
-	 * @type {number}
-	 * @readonly
-	 */
-	get size() {
-		return this._map.size;
-	}
+  /**
+   * Creates an instance of InMemoryView
+   */
+  constructor() {
+    this._map = new Map()
+    this._emitter = new EventEmitter()
 
-	/**
-	 * Creates an instance of InMemoryView
-	 */
-	constructor() {
-		this._map = new Map();
-		this._emitter = new EventEmitter();
+    // explicitly bind functions to this object for easier using in Promises
+    Object.defineProperties(this, {
+      get: { value: this.get.bind(this) }
+    })
+  }
 
-		// explicitly bind functions to this object for easier using in Promises
-		Object.defineProperties(this, {
-			get: { value: this.get.bind(this) }
-		});
-	}
+  /**
+   * Lock the view to prevent concurrent modifications
+   */
+  async lock() {
+    if (this.ready === false) await this.once('ready')
 
-	/**
-	 * Lock the view to prevent concurrent modifications
-	 */
-	async lock() {
-		if (this.ready === false)
-			await this.once('ready');
+    this._ready = false
+  }
 
-		this._ready = false;
-	}
+  /**
+   * Release the lock
+   */
+  async unlock() {
+    this._ready = true
+    this._emitter.emit('ready')
+  }
 
-	/**
-	 * Release the lock
-	 */
-	async unlock() {
-		this._ready = true;
-		this._emitter.emit('ready');
-	}
+  /**
+   * Check if view contains a record with a given key.
+   * This is the only synchronous method, so make sure to check the `ready` flag, if necessary
+   *
+   * @deprecated Use `async get()` instead
+   *
+   * @param {string|number} key
+   * @returns {boolean}
+   * @memberof InMemoryView
+   */
+  has(key) {
+    return this._map.has(key)
+  }
 
-	/**
-	 * Check if view contains a record with a given key.
-	 * This is the only synchronous method, so make sure to check the `ready` flag, if necessary
-	 *
-	 * @deprecated Use `async get()` instead
-	 *
-	 * @param {string|number} key
-	 * @returns {boolean}
-	 * @memberof InMemoryView
-	 */
-	has(key) {
-		return this._map.has(key);
-	}
+  /**
+   * Get record with a given key; await until the view is restored
+   *
+   * @param {string|number} key
+   * @param {object} [options]
+   * @param {boolean} [options.nowait] Skip waiting until the view is restored/ready
+   * @returns {Promise<any>}
+   * @memberof InMemoryView
+   */
+  async get(key, options) {
+    if (!key) throw new TypeError('key argument required')
 
-	/**
-	 * Get record with a given key; await until the view is restored
-	 *
-	 * @param {string|number} key
-	 * @param {object} [options]
-	 * @param {boolean} [options.nowait] Skip waiting until the view is restored/ready
-	 * @returns {Promise<any>}
-	 * @memberof InMemoryView
-	 */
-	async get(key, options) {
-		if (!key) throw new TypeError('key argument required');
+    if (!this._ready && !(options && options.nowait)) await this.once('ready')
 
-		if (!this._ready && !(options && options.nowait))
-			await this.once('ready');
+    return this._map.get(key)
+  }
 
-		return this._map.get(key);
-	}
+  /**
+   * Get all records matching an optional filter
+   *
+   * @param {(record: any, key?: any) => boolean} [filter]
+   */
+  async getAll(filter) {
+    if (filter && typeof filter !== 'function')
+      throw new TypeError('filter argument, when defined, must be a Function')
 
-	/**
-	 * Get all records matching an optional filter
-	 *
-	 * @param {(record: any, key?: any) => boolean} [filter]
-	 */
-	async getAll(filter) {
-		if (filter && typeof filter !== 'function')
-			throw new TypeError('filter argument, when defined, must be a Function');
+    if (!this._ready) await this.once('ready')
 
-		if (!this._ready)
-			await this.once('ready');
+    const r = []
+    for (const entry of this._map.entries()) {
+      if (!filter || filter(entry[1], entry[0])) r.push(entry)
+    }
 
-		const r = [];
-		for (const entry of this._map.entries()) {
-			if (!filter || filter(entry[1], entry[0]))
-				r.push(entry);
-		}
+    return r
+  }
 
-		return r;
-	}
+  /**
+   * Create record with a given key and value
+   *
+   * @param {string|number} key
+   * @param {object} [value]
+   * @memberof InMemoryView
+   */
+  create(key, value = {}) {
+    if (!key) throw new TypeError('key argument required')
+    if (typeof value === 'function')
+      throw new TypeError('value argument must be an instance of an Object')
 
-	/**
-	 * Create record with a given key and value
-	 *
-	 * @param {string|number} key
-	 * @param {object} [value]
-	 * @memberof InMemoryView
-	 */
-	create(key, value = {}) {
-		if (!key) throw new TypeError('key argument required');
-		if (typeof value === 'function') throw new TypeError('value argument must be an instance of an Object');
+    if (this._map.has(key)) throw new Error(`Key '${key}' already exists`)
 
-		if (this._map.has(key))
-			throw new Error(`Key '${key}' already exists`);
+    this._map.set(key, value)
+  }
 
-		this._map.set(key, value);
-	}
+  /**
+   * Update existing view record
+   *
+   * @param {string|number} key
+   * @param {function(any):any} update
+   * @memberof InMemoryView
+   */
+  update(key, update) {
+    if (!key) throw new TypeError('key argument required')
+    if (typeof update !== 'function')
+      throw new TypeError('update argument must be a Function')
 
-	/**
-	 * Update existing view record
-	 *
-	 * @param {string|number} key
-	 * @param {function(any):any} update
-	 * @memberof InMemoryView
-	 */
-	update(key, update) {
-		if (!key) throw new TypeError('key argument required');
-		if (typeof update !== 'function') throw new TypeError('update argument must be a Function');
+    if (!this._map.has(key)) throw new Error(`Key '${key}' does not exist`)
 
-		if (!this._map.has(key))
-			throw new Error(`Key '${key}' does not exist`);
+    this._update(key, update)
+  }
 
-		this._update(key, update);
-	}
+  /**
+   * Update existing view record or create new
+   *
+   * @param {string|number} key
+   * @param {function(any):any} update
+   * @memberof InMemoryView
+   */
+  updateEnforcingNew(key, update) {
+    if (!key) throw new TypeError('key argument required')
+    if (typeof update !== 'function')
+      throw new TypeError('update argument must be a Function')
 
-	/**
-	 * Update existing view record or create new
-	 *
-	 * @param {string|number} key
-	 * @param {function(any):any} update
-	 * @memberof InMemoryView
-	 */
-	updateEnforcingNew(key, update) {
-		if (!key) throw new TypeError('key argument required');
-		if (typeof update !== 'function') throw new TypeError('update argument must be a Function');
+    if (!this._map.has(key))
+      return this.create(key, applyUpdate(undefined, update))
 
-		if (!this._map.has(key))
-			return this.create(key, applyUpdate(undefined, update));
+    return this._update(key, update)
+  }
 
-		return this._update(key, update);
-	}
+  /**
+   * Update all records that match filter criteria
+   *
+   * @param {function(any):boolean} [filter]
+   * @param {function(any):any} update
+   * @memberof InMemoryView
+   */
+  updateAll(filter, update) {
+    if (filter && typeof filter !== 'function')
+      throw new TypeError('filter argument, when specified, must be a Function')
+    if (typeof update !== 'function')
+      throw new TypeError('update argument must be a Function')
 
-	/**
-	 * Update all records that match filter criteria
-	 *
-	 * @param {function(any):boolean} [filter]
-	 * @param {function(any):any} update
-	 * @memberof InMemoryView
-	 */
-	updateAll(filter, update) {
-		if (filter && typeof filter !== 'function') throw new TypeError('filter argument, when specified, must be a Function');
-		if (typeof update !== 'function') throw new TypeError('update argument must be a Function');
+    for (const [key, value] of this._map) {
+      if (!filter || filter(value)) this._update(key, update)
+    }
+  }
 
-		for (const [key, value] of this._map) {
-			if (!filter || filter(value))
-				this._update(key, update);
-		}
-	}
+  /**
+   * Update existing record
+   * @private
+   * @param {string|number} key
+   * @param {function(any):any} update
+   */
+  _update(key, update) {
+    const value = this._map.get(key)
+    this._map.set(key, applyUpdate(value, update))
+  }
 
-	/**
-	 * Update existing record
-	 * @private
-	 * @param {string|number} key
-	 * @param {function(any):any} update
-	 */
-	_update(key, update) {
-		const value = this._map.get(key);
-		this._map.set(key, applyUpdate(value, update));
-	}
+  /**
+   * Delete record
+   *
+   * @param {string|number} key
+   * @memberof InMemoryView
+   */
+  delete(key) {
+    if (!key) throw new TypeError('key argument required')
 
-	/**
-	 * Delete record
-	 *
-	 * @param {string|number} key
-	 * @memberof InMemoryView
-	 */
-	delete(key) {
-		if (!key) throw new TypeError('key argument required');
+    this._map.delete(key)
+  }
 
-		this._map.delete(key);
-	}
+  /**
+   * Delete all records that match filter criteria
+   *
+   * @param {function(any):boolean} [filter]
+   * @memberof InMemoryView
+   */
+  deleteAll(filter) {
+    if (filter && typeof filter !== 'function')
+      throw new TypeError('filter argument, when specified, must be a Function')
 
-	/**
-	 * Delete all records that match filter criteria
-	 *
-	 * @param {function(any):boolean} [filter]
-	 * @memberof InMemoryView
-	 */
-	deleteAll(filter) {
-		if (filter && typeof filter !== 'function') throw new TypeError('filter argument, when specified, must be a Function');
+    for (const [key, value] of this._map) {
+      if (!filter || filter(value)) this._map.delete(key)
+    }
+  }
 
-		for (const [key, value] of this._map) {
-			if (!filter || filter(value))
-				this._map.delete(key);
-		}
-	}
+  /**
+   * Mark view as 'ready' when it's restored by projection
+   * @deprecated Use `unlock()`
+   * @memberof InMemoryView
+   */
+  markAsReady() {
+    this.unlock()
+  }
 
-	/**
-	 * Mark view as 'ready' when it's restored by projection
-	 * @deprecated Use `unlock()`
-	 * @memberof InMemoryView
-	 */
-	markAsReady() {
-		this.unlock();
-	}
+  /**
+   * Create a Promise which will resolve to a first emitted event of a given type
+   *
+   * @param {string} eventType
+   * @returns {Promise<any>}
+   */
+  once(eventType) {
+    if (typeof eventType !== 'string' || !eventType.length)
+      throw new TypeError('eventType argument must be a non-empty String')
 
-	/**
-	 * Create a Promise which will resolve to a first emitted event of a given type
-	 *
-	 * @param {string} eventType
-	 * @returns {Promise<any>}
-	 */
-	once(eventType) {
-		if (typeof eventType !== 'string' || !eventType.length)
-			throw new TypeError('eventType argument must be a non-empty String');
+    return new Promise(resolve => {
+      this._emitter.once(eventType, resolve)
+    })
+  }
 
-		return new Promise(rs => {
-			this._emitter.once(eventType, rs);
-		});
-	}
-
-	/**
-	 * Get view summary as string
-	 *
-	 * @returns {string}
-	 */
-	toString() {
-		return `${this.size} record${this.size !== 1 ? 's' : ''}, ${sizeOf(this._map)} bytes`;
-	}
-};
+  /**
+   * Get view summary as string
+   *
+   * @returns {string}
+   */
+  toString() {
+    return `${this.size} record${this.size !== 1 ? 's' : ''}, ${sizeOf(
+      this._map
+    )} bytes`
+  }
+}

@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /**
  * Calculates an approximate object size in bytes
@@ -6,52 +6,44 @@
  * @return {Number} object size
  */
 module.exports = function sizeOf(object) {
-	if (!object) throw new TypeError('object argument required');
+  if (!object) throw new TypeError('object argument required')
 
-	const queue = [object];
-	let size = 0;
+  const queue = [object]
+  let size = 0
 
-	for (let i = 0; i < queue.length; i++) {
+  for (let i = 0; i < queue.length; i++) {
+    const obj = queue[i]
 
-		const obj = queue[i];
+    if (typeof obj === 'boolean') {
+      size += 4
+    } else if (typeof obj === 'number') {
+      size += 8
+    } else if (typeof obj === 'string') {
+      size += Buffer.byteLength(obj, 'utf-8')
+    } else if (typeof obj === 'symbol') {
+      size += 32
+    } else if (obj instanceof Date) {
+      size += 40 // Buffer.byteLength(obj.toString(), 'utf-8');
+    } else if (obj instanceof Buffer) {
+      size += obj.length
+    } else if (obj instanceof Map) {
+      for (const [key, innerObj] of obj) {
+        queue.push(key)
+        if (typeof innerObj !== 'object' || !queue.includes(innerObj))
+          queue.push(innerObj)
+      }
+    } else if (obj) {
+      if (!Array.isArray(obj)) {
+        for (const key of Object.keys(obj))
+          size += Buffer.byteLength(key, 'utf-8')
+      }
+      for (const key of Object.keys(obj)) {
+        const innerObj = obj[key]
+        if (typeof innerObj !== 'object' || !queue.includes(innerObj))
+          queue.push(innerObj)
+      }
+    }
+  }
 
-		if (typeof obj === 'boolean') {
-			size += 4;
-		}
-		else if (typeof obj === 'number') {
-			size += 8;
-		}
-		else if (typeof obj === 'string') {
-			size += Buffer.byteLength(obj, 'utf-8');
-		}
-		else if (typeof obj === 'symbol') {
-			size += 32;
-		}
-		else if (obj instanceof Date) {
-			size += 40; // Buffer.byteLength(obj.toString(), 'utf-8');
-		}
-		else if (obj instanceof Buffer) {
-			size += obj.length;
-		}
-		else if (obj instanceof Map) {
-			for (const [key, innerObj] of obj) {
-				queue.push(key);
-				if (typeof innerObj !== 'object' || !queue.includes(innerObj))
-					queue.push(innerObj);
-			}
-		}
-		else if (obj) {
-			if (!Array.isArray(obj)) {
-				for (const key of Object.keys(obj))
-					size += Buffer.byteLength(key, 'utf-8');
-			}
-			for (const key of Object.keys(obj)) {
-				const innerObj = obj[key];
-				if (typeof innerObj !== 'object' || !queue.includes(innerObj))
-					queue.push(innerObj);
-			}
-		}
-	}
-
-	return size;
-};
+  return size
+}
