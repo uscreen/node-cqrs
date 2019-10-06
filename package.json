@@ -1,38 +1,28 @@
 {
-  "name": "node-cqrs",
-  "version": "0.15.1",
-  "description": "Basic ES6 backbone for CQRS app development",
-  "repository": "snatalenko/node-cqrs",
+  "name": "@uscreen.de/node-cqrs",
+  "version": "0.0.0",
+  "description": "CQRS backbone for node.js",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com:uscreen/node-cqrs.git"
+  },
+  "author": "Marcus Spiegel <spiegel@uscreen.de>",
+  "contributors": ["@stas_natalenko"],
+  "license": "MIT",
   "keywords": [
     "cqrs",
     "ddd",
-    "domain",
-    "command",
-    "event",
-    "eventstore",
     "eventsourcing"
   ],
-  "main": "index.js",
-  "types": "index.d.ts",
   "engines": {
-    "node": ">=7.6.0"
+    "node": ">=10.x"
   },
   "scripts": {
-    "lint": "npx eslint src/",
-    "lint:strict": "npx eslint src/ --max-warnings=0",
-    "pretest": "npm run lint",
-    "test": "mocha ./tests/index.js",
-    "test:integration": "mocha ./examples/user-domain-tests",
-    "test:coverage": "istanbul cover node_modules/.bin/_mocha tests/index.js -- -R spec",
-    "pretest:coveralls": "npm run test:coverage",
-    "test:coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "posttest:coveralls": "rm -rf ./coverage",
-    "preversion": "npm run lint:strict && npm test",
-    "postversion": "git push origin && git push origin --tags"
+    "lint": "npx eslint src/ --fix",
+    "pretest": "yarn lint",
+    "test": "mocha ./tests/index.js"
   },
-  "author": "@stas_natalenko",
-  "license": "MIT",
-  "homepage": "https://github.com/snatalenko/node-cqrs#readme",
   "dependencies": {
     "debug": "^4.1.1"
   },

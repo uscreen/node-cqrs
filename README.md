@@ -1,10 +1,24 @@
-node-cqrs
-=========
+# @uscreen.de/node-cqrs
 
-[![NPM Version](https://img.shields.io/npm/v/node-cqrs.svg)](https://www.npmjs.com/package/node-cqrs)
-[![Build Status](https://secure.travis-ci.org/snatalenko/node-cqrs.svg?branch=master)](http://travis-ci.org/snatalenko/node-cqrs)
-[![Coverage Status](https://coveralls.io/repos/github/snatalenko/node-cqrs/badge.svg?branch=master)](https://coveralls.io/github/snatalenko/node-cqrs?branch=master)
-[![NPM Downloads](https://img.shields.io/npm/dm/node-cqrs.svg)](https://www.npmjs.com/package/node-cqrs)
+> __Alpha-Warning:__ work in progress, not tested in production and subject of change in api, features and options
+
+This is fork of [snatalenko/node-cqrs](https://github.com/snatalenko/node-cqrs), so most credits go to Mr. Natalenko.
+
+## Abstract
+
+Aim of this fork is to adopt the CQRS approach in an "easy" and reusable manner to node applications. It should not provide a new framework or make strong assumptions on file-structure (and possibly infrastructure). That being said, I'd like to target fastify, express and alike to use this package within their ecosystem.
+
+To get to production ready setup I'd like to see it working within a setup of
+
+- distributed [fastify](https://www.fastify.io) service(s)
+- [mongoDB](https://www.mongodb.com) based storage
+- [nats](https://nats.io) based eventing and messaging
+
+As this is work in progress I'll keep the original README attached below:
+
+---
+
+# README
 
 ## Overview
 
