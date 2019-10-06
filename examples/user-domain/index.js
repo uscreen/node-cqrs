@@ -1,14 +1,14 @@
-'use strict';
+'use strict'
 
 const {
-	Container,
-	InMemoryEventStorage,
-	CommandBus,
-	EventStore,
-	AggregateCommandHandler
-} = require('../../src'); // node-cqrs
-const UserAggregate = require('./UserAggregate');
-const UsersProjection = require('./UsersProjection');
+  Container,
+  InMemoryEventStorage,
+  CommandBus,
+  EventStore,
+  AggregateCommandHandler
+} = require('../../src') // node-cqrs
+const UserAggregate = require('./UserAggregate')
+const UsersProjection = require('./UsersProjection')
 
 /**
  * DI container factory
@@ -16,44 +16,47 @@ const UsersProjection = require('./UsersProjection');
  * @returns {IContainer}
  */
 exports.createContainer = () => {
-	const container = new Container();
+  const container = new Container()
 
-	// register infrastructure services
-	container.register(InMemoryEventStorage, 'storage');
+  // register infrastructure services
+  container.register(InMemoryEventStorage, 'storage')
 
-	// register domain entities
-	container.registerAggregate(UserAggregate);
-	container.registerProjection(UsersProjection, 'users');
+  // register domain entities
+  container.registerAggregate(UserAggregate)
+  container.registerProjection(UsersProjection, 'users')
 
-	// create instances of command/event handlers and related subscriptions
-	container.createUnexposedInstances();
+  // create instances of command/event handlers and related subscriptions
+  container.createUnexposedInstances()
 
-	return container;
-};
+  return container
+}
 
 /**
  * Same as above, but without the DI container
  */
 exports.createBaseInstances = () => {
-	// create infrastructure services
-	const storage = new InMemoryEventStorage();
-	const eventStore = new EventStore({ storage });
-	const commandBus = new CommandBus();
+  // create infrastructure services
+  const storage = new InMemoryEventStorage()
+  const eventStore = new EventStore({ storage })
+  const commandBus = new CommandBus()
 
-	/** @type {IAggregateConstructor} */
-	const aggregateType = UserAggregate;
+  /** @type {IAggregateConstructor} */
+  const aggregateType = UserAggregate
 
-	/** @type {ICommandHandler} */
-	const userCommandHandler = new AggregateCommandHandler({ eventStore, aggregateType });
-	userCommandHandler.subscribe(commandBus);
+  /** @type {ICommandHandler} */
+  const userCommandHandler = new AggregateCommandHandler({
+    eventStore,
+    aggregateType
+  })
+  userCommandHandler.subscribe(commandBus)
 
-	/** @type {IProjection} */
-	const usersProjection = new UsersProjection();
-	usersProjection.subscribe(eventStore);
+  /** @type {IProjection} */
+  const usersProjection = new UsersProjection()
+  usersProjection.subscribe(eventStore)
 
-	return {
-		eventStore,
-		commandBus,
-		users: usersProjection.view
-	};
-};
+  return {
+    eventStore,
+    commandBus,
+    users: usersProjection.view
+  }
+}

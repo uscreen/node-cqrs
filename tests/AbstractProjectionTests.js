@@ -1,208 +1,209 @@
-'use strict';
+'use strict'
 
-const { expect, assert, AssertionError } = require('chai');
-const sinon = require('sinon');
-const { AbstractProjection, InMemoryView, InMemoryEventStorage, EventStore } = require('../src');
-const getPromiseState = require('./utils/getPromiseState');
+const { expect, assert, AssertionError } = require('chai')
+const sinon = require('sinon')
+const {
+  AbstractProjection,
+  InMemoryView,
+  InMemoryEventStorage,
+  EventStore
+} = require('../src')
+const getPromiseState = require('./utils/getPromiseState')
 
 class MyProjection extends AbstractProjection {
-	static get handles() {
-		return ['somethingHappened'];
-	}
+  static get handles() {
+    return ['somethingHappened']
+  }
 
-	async _somethingHappened({ aggregateId, payload, context }) {
-		return this.view.updateEnforcingNew(aggregateId, (v = {}) => {
-			if (v.somethingHappenedCnt)
-				v.somethingHappenedCnt += 1;
-			else
-				v.somethingHappenedCnt = 1;
-			return v;
-		});
-	}
+  async _somethingHappened({ aggregateId, payload, context }) {
+    return this.view.updateEnforcingNew(aggregateId, (v = {}) => {
+      if (v.somethingHappenedCnt) v.somethingHappenedCnt += 1
+      else v.somethingHappenedCnt = 1
+      return v
+    })
+  }
 }
 
+describe('AbstractProjection', function() {
+  let projection
 
-describe('AbstractProjection', function () {
+  beforeEach(() => {
+    projection = new MyProjection()
+  })
 
-	let projection;
+  describe('view', () => {
+    it('returns a view storage associated with projection', () => {
+      const view = new InMemoryView()
+      const proj = new MyProjection({ view })
 
-	beforeEach(() => {
-		projection = new MyProjection();
-	});
+      expect(proj.view).to.equal(view)
+    })
+  })
 
-	describe('view', () => {
+  describe('subscribe(eventStore)', () => {
+    let observable
 
-		it('returns a view storage associated with projection', () => {
+    beforeEach(() => {
+      observable = {
+        getAllEvents() {
+          return []
+        },
+        on() {}
+      }
+      sinon.spy(observable, 'on')
+    })
 
-			const view = new InMemoryView();
-			const proj = new MyProjection({ view });
+    it('subscribes to all handlers defined', () => {
+      class ProjectionWithoutHandles extends AbstractProjection {
+        somethingHappened() {}
+        somethingHappened2() {}
+      }
 
-			expect(proj.view).to.equal(view);
-		});
-	});
+      new ProjectionWithoutHandles().subscribe(observable)
 
-	describe('subscribe(eventStore)', () => {
+      expect(observable.on).to.have.property('callCount', 2)
+      expect(observable.on)
+        .to.have.nested.property('firstCall.args[0]')
+        .that.eql('somethingHappened')
+      expect(observable.on)
+        .to.have.nested.property('lastCall.args[0]')
+        .that.eql('somethingHappened2')
+    })
 
-		let observable;
+    it('ignores overridden projection methods', () => {
+      class ProjectionWithoutHandles extends AbstractProjection {
+        somethingHappened() {}
 
-		beforeEach(() => {
-			observable = {
-				getAllEvents() {
-					return [];
-				},
-				on() { }
-			};
-			sinon.spy(observable, 'on');
-		});
+        /** overridden projection method */
+        project(event) {
+          return super.project(event)
+        }
+      }
 
-		it('subscribes to all handlers defined', () => {
+      new ProjectionWithoutHandles().subscribe(observable)
 
-			class ProjectionWithoutHandles extends AbstractProjection {
-				somethingHappened() { }
-				somethingHappened2() { }
-			}
+      expect(observable.on).to.have.property('calledOnce', true)
+      expect(observable.on)
+        .to.have.nested.property('lastCall.args[0]')
+        .that.eql('somethingHappened')
+    })
 
-			new ProjectionWithoutHandles().subscribe(observable);
+    it('subscribes projection to all events returned by "handles"', () => {
+      class ProjectionWithHandles extends AbstractProjection {
+        static get handles() {
+          return ['somethingHappened2']
+        }
 
-			expect(observable.on).to.have.property('callCount', 2);
-			expect(observable.on).to.have.nested.property('firstCall.args[0]').that.eql('somethingHappened');
-			expect(observable.on).to.have.nested.property('lastCall.args[0]').that.eql('somethingHappened2');
-		});
+        somethingHappened() {}
+        somethingHappened2() {}
+      }
 
-		it('ignores overridden projection methods', () => {
+      new ProjectionWithHandles().subscribe(observable)
 
-			class ProjectionWithoutHandles extends AbstractProjection {
-				somethingHappened() { }
+      expect(observable.on).to.have.property('calledOnce', true)
+      expect(observable.on)
+        .to.have.nested.property('lastCall.args[0]')
+        .that.eql('somethingHappened2')
+    })
+  })
 
-				/** overridden projection method */
-				project(event) {
-					return super.project(event);
-				}
-			}
+  describe('restore(eventStore)', () => {
+    let es
 
-			new ProjectionWithoutHandles().subscribe(observable);
+    beforeEach(() => {
+      es = {
+        async getAllEvents() {
+          return [
+            { type: 'somethingHappened', aggregateId: 1, aggregateVersion: 1 },
+            { type: 'somethingHappened', aggregateId: 1, aggregateVersion: 2 },
+            { type: 'somethingHappened', aggregateId: 2, aggregateVersion: 1 }
+          ]
+        }
+      }
+      sinon.spy(es, 'getAllEvents')
 
-			expect(observable.on).to.have.property('calledOnce', true);
-			expect(observable.on).to.have.nested.property('lastCall.args[0]').that.eql('somethingHappened');
-		});
+      return projection.restore(es)
+    })
 
-		it('subscribes projection to all events returned by "handles"', () => {
+    it('queries events of specific types from event store', () => {
+      assert(es.getAllEvents.calledOnce, 'es.getAllEvents was not called')
 
-			class ProjectionWithHandles extends AbstractProjection {
-				static get handles() {
-					return ['somethingHappened2'];
-				}
-				somethingHappened() { }
-				somethingHappened2() { }
-			}
+      const { args } = es.getAllEvents.lastCall
 
-			new ProjectionWithHandles().subscribe(observable);
+      expect(args).to.have.length(1)
+      expect(args[0]).to.deep.eq(MyProjection.handles)
+    })
 
-			expect(observable.on).to.have.property('calledOnce', true);
-			expect(observable.on).to.have.nested.property('lastCall.args[0]').that.eql('somethingHappened2');
-		});
-	});
+    it('projects all retrieved events to view', async () => {
+      const viewRecord = await projection.view.get(1)
 
-	describe('restore(eventStore)', () => {
+      expect(viewRecord).to.exist
+      expect(viewRecord).to.have.property('somethingHappenedCnt', 2)
+    })
 
-		let es;
+    it('assigns "ready=true" property to InMemoryView view', () => {
+      const blankProjection = new MyProjection()
+      expect(blankProjection.view).to.have.property('ready').that.is.not.ok
 
-		beforeEach(() => {
-			es = {
-				async getAllEvents() {
-					return [
-						{ type: 'somethingHappened', aggregateId: 1, aggregateVersion: 1 },
-						{ type: 'somethingHappened', aggregateId: 1, aggregateVersion: 2 },
-						{ type: 'somethingHappened', aggregateId: 2, aggregateVersion: 1 }
-					];
-				}
-			};
-			sinon.spy(es, 'getAllEvents');
+      expect(projection.view).to.have.property('ready', true)
+    })
 
-			return projection.restore(es);
-		});
+    it('throws, if projection error encountered', () => {
+      es = {
+        getAllEvents() {
+          return Promise.resolve([{ type: 'unexpectedEvent' }])
+        }
+      }
 
-		it('queries events of specific types from event store', () => {
+      return projection.restore(es).then(
+        () => {
+          throw new AssertionError('must fail')
+        },
+        err => {
+          expect(err).to.have.property(
+            'message',
+            "'unexpectedEvent' handler is not defined or not a function"
+          )
+        }
+      )
+    })
+  })
 
-			assert(es.getAllEvents.calledOnce, 'es.getAllEvents was not called');
+  describe('project(event)', () => {
+    const event = { type: 'somethingHappened', aggregateId: 1 }
 
-			const { args } = es.getAllEvents.lastCall;
+    it('waits until the restoring process is done', async () => {
+      const storage = new InMemoryEventStorage()
+      const es = new EventStore({ storage })
 
-			expect(args).to.have.length(1);
-			expect(args[0]).to.deep.eq(MyProjection.handles);
-		});
+      const restoreProcess = projection.restore(es)
+      const projectProcess = projection.project(event)
 
-		it('projects all retrieved events to view', async () => {
+      expect(await getPromiseState(projectProcess)).to.eq('pending')
 
-			const viewRecord = await projection.view.get(1);
+      await restoreProcess
 
-			expect(viewRecord).to.exist;
-			expect(viewRecord).to.have.property('somethingHappenedCnt', 2);
-		});
+      expect(await getPromiseState(projectProcess)).to.eq('resolved')
+    })
 
-		it('assigns "ready=true" property to InMemoryView view', () => {
+    it('can bypass waiting when invoked as a protected method', async () => {
+      const response = projection._project(event)
 
-			const blankProjection = new MyProjection();
-			expect(blankProjection.view).to.have.property('ready').that.is.not.ok;
+      expect(await getPromiseState(response)).to.eq('resolved')
+    })
 
-			expect(projection.view).to.have.property('ready', true);
-		});
+    it('passes event to projection event handler', async () => {
+      projection.view.unlock()
+      sinon.spy(projection, '_somethingHappened')
 
-		it('throws, if projection error encountered', () => {
+      const event = { type: 'somethingHappened', aggregateId: 1 }
 
-			es = {
-				getAllEvents() {
-					return Promise.resolve([{ type: 'unexpectedEvent' }]);
-				}
-			};
+      expect(projection._somethingHappened).to.have.property('called', false)
 
-			return projection.restore(es).then(() => {
-				throw new AssertionError('must fail');
-			}, err => {
-				expect(err).to.have.property('message', '\'unexpectedEvent\' handler is not defined or not a function');
-			});
-		});
-	});
+      await projection.project(event)
 
-	describe('project(event)', () => {
-
-		const event = { type: 'somethingHappened', aggregateId: 1 };
-
-		it('waits until the restoring process is done', async () => {
-
-			const storage = new InMemoryEventStorage();
-			const es = new EventStore({ storage });
-
-			const restoreProcess = projection.restore(es);
-			const projectProcess = projection.project(event);
-
-			expect(await getPromiseState(projectProcess)).to.eq('pending');
-
-			await restoreProcess;
-
-			expect(await getPromiseState(projectProcess)).to.eq('resolved');
-		});
-
-		it('can bypass waiting when invoked as a protected method', async () => {
-
-			const response = projection._project(event);
-
-			expect(await getPromiseState(response)).to.eq('resolved');
-		});
-
-		it('passes event to projection event handler', async () => {
-
-			projection.view.unlock();
-			sinon.spy(projection, '_somethingHappened');
-
-			const event = { type: 'somethingHappened', aggregateId: 1 };
-
-			expect(projection._somethingHappened).to.have.property('called', false);
-
-			await projection.project(event);
-
-			expect(projection._somethingHappened).to.have.property('calledOnce', true);
-			expect(projection._somethingHappened.lastCall.args).to.eql([event]);
-		});
-	});
-});
+      expect(projection._somethingHappened).to.have.property('calledOnce', true)
+      expect(projection._somethingHappened.lastCall.args).to.eql([event])
+    })
+  })
+})

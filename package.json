@@ -19,7 +19,7 @@
     "node": ">=10.x"
   },
   "scripts": {
-    "lint": "eslint src/ --fix",
+    "lint": "eslint '**/*.js' --fix",
     "pretest": "yarn lint",
     "test": "mocha ./tests/index.js"
   },

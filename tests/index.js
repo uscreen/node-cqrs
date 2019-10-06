@@ -1,23 +1,23 @@
-'use strict';
+'use strict'
 
 // require('debug').enable('cqrs:*');
 
-require('./utilsTests');
+require('./utilsTests')
 
-require('./InMemoryMessageBusTests');
-require('./InMemoryViewTests');
+require('./InMemoryMessageBusTests')
+require('./InMemoryViewTests')
 
-require('./EventStream');
-require('./EventStoreTests');
-require('./CommandBusTests');
-require('./ContainerTests');
+require('./EventStream')
+require('./EventStoreTests')
+require('./CommandBusTests')
+require('./ContainerTests')
 
-require('./AbstractAggregate');
-require('./AggregateCommandHandlerTests');
+require('./AbstractAggregate')
+require('./AggregateCommandHandlerTests')
 
-require('./AbstractSagaTests');
-require('./SagaEventHandlerTests');
+require('./AbstractSagaTests')
+require('./SagaEventHandlerTests')
 
-require('./AbstractProjectionTests');
+require('./AbstractProjectionTests')
 
-require('../examples/user-domain-tests');
+require('../examples/user-domain-tests')
