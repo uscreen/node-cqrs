@@ -17,5 +17,10 @@ exports.InMemoryEventStorage = require('./infrastructure/InMemoryEventStorage')
 exports.InMemorySnapshotStorage = require('./infrastructure/InMemorySnapshotStorage')
 exports.InMemoryView = require('./infrastructure/InMemoryView')
 
+exports.NatsMessageBus = require('./buses/NatsMessageBus')
+exports.MongoEventStorage = require('./stores/MongoEventStorage')
+exports.MongoSnapshotStorage = require('./stores/MongoSnapshotStorage')
+exports.MongoView = require('./stores/MongoView')
+
 exports.getMessageHandlerNames = require('./utils/getMessageHandlerNames')
 exports.subscribe = require('./subscribe')
