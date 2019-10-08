@@ -37,30 +37,14 @@ class CommandBus {
 
   /**
    * Format and send a command for execution
-   *
-   * @param {string} type
-   * @param {string} aggregateId
-   * @param {{ payload: object, context: object }} options
-   * @param {...object} otherArgs
-   * @returns {Promise<IEventStream>} - produced events
    */
-  send(type, aggregateId, options, ...otherArgs) {
+  send(type, aggregateId, options) {
     if (typeof type !== 'string' || !type.length)
       throw new TypeError('type argument must be a non-empty String')
     if (typeof options !== 'object' || !options)
       throw new TypeError('options argument must be an Object')
-    if (otherArgs.length > 1)
-      throw new TypeError('more than expected arguments supplied')
 
-    // obsolete. left for backward compatibility
-    if (
-      otherArgs.length ||
-      (!('context' in options) && !('payload' in options))
-    ) {
-      const context = options
-      const payload = otherArgs.length ? otherArgs[0] : undefined
-      return this.sendRaw({ type, aggregateId, context, payload })
-    }
+    console.log(type, aggregateId, options)
 
     return this.sendRaw(Object.assign({ type, aggregateId }, options))
   }

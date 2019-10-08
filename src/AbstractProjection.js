@@ -69,7 +69,6 @@ class AbstractProjection {
    */
   constructor(options) {
     validateHandlers(this)
-
     if (options && options.view) this._view = options.view
   }
 
@@ -169,6 +168,10 @@ class AbstractProjection {
    * Get human-readable Projection name
    */
   toString() {
+    return getClassName(this)
+  }
+
+  get name() {
     return getClassName(this)
   }
 }

@@ -1,154 +1,90 @@
 'use strict'
 
-const EventEmitter = require('events')
-const { sizeOf } = require('../utils')
+const assert = require('assert').strict
 
-const applyUpdate = (view, update) => {
-  const valueReturnedByUpdate = update(view)
-  return valueReturnedByUpdate === undefined ? view : valueReturnedByUpdate
+assert.isObject = (thing, message) => {
+  assert(typeof thing === 'object', message)
 }
 
-/**
- * In-memory Projection View, which suspends get()'s until it is ready
- *
- * @class InMemoryView
- * @implements {IInMemoryView<any>}
- */
+const EventEmitter = require('events')
+
 module.exports = class MongoView {
-  get ready() {
-    return this._ready
-  }
-
-  get size() {
-    return this._map.size
-  }
-
-  constructor() {
-    console.log('--------------------> mongo view')
-    this._map = new Map()
-    this._emitter = new EventEmitter()
-
-    // explicitly bind functions to this object for easier using in Promises
-    Object.defineProperties(this, {
-      get: { value: this.get.bind(this) }
-    })
-  }
-
-  async lock() {
-    if (this.ready === false) await this.once('ready')
-
-    this._ready = false
-  }
-
-  async unlock() {
-    this._ready = true
-    this._emitter.emit('ready')
-  }
-
-  has(key) {
-    return this._map.has(key)
-  }
-
-  async get(key, options) {
-    if (!key) throw new TypeError('key argument required')
-
-    if (!this._ready && !(options && options.nowait)) await this.once('ready')
-
-    return Object.assign({ _id: key }, this._map.get(key))
-  }
-
-  async getAll(filter) {
-    if (filter && typeof filter !== 'function')
-      throw new TypeError('filter argument, when defined, must be a Function')
-
-    if (!this._ready) await this.once('ready')
-
-    const r = []
-    for (const entry of this._map.entries()) {
-      if (!filter || filter(entry[1], entry[0])) r.push(entry)
-    }
-
-    return r
+  constructor({ mongo, collection }) {
+    this.ObjectId = mongo.ObjectId
+    this.collection = mongo.db.collection(collection)
+    this.emitter = new EventEmitter()
   }
 
   create(key, value = {}) {
-    if (!key) throw new TypeError('key argument required')
-    if (typeof value === 'function')
-      throw new TypeError('value argument must be an instance of an Object')
-
-    if (this._map.has(key)) throw new Error(`Key '${key}' already exists`)
-
-    this._map.set(key, value)
+    assert(key, 'key required')
+    assert.isObject(value, 'value must be object')
+    return this.collection.insertOne(Object.assign(value, { _id: key }))
   }
 
-  update(key, update) {
-    if (!key) throw new TypeError('key argument required')
-    if (typeof update !== 'function')
-      throw new TypeError('update argument must be a Function')
-
-    if (!this._map.has(key)) throw new Error(`Key '${key}' does not exist`)
-
-    this._update(key, update)
+  read(key) {
+    assert(key, 'key required')
+    return this.findOne({ _id: this.ObjectId(key) })
   }
 
-  updateEnforcingNew(key, update) {
-    if (!key) throw new TypeError('key argument required')
-    if (typeof update !== 'function')
-      throw new TypeError('update argument must be a Function')
-
-    if (!this._map.has(key))
-      return this.create(key, applyUpdate(undefined, update))
-
-    return this._update(key, update)
-  }
-
-  updateAll(filter, update) {
-    if (filter && typeof filter !== 'function')
-      throw new TypeError('filter argument, when specified, must be a Function')
-    if (typeof update !== 'function')
-      throw new TypeError('update argument must be a Function')
-
-    for (const [key, value] of this._map) {
-      if (!filter || filter(value)) this._update(key, update)
-    }
-  }
-
-  _update(key, update) {
-    const value = this._map.get(key)
-    this._map.set(key, applyUpdate(value, update))
+  update(key, value = {}) {
+    assert(key, 'key required')
+    assert.isObject(value, 'value must be object')
+    return this.collection.findOneAndUpdate(
+      { _id: this.ObjectId(key) },
+      { $set: value },
+      { returnOriginal: false, upsert: true }
+    )
   }
 
   delete(key) {
-    if (!key) throw new TypeError('key argument required')
-
-    this._map.delete(key)
-  }
-
-  deleteAll(filter) {
-    if (filter && typeof filter !== 'function')
-      throw new TypeError('filter argument, when specified, must be a Function')
-
-    for (const [key, value] of this._map) {
-      if (!filter || filter(value)) this._map.delete(key)
-    }
-  }
-
-  markAsReady() {
-    this.unlock()
-  }
-
-  once(eventType) {
-    if (typeof eventType !== 'string' || !eventType.length)
-      throw new TypeError('eventType argument must be a non-empty String')
-
-    return new Promise(resolve => {
-      this._emitter.once(eventType, resolve)
+    assert(key, 'key required')
+    return this.collection.findOneAndDelete({
+      _id: this.ObjectId(key)
     })
   }
 
-  toString() {
-    return `${this.size} record${this.size !== 1 ? 's' : ''}, ${sizeOf(
-      this._map
-    )} bytes`
+  findOne(query) {
+    assert.isObject(query, 'query must be object')
+    return this.collection.findOne(query)
+  }
+
+  list(query = {}) {
+    assert.isObject(query, 'query must be object')
+    return this.collection.find(query).toArray()
+  }
+
+  once(eventType) {
+    assert(eventType, 'eventType argument must be a non-empty String')
+    return new Promise(resolve => {
+      this.emitter.once(eventType, resolve)
+    })
+  }
+
+  /**
+   * keep some deprecated methods to comply with any
+   * possible interface
+   * @todo check remove unused
+   */
+
+  get(key, options) {
+    throw new TypeError('get() is unsupported - use read() instead')
+  }
+
+  updateEnforcingNew(key, update) {
+    throw new TypeError(
+      'updateEnforcingNew() is unsupported - use update() instead'
+    )
+  }
+
+  updateAll(filter, update) {
+    throw new TypeError('updateAll() is unsupported - use update() instead')
+  }
+
+  deleteAll(filter) {
+    throw new TypeError('deleteAll() is unsupported - use delete() instead')
+  }
+
+  async getAll(filter) {
+    throw new TypeError('getAll() is unsupported - use list() instead')
   }
 }
