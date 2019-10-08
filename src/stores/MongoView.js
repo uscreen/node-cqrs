@@ -1,18 +1,11 @@
 'use strict'
 
-const assert = require('assert').strict
-
-assert.isObject = (thing, message) => {
-  assert(typeof thing === 'object', message)
-}
-
-const EventEmitter = require('events')
+const assert = require('../utils/assert')
 
 module.exports = class MongoView {
   constructor({ mongo, collection }) {
     this.ObjectId = mongo.ObjectId
     this.collection = mongo.db.collection(collection)
-    this.emitter = new EventEmitter()
   }
 
   create(key, value = {}) {
@@ -53,17 +46,13 @@ module.exports = class MongoView {
     return this.collection.find(query).toArray()
   }
 
-  once(eventType) {
-    assert(eventType, 'eventType argument must be a non-empty String')
-    return new Promise(resolve => {
-      this.emitter.once(eventType, resolve)
-    })
-  }
-
   /**
    * keep some deprecated methods to comply with any
    * possible interface
    * @todo check remove unused
+   *
+   * -----------------------------------------------------------------------
+   *
    */
 
   get(key, options) {
@@ -86,5 +75,16 @@ module.exports = class MongoView {
 
   async getAll(filter) {
     throw new TypeError('getAll() is unsupported - use list() instead')
+  }
+
+  once(eventType) {
+    throw new TypeError('once() got removed')
+    // console.log('------------------> MongoView.eventType:', eventType)
+    // assert(eventType, 'eventType argument must be a non-empty String')
+    // return new Promise(resolve => {
+    //   this.emitter.once(eventType, resolve)
+    // })
+
+    // and in constructor: this.emitter = new EventEmitter()
   }
 }
