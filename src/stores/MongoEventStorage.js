@@ -1,9 +1,4 @@
-/* eslint no-return-assign: "off", eqeqeq: "off", require-jsdoc: "off" */
 'use strict'
-
-function wrapEvent(event) {
-  return Object.assign({}, event)
-}
 
 /**
  * A simple event storage implementation intended to use for tests only.
@@ -29,13 +24,30 @@ module.exports = class MongoEventStorage {
     )
   }
 
+  wrapEvent(event) {
+    const evt = Object.assign({}, event)
+    evt.aggregateId = this.ObjectId(evt.aggregateId)
+    return evt
+  }
+
   commitEvents(eventStream) {
-    const events = eventStream.map(wrapEvent)
+    const events = eventStream.map(this.wrapEvent.bind(this))
     return this.collection.insertMany(events)
   }
 
   async getAggregateEvents(aggregateId, { snapshot } = {}) {
-    console.log('getAggregateEvents', aggregateId)
+    return this.collection
+      .find(
+        {
+          aggregateId: this.ObjectId(aggregateId)
+        },
+        {
+          projection: { _id: false },
+          sort: 'aggregateVersion'
+        }
+      )
+      .toArray()
+
     // const events = await this._events
     // if (snapshot)
     //   return events.filter(
@@ -45,6 +57,18 @@ module.exports = class MongoEventStorage {
     //   )
     // return events.filter(e => e.aggregateId == aggregateId)
   }
+
+  // async getAggregateEvents(aggregateId, { snapshot } = {}) {
+  //   console.log('getAggregateEvents', aggregateId)
+  //   // const events = await this._events
+  //   // if (snapshot)
+  //   //   return events.filter(
+  //   //     e =>
+  //   //       e.aggregateId == aggregateId &&
+  //   //       e.aggregateVersion > snapshot.aggregateVersion
+  //   //   )
+  //   // return events.filter(e => e.aggregateId == aggregateId)
+  // }
 
   getSagaEvents(sagaId, { beforeEvent }) {
     console.log('getSagaEvents', sagaId)

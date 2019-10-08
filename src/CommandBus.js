@@ -44,8 +44,6 @@ class CommandBus {
     if (typeof options !== 'object' || !options)
       throw new TypeError('options argument must be an Object')
 
-    console.log(type, aggregateId, options)
-
     return this.sendRaw(Object.assign({ type, aggregateId }, options))
   }
 
