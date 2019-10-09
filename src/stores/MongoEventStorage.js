@@ -1,9 +1,9 @@
 'use strict'
 
 module.exports = class MongoEventStorage {
-  constructor(MongoEventStorageConfig) {
-    this.ObjectId = MongoEventStorageConfig.ObjectId
-    this.collection = MongoEventStorageConfig.events
+  constructor({ ObjectId, EventsCollection }) {
+    this.ObjectId = ObjectId
+    this.collection = EventsCollection
     this.collection.createIndex(
       { aggregateId: 1, aggregateVersion: 1 },
       { unique: true, sparse: true }

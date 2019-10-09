@@ -1,9 +1,9 @@
 'use strict'
 
 module.exports = class MongoView {
-  constructor({ mongo, collection }) {
-    this.ObjectId = mongo.ObjectId
-    this.collection = mongo.db.collection(collection)
+  constructor({ ObjectId, collection }) {
+    this.ObjectId = ObjectId
+    this.collection = collection
   }
 
   create(key, value = {}) {

@@ -22,6 +22,9 @@ const database = process.env.TAP
 
 config.mongoUri = `mongodb://${config.mongoServer}/${database}`
 
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 module.exports = {
-  config
+  config,
+  wait
 }
