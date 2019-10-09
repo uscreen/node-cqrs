@@ -1,18 +1,31 @@
-# @uscreen.de/node-cqrs
+# @uscreen.de/cqrs-kit
+
+> CQRS Starter Kit to start fast into DDD. Eventsourcing included. Some soldering required.
 
 > __Alpha-Warning:__ work in progress, not tested in production and subject of change in api, features and options
 
-This is fork of [snatalenko/node-cqrs](https://github.com/snatalenko/node-cqrs), so most credits go to Mr. Natalenko.
+This module is based on the work of and started as a fork of [snatalenko/node-cqrs](https://github.com/snatalenko/node-cqrs), so most credits go to Mr. Natalenko.
 
 ## Abstract
 
-Aim of this fork is to adopt the CQRS approach in an "easy" and reusable manner to node applications. It should not provide a new framework or make strong assumptions on file-structure (and possibly infrastructure). That being said, I'd like to target fastify, express and alike to use this package within their ecosystem.
+Goal of this module is to adopt the CQRS/DDD + ES in an "easy" and reusable manner to node applications. It should not provide a new framework or make strong assumptions on infrastructure. That being said, the initial iteration will target frameworks like fastify, express and alike to use this package within their ecosystem.
 
-To get to production ready setup I'd like to see it working within a setup of
+To get to a production ready setup it should provied a working example within a setup of
 
 - distributed [fastify](https://www.fastify.io) service(s)
 - [mongoDB](https://www.mongodb.com) based storage
 - [nats](https://nats.io) based eventing and messaging
+
+## Assumptions
+
+* storage and message adapters SHOULD NOT handle their connections, pools, reconnections within this modules
+* storage and message adapters SHOULD reuse their clients as injected from the outside
+* storage and message adapters SHOULD be injectable (basic reference implementations inlcluded)
+* this module SHOULD NOT provide a framework,
+* this module SHOULD NOT require a specific framework,
+* this module SHOULD NOT assume any filestructure
+* this module SHOULD NOT setup a domain on it's own
+* this module SHOULD NOT depend on any given framework
 
 As this is work in progress I'll keep the original README attached below:
 
@@ -27,7 +40,7 @@ The package provides building blocks for making a CQRS-ES application. It was in
 [Documentation at node-cqrs.org](https://www.node-cqrs.org)
 
 
-Your app is expected to operate with loosely typed commands and events that match the following interface: 
+Your app is expected to operate with loosely typed commands and events that match the following interface:
 
 ```ts
 declare interface IMessage {
@@ -80,14 +93,14 @@ class UserAggregate extends AbstractAggregate {
   static get handles() {
     return ['createUser'];
   }
-  
+
   createUser(commandPayload) {
     // ...
   }
 }
 ```
 
-Then register aggregate in the [DI container](middleware/DIContainer.md). 
+Then register aggregate in the [DI container](middleware/DIContainer.md).
 All the wiring can be done manually, without a DI container (you can find it in samples), but with container it’s just easier:
 
 ```js
@@ -111,11 +124,11 @@ const payload = {
 container.commandBus.send('createUser', userAggregateId, { payload });
 ```
 
-Behind the scene, an AggregateCommandHandler will catch the command, 
-try to load an aggregate event stream and project it to aggregate state, 
+Behind the scene, an AggregateCommandHandler will catch the command,
+try to load an aggregate event stream and project it to aggregate state,
 then it will pass the command payload to the `createUser` handler we’ve defined earlier.
 
-The `createUser` implementation can look like this: 
+The `createUser` implementation can look like this:
 
 ```js
 createUser(commandPayload) {
@@ -125,7 +138,7 @@ createUser(commandPayload) {
     username,
     passwordHash: md5Hash(password)
   });
-}  
+}
 ```
 
 Once the above method is executed, the emitted userCreated event will be persisted and delivered to event handlers (sagas, projections or any other custom event receptors).
@@ -133,7 +146,7 @@ Once the above method is executed, the emitted userCreated event will be persist
 
 ### Aggregate → Event → Projection → View
 
-Now it’s time to work on a read model. We’ll need a projection that will handle our events. Projection must implement 2 methods: `subscribe(eventStore)` and `project(event)` . 
+Now it’s time to work on a read model. We’ll need a projection that will handle our events. Projection must implement 2 methods: `subscribe(eventStore)` and `project(event)` .
 To make it easier, you can extend an `AbstractProjection`:
 
 ```js
@@ -143,7 +156,7 @@ class UsersProjection extends AbstractProjection {
   static get handles() {
     return ['userCreated'];
   }
-  
+
   userCreated(event) {
     // ...
   }
@@ -176,7 +189,7 @@ class UsersProjection extends AbstractProjection {
 }
 ```
 
-Once the projection is ready, it can be registered in the DI container: 
+Once the projection is ready, it can be registered in the DI container:
 
 ```js
 container.registerProjection(UsersProjection, 'users');
