@@ -1,7 +1,5 @@
 'use strict'
 
-const assert = require('../utils/assert')
-
 module.exports = class MongoView {
   constructor({ mongo, collection }) {
     this.ObjectId = mongo.ObjectId
@@ -9,40 +7,32 @@ module.exports = class MongoView {
   }
 
   create(key, value = {}) {
-    assert(key, 'key required')
-    assert.isObject(value, 'value must be object')
     return this.collection.insertOne(Object.assign(value, { _id: key }))
   }
 
   read(key) {
-    assert(key, 'key required')
     return this.findOne({ _id: this.ObjectId(key) })
   }
 
   update(key, value = {}) {
-    assert(key, 'key required')
-    assert.isObject(value, 'value must be object')
     return this.collection.findOneAndUpdate(
       { _id: this.ObjectId(key) },
       { $set: value },
-      { returnOriginal: false, upsert: true }
+      { returnOriginal: false, upsert: false }
     )
   }
 
   delete(key) {
-    assert(key, 'key required')
     return this.collection.findOneAndDelete({
       _id: this.ObjectId(key)
     })
   }
 
   findOne(query) {
-    assert.isObject(query, 'query must be object')
     return this.collection.findOne(query)
   }
 
   list(query = {}) {
-    assert.isObject(query, 'query must be object')
     return this.collection.find(query).toArray()
   }
 
@@ -73,18 +63,11 @@ module.exports = class MongoView {
     throw new TypeError('deleteAll() is unsupported - use delete() instead')
   }
 
-  async getAll(filter) {
+  getAll(filter) {
     throw new TypeError('getAll() is unsupported - use list() instead')
   }
 
   once(eventType) {
     throw new TypeError('once() got removed')
-    // console.log('------------------> MongoView.eventType:', eventType)
-    // assert(eventType, 'eventType argument must be a non-empty String')
-    // return new Promise(resolve => {
-    //   this.emitter.once(eventType, resolve)
-    // })
-
-    // and in constructor: this.emitter = new EventEmitter()
   }
 }

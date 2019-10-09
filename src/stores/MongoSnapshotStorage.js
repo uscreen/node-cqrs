@@ -1,16 +1,8 @@
 'use strict'
 
-/**
- * In-memory storage for aggregate snapshots.
- * Storage content resets on app restart
- *
- * @class InMemorySnapshotStorage
- * @implements {IAggregateSnapshotStorage}
- */
 module.exports = class MongoSnapshotStorage {
   /**
-   * Creates an instance of InMemorySnapshotStorage
-   * @memberof InMemorySnapshotStorage
+   * Creates an instance of MongoSnapshotStorage
    */
   constructor() {
     console.log('--------------------> mongo snapshots')
@@ -19,10 +11,6 @@ module.exports = class MongoSnapshotStorage {
 
   /**
    * Get latest aggregate snapshot
-   *
-   * @param {Identifier} aggregateId
-   * @returns {Promise<IEvent>}
-   * @memberof InMemorySnapshotStorage
    */
   async getAggregateSnapshot(aggregateId) {
     return this._snapshots.get(aggregateId)
@@ -30,9 +18,6 @@ module.exports = class MongoSnapshotStorage {
 
   /**
    * Save new aggregate snapshot
-   *
-   * @param {IEvent} snapshotEvent
-   * @memberof InMemorySnapshotStorage
    */
   async saveAggregateSnapshot(snapshotEvent) {
     this._snapshots.set(snapshotEvent.aggregateId, snapshotEvent)
