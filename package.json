@@ -1,6 +1,6 @@
 {
   "name": "@uscreen.de/cqrs-kit",
-  "version": "0.0.0",
+  "version": "0.20.0",
   "description": "CQRS Starter Kit to start fast into DDD. Eventsourcing included. Some soldering required.",
   "main": "index.js",
   "repository": {
@@ -8,7 +8,9 @@
     "url": "https://github.com:uscreen/node-cqrs.git"
   },
   "author": "Marcus Spiegel <spiegel@uscreen.de>",
-  "contributors": ["@stas_natalenko"],
+  "contributors": [
+    "@stas_natalenko"
+  ],
   "license": "MIT",
   "keywords": [
     "cqrs",
@@ -37,8 +39,6 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^5.2.0",
-    "sinon": "^7.4.1",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.3.0",
     "eslint-config-standard": "^14.1.0",
@@ -48,7 +48,9 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "lint-staged": "^9.4.1",
+    "mocha": "^5.2.0",
     "prettier": "^1.18.2",
+    "sinon": "^7.4.1",
     "yorkie": "^2.0.0"
   }
 }
