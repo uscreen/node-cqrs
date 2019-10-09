@@ -22,9 +22,12 @@ function isObject(instance) {
 }
 
 function createInstance(typeOrFactory, container, additionalOptions) {
+  /* istanbul ignore next */
   if (typeof typeOrFactory !== 'function')
     throw new TypeError('typeOrFactory argument must be a Function')
+  /* istanbul ignore next */
   if (!container) throw new TypeError('container argument required')
+  /* istanbul ignore next */
   if (additionalOptions && !isObject(additionalOptions))
     throw new TypeError(
       'additionalOptions argument, when specified, must be an Object'
@@ -34,11 +37,15 @@ function createInstance(typeOrFactory, container, additionalOptions) {
     const Type = typeOrFactory
 
     const dependencies = getClassDependencyNames(Type)
-    if (!dependencies) trace(`${Type.name || 'class'} has no constructor`)
-    else if (!dependencies.length)
-      trace(`${Type.name || 'class'} has no dependencies`)
-    else trace(`${Type.name || 'class'} dependencies: ${dependencies}`)
 
+    /* istanbul ignore next */
+    if (!dependencies) trace(`${Type.name || 'class'} has no constructor`)
+    /* istanbul ignore next */ else if (!dependencies.length)
+      trace(`${Type.name || 'class'} has no dependencies`)
+    /* istanbul ignore next */ else
+      trace(`${Type.name || 'class'} dependencies: ${dependencies}`)
+
+    /* istanbul ignore next */
     const parameters = dependencies
       ? dependencies.map(dependency => {
           if (typeof dependency === 'string') {
@@ -98,12 +105,17 @@ class Container {
    * @param {(instance: object) => object} [exposeMap] Instance -> Object-to-Expose mapping
    */
   register(typeOrFactory, exposeAs, exposeMap) {
+    /* istanbul ignore next */
     if (typeof typeOrFactory !== 'function')
       throw new TypeError('typeOrFactory argument must be a Function')
+
+    /* istanbul ignore next */
     if (exposeAs && typeof exposeAs !== 'string')
       throw new TypeError(
         'exposeAs argument, when provided, must be a non-empty string'
       )
+
+    /* istanbul ignore next */
     if (exposeMap && typeof exposeMap !== 'function')
       throw new TypeError(
         'exposeMap argument, when provided, must be a function'
@@ -142,6 +154,7 @@ class Container {
    * @param  {String} exposeAs Object name to use for instance exposing on the container
    */
   registerInstance(instance, exposeAs) {
+    /* istanbul ignore next */
     if (typeof exposeAs !== 'string' || !exposeAs.length)
       throw new TypeError('exposeAs argument must be a non-empty String')
 

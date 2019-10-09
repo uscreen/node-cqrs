@@ -31,6 +31,14 @@ const createDomain = async () => {
     EventCreated({ payload }) {
       this.body = payload.body
     }
+
+    EventChanged({ payload }) {
+      this.body = payload.body
+    }
+
+    EventDeleted() {
+      this.body = ''
+    }
   }
 
   class Aggregate extends AbstractAggregate {
@@ -40,6 +48,14 @@ const createDomain = async () => {
 
     createEvent(payload) {
       this.emit('EventCreated', payload)
+    }
+
+    changeEvent(payload) {
+      this.emit('EventChanged', payload)
+    }
+
+    deleteEvent() {
+      this.emit('EventDeleted')
     }
   }
   cqrs.registerAggregate(Aggregate)
@@ -61,6 +77,14 @@ const createDomain = async () => {
 
     EventCreated({ aggregateId, payload }) {
       this.view.create(aggregateId, payload)
+    }
+
+    EventChanged({ aggregateId, payload }) {
+      this.view.update(aggregateId, payload)
+    }
+
+    EventDeleted({ aggregateId }) {
+      this.view.delete(aggregateId)
     }
   }
   cqrs.registerProjection(Views, 'Views')
