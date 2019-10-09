@@ -1,7 +1,7 @@
 {
-  "name": "@uscreen.de/node-cqrs",
+  "name": "@uscreen.de/cqrs-kit",
   "version": "0.0.0",
-  "description": "CQRS backbone for node.js",
+  "description": "CQRS Starter Kit to start fast into DDD. Eventsourcing included. Some soldering required.",
   "main": "index.js",
   "repository": {
     "type": "git",
