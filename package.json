@@ -22,7 +22,7 @@
   },
   "scripts": {
     "lint": "eslint '**/*.js' --fix",
-    "pretest": "yarn lint",
+
     "test": "tap test/**/*.test.js",
     "test:cov": "tap --coverage-report=html test/**/*.test.js",
     "test:ci": "tap --coverage-report=text-summary test/**/*.test.js"
@@ -50,6 +50,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "lint-staged": "^9.4.1",
+    "mongodb": "^3.3.2",
     "prettier": "^1.18.2",
     "tap": "^14.6.9",
     "yorkie": "^2.0.0"
