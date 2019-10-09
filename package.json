@@ -23,7 +23,9 @@
   "scripts": {
     "lint": "eslint '**/*.js' --fix",
     "pretest": "yarn lint",
-    "test": "mocha ./tests/index.js"
+    "test": "tap test/**/*.test.js",
+    "test:cov": "tap --coverage-report=html test/**/*.test.js",
+    "test:ci": "tap --coverage-report=text-summary test/**/*.test.js"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
@@ -38,7 +40,6 @@
     "debug": "^4.1.1"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.3.0",
     "eslint-config-standard": "^14.1.0",
@@ -48,9 +49,8 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "lint-staged": "^9.4.1",
-    "mocha": "^5.2.0",
     "prettier": "^1.18.2",
-    "sinon": "^7.4.1",
+    "tap": "^14.6.9",
     "yorkie": "^2.0.0"
   }
 }

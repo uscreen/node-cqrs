@@ -46,3 +46,4 @@ Thumbs.db
 *.bak
 *.swp
 .env
+/.nyc_output
