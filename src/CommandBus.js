@@ -36,6 +36,7 @@ class CommandBus {
         debug(`'${command.type}' processed`)
         return r
       },
+      /* istanbul ignore next */
       err => {
         info(`'${command.type}' processing has failed: ${err}`)
         throw err

@@ -22,7 +22,6 @@
   },
   "scripts": {
     "lint": "eslint '**/*.js' --fix",
-
     "test": "tap test/**/*.test.js",
     "test:cov": "tap --coverage-report=html test/**/*.test.js",
     "test:ci": "tap --coverage-report=text-summary test/**/*.test.js"
@@ -37,6 +36,7 @@
     ]
   },
   "dependencies": {
+    "assert-plus": "^1.0.0",
     "debug": "^4.1.1"
   },
   "devDependencies": {

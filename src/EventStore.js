@@ -1,6 +1,7 @@
 'use strict'
 
 const InMemoryBus = require('./infrastructure/InMemoryMessageBus')
+const assert = require('assert-plus')
 const debug = require('debug')('cqrs:debug:EventStore')
 const info = require('debug')('cqrs:info:EventStore')
 const EventStream = require('./EventStream')
@@ -17,36 +18,30 @@ const _defaults = {
  * @param {IEvent} event
  */
 function validateEvent(event) {
-  if (typeof event !== 'object' || !event)
-    throw new TypeError('event must be an Object')
-  if (typeof event.type !== 'string' || !event.type.length)
-    throw new TypeError('event.type must be a non-empty String')
-  if (!event.aggregateId && !event.sagaId)
-    throw new TypeError('either event.aggregateId or event.sagaId is required')
-  if (event.sagaId && typeof event.sagaVersion === 'undefined')
-    throw new TypeError(
-      'event.sagaVersion is required, when event.sagaId is defined'
-    )
+  assert.object(event, 'event')
+  assert.string(event.type, 'event.type')
+
+  assert.ok(
+    event.aggregateId || event.sagaId,
+    'either event.aggregateId or event.sagaId is required'
+  )
+
+  assert.ok(
+    !(event.sagaId && typeof event.sagaVersion === 'undefined'),
+    'event.sagaVersion is required, when event.sagaId is defined'
+  )
 }
 
 /**
- * Ensure provided eventStorage matches the expected format
- * @param {IEventStorage} storage
+ * Ensure provided eventStorage matches expected interface
  */
 function validateEventStorage(storage) {
-  if (!storage) throw new TypeError('storage argument required')
-  if (typeof storage !== 'object')
-    throw new TypeError('storage argument must be an Object')
-  if (typeof storage.commitEvents !== 'function')
-    throw new TypeError('storage.commitEvents must be a Function')
-  if (typeof storage.getEvents !== 'function')
-    throw new TypeError('storage.getEvents must be a Function')
-  if (typeof storage.getAggregateEvents !== 'function')
-    throw new TypeError('storage.getAggregateEvents must be a Function')
-  if (typeof storage.getSagaEvents !== 'function')
-    throw new TypeError('storage.getSagaEvents must be a Function')
-  if (typeof storage.getNewId !== 'function')
-    throw new TypeError('storage.getNewId must be a Function')
+  assert.object(storage, 'storage')
+  assert.func(storage.commitEvents, 'storage.commitEvents')
+  assert.func(storage.getEvents, 'storage.getEvents')
+  assert.func(storage.getAggregateEvents, 'storage.getAggregateEvents')
+  assert.func(storage.getSagaEvents, 'storage.getSagaEvents')
+  assert.func(storage.getNewId, 'storage.getNewId')
 }
 
 /**
