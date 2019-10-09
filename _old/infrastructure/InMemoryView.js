@@ -1,7 +1,6 @@
 'use strict'
 
 const EventEmitter = require('events')
-const { sizeOf } = require('../utils')
 
 /**
  * Update given value with an update Cb and return updated value.
@@ -260,8 +259,6 @@ module.exports = class InMemoryView {
    * @returns {string}
    */
   toString() {
-    return `${this.size} record${this.size !== 1 ? 's' : ''}, ${sizeOf(
-      this._map
-    )} bytes`
+    return `${this.size} record${this.size !== 1 ? 's' : ''}`
   }
 }

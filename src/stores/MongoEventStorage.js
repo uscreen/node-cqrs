@@ -37,15 +37,6 @@ module.exports = class MongoEventStorage {
         }
       )
       .toArray()
-
-    // const events = await this._events
-    // if (snapshot)
-    //   return events.filter(
-    //     e =>
-    //       e.aggregateId == aggregateId &&
-    //       e.aggregateVersion > snapshot.aggregateVersion
-    //   )
-    // return events.filter(e => e.aggregateId == aggregateId)
   }
 
   getSagaEvents(sagaId, { beforeEvent }) {

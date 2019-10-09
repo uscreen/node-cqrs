@@ -2,10 +2,5 @@
 
 /**
  * Get instance class name
- *
- * @param {object} instance
- * @returns {string}
  */
-module.exports = function getClassName(instance) {
-  return Object.getPrototypeOf(instance).constructor.name
-}
+module.exports = instance => Object.getPrototypeOf(instance).constructor.name

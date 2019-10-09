@@ -1,5 +1,7 @@
 'use strict'
 
+const assert = require('assert-plus')
+
 const getHandler = require('./getHandler')
 
 /**
@@ -8,20 +10,22 @@ const getHandler = require('./getHandler')
  * @param {object} instance
  */
 function validateHandlers(instance, handlesFieldName = 'handles') {
-  if (!instance) throw new TypeError('instance argument required')
+  assert.ok(instance, 'instance')
 
   const messageTypes = Object.getPrototypeOf(instance).constructor[
     handlesFieldName
   ]
   if (messageTypes === undefined) return
-  if (!Array.isArray(messageTypes))
-    throw new TypeError(
-      'handles getter, when defined, must return an Array of Strings'
-    )
+  assert.array(
+    messageTypes,
+    'handles getter, when defined, must return an Array of Strings'
+  )
 
   for (const type of messageTypes) {
-    if (!getHandler(instance, type))
-      throw new Error(`'${type}' handler is not defined or not a function`)
+    assert.func(
+      getHandler(instance, type),
+      `'${type}' handler is not defined or not a function`
+    )
   }
 }
 

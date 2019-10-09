@@ -4,7 +4,6 @@ const assert = require('assert-plus')
 const info = require('debug')('cqrs:info')
 
 const subscribe = require('./subscribe')
-const InMemoryView = require('./infrastructure/InMemoryView')
 const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
 const { validateHandlers, getHandler, getClassName } = require('./utils')
 
@@ -30,7 +29,7 @@ class AbstractProjection {
    * View associated with projection
    */
   get view() {
-    return this._view || (this._view = new InMemoryView())
+    return this._view || (this._view = new Map())
   }
 
   /**
@@ -38,7 +37,7 @@ class AbstractProjection {
    * Override for custom behavior.
    */
   get shouldRestoreView() {
-    return this.view instanceof Map || this.view instanceof InMemoryView
+    return this.view instanceof Map
   }
 
   /**

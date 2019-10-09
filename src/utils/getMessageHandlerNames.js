@@ -1,8 +1,13 @@
 'use strict'
 
+const assert = require('assert-plus')
+
 const KNOWN_METHOD_NAMES = new Set(['subscribe'])
 
-function getInheritedPropertyNames(prototype) {
+/**
+ * getInheritedPropertyNames
+ */
+const getInheritedPropertyNames = prototype => {
   const parentPrototype = prototype && Object.getPrototypeOf(prototype)
   if (!parentPrototype) return []
 
@@ -15,23 +20,18 @@ function getInheritedPropertyNames(prototype) {
 /**
  * Get message handler names from a command/event handler class.
  * Assumes all private method names start from underscore ("_").
- *
- * @param {any} observerInstanceOrClass Command or event handler class
- * @returns {string[]}
  */
-function getMessageHandlerNames(observerInstanceOrClass) {
-  if (!observerInstanceOrClass)
-    throw new TypeError('observerInstanceOrClass argument required')
+const getMessageHandlerNames = observerInstanceOrClass => {
+  assert.ok(observerInstanceOrClass, 'observerInstanceOrClass')
 
   const prototype =
     typeof observerInstanceOrClass === 'function'
       ? observerInstanceOrClass.prototype
       : Object.getPrototypeOf(observerInstanceOrClass)
 
-  if (!prototype) throw new TypeError('prototype cannot be resolved')
+  assert.ok(prototype, 'prototype  cannot be resolved')
 
   const inheritedProperties = new Set(getInheritedPropertyNames(prototype))
-
   const propDescriptors = Object.getOwnPropertyDescriptors(prototype)
   const propNames = Object.keys(propDescriptors)
 

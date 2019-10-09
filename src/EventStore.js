@@ -1,6 +1,6 @@
 'use strict'
 
-const InMemoryBus = require('./infrastructure/InMemoryMessageBus')
+const InMemoryBus = require('./buses/InMemoryMessageBus')
 const assert = require('assert-plus')
 const debug = require('debug')('cqrs:debug:EventStore')
 const info = require('debug')('cqrs:info:EventStore')
