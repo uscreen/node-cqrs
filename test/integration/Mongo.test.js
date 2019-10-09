@@ -1,81 +1,9 @@
 const tap = require('tap')
-const { MongoClient, ObjectId } = require('mongodb')
-const {
-  Container,
-  AbstractAggregate,
-  AbstractProjection,
-  MongoView,
-  MongoEventStorage
-} = require('../../index')
-const { config, wait } = require('../helper')
+const { wait } = require('../helper')
+const { createDomain, closeDb } = require('../domain')
 
 tap.test('MongoEventStorage', async t => {
-  const client = await MongoClient.connect(config.mongoUri)
-  const db = client.db()
-  const collection = db.collection('insert-test')
-  const events = db.collection('events-test-1')
-  const views = db.collection('views-test-1')
-
-  try {
-    await collection.drop()
-    await events.drop()
-    await views.drop()
-  } catch (_) {}
-
-  const result = await collection.insertOne({ a: 1 })
-  t.same(1, result.insertedCount)
-
-  const cqrs = new Container()
-
-  cqrs.register(MongoEventStorage, 'storage')
-  cqrs.registerInstance(events, 'EventsCollection')
-  cqrs.registerInstance(ObjectId, 'ObjectId')
-
-  class State {
-    EventCreated({ payload }) {
-      this.body = payload.body
-    }
-  }
-
-  class Aggregate extends AbstractAggregate {
-    get state() {
-      return this._state || (this._state = new State())
-    }
-
-    createEvent(payload) {
-      this.emit('EventCreated', payload)
-    }
-  }
-  cqrs.registerAggregate(Aggregate)
-
-  class Views extends AbstractProjection {
-    get view() {
-      return (
-        this._view ||
-        (this._view = new MongoView({
-          collection: views,
-          ObjectId
-        }))
-      )
-    }
-
-    get shouldRestoreView() {
-      return false
-    }
-
-    EventCreated({ aggregateId, payload }) {
-      this.view.create(aggregateId, payload)
-    }
-  }
-  cqrs.registerProjection(Views, 'Views')
-
-  /**
-   * create instances for DI
-   * @todo find out about Unexposed vs. All
-   */
-  cqrs.createUnexposedInstances()
-  cqrs.createAllInstances()
-
+  const { cqrs, eventsCollection, viewsCollection } = await createDomain()
   let aggregateId
 
   /**
@@ -87,7 +15,7 @@ tap.test('MongoEventStorage', async t => {
     const context = { reqId: 1234 }
     await cqrs.commandBus.send('createEvent', id, { payload, context })
 
-    const found = await events.findOne({ aggregateId: id })
+    const found = await eventsCollection.findOne({ aggregateId: id })
     t.same(id, found.aggregateId, 'event should have been stored with given id')
     t.same(0, found.aggregateVersion, 'version should be 0')
     t.same('EventCreated', found.type, 'type should be "EventCreated"')
@@ -116,10 +44,13 @@ tap.test('MongoEventStorage', async t => {
         'view should have been stored with given id'
       )
       t.same('Lorem Ipsum', view.body, 'body should match payload')
+
+      const found = await viewsCollection.findOne({ _id: aggregateId })
+      t.same(view, found, 'view should be the same as read raw from mongo')
       t.end()
     }
   )
 
-  client.close()
+  closeDb()
   t.end()
 })
