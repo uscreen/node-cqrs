@@ -1,13 +1,12 @@
 'use strict'
 
+const assert = require('assert-plus')
+
 const { validateHandlers, getHandler, getClassName } = require('./utils')
 const EventStream = require('./EventStream')
 
 /**
  * Deep-clone simple JS object
- * @template T
- * @param {T} obj
- * @returns {T}
  */
 const clone = obj => JSON.parse(JSON.stringify(obj))
 
@@ -20,19 +19,10 @@ const _snapshotVersion = Symbol('snapshotVersion')
 
 /**
  * Base class for Aggregate definition
- *
- * @class AbstractAggregate
- * @implements {IAggregate}
  */
 class AbstractAggregate {
   /**
    * List of commands handled by Aggregate. Can be overridden in aggregate implementation
-   *
-   * @type {string[]}
-   * @readonly
-   * @static
-   * @example
-   * 	return ['createUser', 'changePassword'];
    */
   static get handles() {
     return undefined
@@ -40,9 +30,6 @@ class AbstractAggregate {
 
   /**
    * Aggregate ID
-   *
-   * @type {string|number}
-   * @readonly
    */
   get id() {
     return this[_id]
@@ -50,9 +37,6 @@ class AbstractAggregate {
 
   /**
    * Aggregate Version
-   *
-   * @type {number}
-   * @readonly
    */
   get version() {
     return this[_version]
@@ -60,9 +44,6 @@ class AbstractAggregate {
 
   /**
    * Aggregate Snapshot Version
-   *
-   * @type {number|undefined}
-   * @readonly
    */
   get snapshotVersion() {
     return this[_snapshotVersion]
@@ -70,9 +51,6 @@ class AbstractAggregate {
 
   /**
    * Events emitted by Aggregate command handlers
-   *
-   * @type {IEventStream}
-   * @readonly
    */
   get changes() {
     return new EventStream(this[_changes])
@@ -80,30 +58,19 @@ class AbstractAggregate {
 
   /**
    * Override to define, whether an aggregate state snapshot should be taken
-   *
-   * @type {boolean}
-   * @readonly
-   * @example
-   * 	// create snapshot every 50 events
-   * 	return this.version % 50 === 0;
    */
   get shouldTakeSnapshot() {
-    // eslint-disable-line class-methods-use-this
     return false
   }
 
   /**
    * Creates an instance of AbstractAggregate.
-   *
-   * @param {TAggregateParams} options
    */
   constructor(options) {
     const { id, state, events } = options
-    if (!id) throw new TypeError('id argument required')
-    if (state && typeof state !== 'object')
-      throw new TypeError('state argument, when provided, must be an Object')
-    if (events && !Array.isArray(events))
-      throw new TypeError('events argument, when provided, must be an Array')
+    assert.ok(id, 'id')
+    assert.optionalObject(state, 'state')
+    assert.optionalArray(events, 'events')
 
     this[_id] = id
     this[_changes] = []
@@ -113,26 +80,18 @@ class AbstractAggregate {
     validateHandlers(this)
 
     if (state) this.state = state
-
     if (events) events.forEach(event => this.mutate(event))
   }
 
   /**
    * Pass command to command handler
-   *
-   * @param {ICommand} command
-   * @returns {any}
    */
   handle(command) {
-    if (!command) throw new TypeError('command argument required')
-    if (!command.type) throw new TypeError('command.type argument required')
+    assert.ok(command, 'command')
+    assert.ok(command.type, 'command.type')
 
     const handler = getHandler(this, command.type)
-    if (!handler)
-      throw new Error(
-        `'${command.type}' handler is not defined or not a function`
-      )
-
+    assert.func(handler, `'${command.type}' handler`)
     this.command = command
 
     return handler.call(this, command.payload, command.context)
@@ -140,9 +99,6 @@ class AbstractAggregate {
 
   /**
    * Mutate aggregate state and increment aggregate version
-   *
-   * @protected
-   * @param {IEvent} event
    */
   mutate(event) {
     if ('aggregateVersion' in event) this[_version] = event.aggregateVersion
@@ -160,29 +116,17 @@ class AbstractAggregate {
 
   /**
    * Format and register aggregate event and mutate aggregate state
-   *
-   * @protected
-   * @param {string} type - event type
-   * @param {object} [payload] - event data
    */
   emit(type, payload) {
-    if (typeof type !== 'string' || !type.length)
-      throw new TypeError('type argument must be a non-empty string')
-
+    assert.string(type, 'type')
     const event = this.makeEvent(type, payload, this.command)
-
     this.emitRaw(event)
   }
 
   /**
-   *
-   * @param {string} type
-   * @param {any} [payload]
-   * @param {ICommand} [sourceCommand]
-   * @returns {IEvent}
+   * (Re-)format event
    */
   makeEvent(type, payload, sourceCommand) {
-    /** @type {IEvent} */
     const event = {
       aggregateId: this.id,
       aggregateVersion: this.version,
@@ -191,7 +135,6 @@ class AbstractAggregate {
     }
 
     if (sourceCommand) {
-      // augment event with command context
       const { context, sagaId, sagaVersion } = sourceCommand
       if (context !== undefined) event.context = context
       if (sagaId !== undefined) event.sagaId = sagaId
@@ -203,21 +146,14 @@ class AbstractAggregate {
 
   /**
    * Register aggregate event and mutate aggregate state
-   *
-   * @protected
-   * @param {IEvent} event
    */
   emitRaw(event) {
-    if (!event) throw new TypeError('event argument required')
-    if (!event.aggregateId)
-      throw new TypeError('event.aggregateId argument required')
-    if (typeof event.aggregateVersion !== 'number')
-      throw new TypeError('event.aggregateVersion argument must be a Number')
-    if (typeof event.type !== 'string' || !event.type.length)
-      throw new TypeError('event.type argument must be a non-empty String')
+    assert.ok(event, 'event')
+    assert.ok(event.aggregateId, 'event.aggregateId')
+    assert.number(event.aggregateVersion, 'event.aggregateVersion')
+    assert.string(event.type, 'event.type')
 
     this.mutate(event)
-
     this[_changes].push(event)
   }
 
@@ -230,38 +166,30 @@ class AbstractAggregate {
 
   /**
    * Create an aggregate state snapshot
-   *
-   * @protected
-   * @returns {object}
    */
   makeSnapshot() {
-    if (!this.state)
-      throw new Error(
-        'state property is empty, either define state or override makeSnapshot method'
-      )
-
+    assert.ok(
+      this.state,
+      'state property is empty, either define state or override makeSnapshot method'
+    )
     return clone(this.state)
   }
 
   /**
    * Restore aggregate state from a snapshot
-   *
-   * @protected
-   * @param {IEvent} snapshotEvent
    */
   restoreSnapshot(snapshotEvent) {
-    if (!snapshotEvent) throw new TypeError('snapshotEvent argument required')
-    if (!snapshotEvent.type)
-      throw new TypeError('snapshotEvent.type argument required')
-    if (!snapshotEvent.payload)
-      throw new TypeError('snapshotEvent.payload argument required')
-
-    if (snapshotEvent.type !== SNAPSHOT_EVENT_TYPE)
-      throw new Error(`${SNAPSHOT_EVENT_TYPE} event type expected`)
-    if (!this.state)
-      throw new Error(
-        'state property is empty, either defined state or override restoreSnapshot method'
-      )
+    assert.ok(snapshotEvent, 'snapshotEvent')
+    assert.ok(snapshotEvent.type, 'snapshotEvent.type')
+    assert.ok(snapshotEvent.payload, 'snapshotEvent.payload')
+    assert.ok(
+      snapshotEvent.type === SNAPSHOT_EVENT_TYPE,
+      `${SNAPSHOT_EVENT_TYPE} event type expected`
+    )
+    assert.ok(
+      this.state,
+      'state property is empty, either define state or override makeSnapshot method'
+    )
 
     Object.assign(this.state, clone(snapshotEvent.payload))
   }
