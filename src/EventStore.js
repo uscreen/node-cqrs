@@ -56,19 +56,17 @@ function isEmitter(storage) {
 
 /**
  * Ensure snapshotStorage matches the expected format
- * @param {IAggregateSnapshotStorage} snapshotStorage
  */
 function validateSnapshotStorage(snapshotStorage) {
-  if (typeof snapshotStorage !== 'object' || !snapshotStorage)
-    throw new TypeError('snapshotStorage argument must be an Object')
-  if (typeof snapshotStorage.getAggregateSnapshot !== 'function')
-    throw new TypeError(
-      'snapshotStorage.getAggregateSnapshot argument must be a Function'
-    )
-  if (typeof snapshotStorage.saveAggregateSnapshot !== 'function')
-    throw new TypeError(
-      'snapshotStorage.saveAggregateSnapshot argument must be a Function'
-    )
+  assert.object(snapshotStorage, 'snapshotStorage')
+  assert.func(
+    snapshotStorage.getAggregateSnapshot,
+    'snapshotStorage.getAggregateSnapshot'
+  )
+  assert.func(
+    snapshotStorage.saveAggregateSnapshot,
+    'snapshotStorage.saveAggregateSnapshot'
+  )
 }
 
 /**

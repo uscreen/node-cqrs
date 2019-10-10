@@ -4,22 +4,26 @@ module.exports = class MongoSnapshotStorage {
   /**
    * Creates an instance of MongoSnapshotStorage
    */
-  constructor() {
-    console.log('--------------------> mongo snapshots')
-    this._snapshots = new Map()
+  constructor({ ObjectId, SnapshotsCollection }) {
+    this.ObjectId = ObjectId
+    this.collection = SnapshotsCollection
   }
 
   /**
    * Get latest aggregate snapshot
    */
   async getAggregateSnapshot(aggregateId) {
-    return this._snapshots.get(aggregateId)
+    return this.collection.findOne({ _id: this.ObjectId(aggregateId) })
   }
 
   /**
    * Save new aggregate snapshot
    */
   async saveAggregateSnapshot(snapshotEvent) {
-    this._snapshots.set(snapshotEvent.aggregateId, snapshotEvent)
+    await this.collection.findOneAndUpdate(
+      { _id: this.ObjectId(snapshotEvent.aggregateId) },
+      { $set: snapshotEvent },
+      { returnOriginal: false, upsert: true }
+    )
   }
 }

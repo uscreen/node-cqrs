@@ -83,6 +83,8 @@ class AggregateCommandHandler {
 
     let events = aggregate.changes
     info('%s "%s" command processed, %s produced', aggregate, cmd.type, events)
+
+    /* istanbul ignore next */
     if (!events.length) return []
 
     if (aggregate.shouldTakeSnapshot && this._eventStore.snapshotsSupported) {

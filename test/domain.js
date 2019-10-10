@@ -4,31 +4,36 @@ const {
   AbstractAggregate,
   AbstractProjection,
   MongoView,
-  MongoEventStorage
+  MongoEventStorage,
+  MongoSnapshotStorage
 } = require('../index')
-const { config } = require('./helper')
+const { config, wait } = require('./helper')
 
-const createDomain = async (t, ns = '') => {
+const createDomain = async (t, ns = '', { skipSnapshot } = {}) => {
   const client = await MongoClient.connect(config.mongoUri)
   const db = client.db()
   const eventsCollection = db.collection(`${ns}events-test-1`)
+  const snapshotsCollection = db.collection(`${ns}snapshots-test-1`)
   const viewsCollection = db.collection(`${ns}views-test-1`)
 
   try {
     await eventsCollection.drop()
+    await snapshotsCollection.drop()
     await viewsCollection.drop()
   } catch (_) {}
 
   t.teardown(async () => {
-    console.log('teardown')
-    // await wait(100)
     await client.close()
   })
 
   const cqrs = new Container()
 
   cqrs.register(MongoEventStorage, 'storage')
+  if (!skipSnapshot) {
+    cqrs.register(MongoSnapshotStorage, 'snapshotStorage')
+  }
   cqrs.registerInstance(eventsCollection, 'EventsCollection')
+  cqrs.registerInstance(snapshotsCollection, 'SnapshotsCollection')
   cqrs.registerInstance(ObjectId, 'ObjectId')
 
   class State {
@@ -51,7 +56,6 @@ const createDomain = async (t, ns = '') => {
     }
 
     get shouldTakeSnapshot() {
-      // console.log('shouldTakeSnapshot', this.version, this.snapshotVersion)
       return this.version - this.snapshotVersion > 10
     }
 
@@ -63,7 +67,8 @@ const createDomain = async (t, ns = '') => {
       this.emit('EventChanged', payload)
     }
 
-    deleteEvent() {
+    async deleteEvent() {
+      await wait(10)
       this.emit('EventDeleted')
     }
   }
@@ -105,7 +110,7 @@ const createDomain = async (t, ns = '') => {
   cqrs.createUnexposedInstances()
   cqrs.createAllInstances()
 
-  return { cqrs, eventsCollection, viewsCollection }
+  return { cqrs, eventsCollection, viewsCollection, snapshotsCollection }
 }
 
 module.exports = {

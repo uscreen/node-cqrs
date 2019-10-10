@@ -26,16 +26,21 @@ module.exports = class MongoEventStorage {
   }
 
   getAggregateEvents(aggregateId, { snapshot } = {}) {
+    const query = {
+      aggregateId: this.ObjectId(aggregateId)
+    }
+
+    if (snapshot && snapshot.aggregateVersion) {
+      query.aggregateVersion = {
+        $gt: snapshot.aggregateVersion
+      }
+    }
+
     return this.collection
-      .find(
-        {
-          aggregateId: this.ObjectId(aggregateId)
-        },
-        {
-          projection: { _id: false },
-          sort: 'aggregateVersion'
-        }
-      )
+      .find(query, {
+        projection: { _id: false },
+        sort: 'aggregateVersion'
+      })
       .toArray()
   }
 
