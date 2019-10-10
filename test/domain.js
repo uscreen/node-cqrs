@@ -8,18 +8,22 @@ const {
 } = require('../index')
 const { config } = require('./helper')
 
-let client
-
-const createDomain = async () => {
-  client = await MongoClient.connect(config.mongoUri)
+const createDomain = async (t, ns = '') => {
+  const client = await MongoClient.connect(config.mongoUri)
   const db = client.db()
-  const eventsCollection = db.collection('events-test-1')
-  const viewsCollection = db.collection('views-test-1')
+  const eventsCollection = db.collection(`${ns}events-test-1`)
+  const viewsCollection = db.collection(`${ns}views-test-1`)
 
   try {
     await eventsCollection.drop()
     await viewsCollection.drop()
   } catch (_) {}
+
+  t.teardown(async () => {
+    console.log('teardown')
+    // await wait(100)
+    await client.close()
+  })
 
   const cqrs = new Container()
 
@@ -44,6 +48,11 @@ const createDomain = async () => {
   class Aggregate extends AbstractAggregate {
     get state() {
       return this._state || (this._state = new State())
+    }
+
+    get shouldTakeSnapshot() {
+      // console.log('shouldTakeSnapshot', this.version, this.snapshotVersion)
+      return this.version - this.snapshotVersion > 10
     }
 
     createEvent(payload) {
@@ -99,11 +108,6 @@ const createDomain = async () => {
   return { cqrs, eventsCollection, viewsCollection }
 }
 
-const closeDb = () => {
-  client.close()
-}
-
 module.exports = {
-  createDomain,
-  closeDb
+  createDomain
 }

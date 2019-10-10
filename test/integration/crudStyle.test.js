@@ -1,9 +1,9 @@
 const tap = require('tap')
 const { wait } = require('../helper')
-const { createDomain, closeDb } = require('../domain')
+const { createDomain } = require('../domain')
 
-tap.test('MongoEventStorage', async t => {
-  const { cqrs, eventsCollection, viewsCollection } = await createDomain()
+tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
+  const { cqrs, eventsCollection, viewsCollection } = await createDomain(t)
   let aggregateId
 
   /**
@@ -163,6 +163,5 @@ tap.test('MongoEventStorage', async t => {
     }
   )
 
-  closeDb()
   t.end()
 })
