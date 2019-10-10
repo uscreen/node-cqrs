@@ -99,19 +99,10 @@ function setupOneTimeEmitterSubscription(
   filter,
   handler
 ) {
-  if (typeof emitter !== 'object' || !emitter)
-    throw new TypeError('emitter argument must be an Object')
-  if (
-    !Array.isArray(messageTypes) ||
-    messageTypes.some(m => !m || typeof m !== 'string')
-  )
-    throw new TypeError(
-      'messageTypes argument must be an Array of non-empty Strings'
-    )
-  if (handler && typeof handler !== 'function')
-    throw new TypeError('handler argument, when specified, must be a Function')
-  if (filter && typeof filter !== 'function')
-    throw new TypeError('filter argument, when specified, must be a Function')
+  assert.object(emitter, 'emitter')
+  assert.arrayOfString(messageTypes, 'messageTypes')
+  assert.optionalFunc(handler, 'handler')
+  assert.optionalFunc(filter, 'filter')
 
   return new Promise(resolve => {
     // handler will be invoked only once,
@@ -124,8 +115,9 @@ function setupOneTimeEmitterSubscription(
       if (handled) return
       handled = true
 
-      for (const messageType of messageTypes)
+      for (const messageType of messageTypes) {
         emitter.off(messageType, filteredHandler)
+      }
 
       debug(
         "'%s' received, one-time subscription to '%s' removed",
@@ -138,8 +130,9 @@ function setupOneTimeEmitterSubscription(
       resolve(event)
     }
 
-    for (const messageType of messageTypes)
+    for (const messageType of messageTypes) {
       emitter.on(messageType, filteredHandler)
+    }
 
     debug(
       "set up one-time %s to '%s'",
@@ -201,14 +194,18 @@ class EventStore {
    */
   constructor(options) {
     validateEventStorage(options.storage)
-    if (options.snapshotStorage)
+    if (options.snapshotStorage) {
       validateSnapshotStorage(options.snapshotStorage)
-    if (options.messageBus) validateMessageBus(options.messageBus)
+    }
+    if (options.messageBus) {
+      validateMessageBus(options.messageBus)
+    }
     if (
       options.eventValidator !== undefined &&
       typeof options.eventValidator !== 'function'
-    )
+    ) {
       throw new TypeError('eventValidator, when provided, must be a function')
+    }
 
     this._config = Object.freeze(
       Object.assign({}, EventStore.defaults, options.eventStoreConfig)
@@ -270,7 +267,7 @@ class EventStore {
    * @returns {Promise<IEventStream>}
    */
   async getAggregateEvents(aggregateId) {
-    if (!aggregateId) throw new TypeError('aggregateId argument required')
+    assert.ok(aggregateId, 'aggregateId')
 
     debug(`retrieving event stream for aggregate ${aggregateId}...`)
 
@@ -338,8 +335,7 @@ class EventStore {
    * @returns {Promise<IEventStream>} - resolves to signed and committed events
    */
   async commit(events) {
-    if (!Array.isArray(events))
-      throw new TypeError('events argument must be an Array')
+    assert.array(events, 'events')
 
     const containsSagaStarters =
       this._sagaStarters.length &&
@@ -397,8 +393,7 @@ class EventStore {
    * @returns {Promise<IEventStream>} Event stream without snapshot events
    */
   async save(events) {
-    if (!Array.isArray(events))
-      throw new TypeError('events argument must be an Array')
+    assert.array(events, 'events')
 
     const snapshotEvents = events.filter(e => e.type === SNAPSHOT_EVENT_TYPE)
     if (snapshotEvents.length > 1)
@@ -456,20 +451,10 @@ class EventStore {
 
   /**
    * Setup a listener for a specific event type
-   *
-   * @param {string} messageType
-   * @param {function(IEvent): any} handler
    */
   on(messageType, handler) {
-    if (typeof messageType !== 'string' || !messageType.length)
-      throw new TypeError('messageType argument must be a non-empty String')
-    if (typeof handler !== 'function')
-      throw new TypeError('handler argument must be a Function')
-    if (arguments.length !== 2)
-      throw new TypeError(
-        `2 arguments are expected, but ${arguments.length} received`
-      )
-
+    assert.string(messageType, 'messageType')
+    assert.func(handler, 'handler')
     this._eventEmitter.on(messageType, handler)
   }
 
