@@ -15,11 +15,17 @@ const createDomain = async (t, ns = '', { skipSnapshot } = {}) => {
   const eventsCollection = db.collection(`${ns}events-test-1`)
   const snapshotsCollection = db.collection(`${ns}snapshots-test-1`)
   const viewsCollection = db.collection(`${ns}views-test-1`)
+  const anotherViewsCollection = db.collection(`${ns}another-views-test-1`)
+  const ThirdProjectionCollection = db.collection(
+    `${ns}ThirdProjection-views-test-1`
+  )
 
   try {
     await eventsCollection.drop()
     await snapshotsCollection.drop()
     await viewsCollection.drop()
+    await anotherViewsCollection.drop()
+    await ThirdProjectionCollection.drop()
   } catch (_) {}
 
   t.teardown(async () => {
@@ -102,6 +108,70 @@ const createDomain = async (t, ns = '', { skipSnapshot } = {}) => {
     }
   }
   cqrs.registerProjection(Views, 'Views')
+
+  class AnotherViews extends AbstractProjection {
+    get view() {
+      return (
+        this._view ||
+        (this._view = new MongoView({
+          collection: anotherViewsCollection,
+          ObjectId
+        }))
+      )
+    }
+
+    static get handles() {
+      return ['EventCreated', 'EventChanged']
+    }
+
+    get shouldRestoreView() {
+      return false
+    }
+
+    EventCreated({ aggregateId, payload }) {
+      this.view.create(aggregateId, payload)
+    }
+
+    /**
+     * underscore prefixed should handled too
+     */
+    _EventChanged({ aggregateId, payload }) {
+      this.view.update(aggregateId, payload)
+    }
+
+    /**
+     * unlisteted handles should get used
+     */
+    EventDeleted({ aggregateId }) {
+      this.view.delete(aggregateId)
+    }
+  }
+  cqrs.registerProjection(AnotherViews, 'AnotherViews')
+
+  class ThirdProjection extends AbstractProjection {
+    get view() {
+      return (
+        this._view ||
+        (this._view = new MongoView({
+          collection: ThirdProjectionCollection,
+          ObjectId
+        }))
+      )
+    }
+
+    get handles() {
+      return ['EventCreated']
+    }
+
+    get shouldRestoreView() {
+      return false
+    }
+
+    EventCreated({ aggregateId, payload }) {
+      this.view.create(aggregateId, Object.assign({ name: this.name }, payload))
+    }
+  }
+  cqrs.registerProjection(ThirdProjection, 'ThirdProjection')
 
   /**
    * create instances for DI

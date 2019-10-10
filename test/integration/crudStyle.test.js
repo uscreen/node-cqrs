@@ -159,6 +159,64 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
 
       const found = await viewsCollection.findOne({ _id: aggregateId })
       t.same(null, found, 'no view exists in collection')
+
+      t.end()
+    }
+  )
+
+  /**
+   * how about anotherView
+   */
+  await t.test(
+    'read anotherView as a projection with cqrs.views.read()',
+    async t => {
+      const anotherView = await cqrs.AnotherViews.read(aggregateId)
+      t.ok(
+        anotherView,
+        'anotherView should still exist, as it is not subscribed to delete event'
+      )
+      t.same(
+        aggregateId,
+        anotherView._id,
+        'anotherView _id should match aggregateId'
+      )
+      t.same(
+        'Baba Luga',
+        anotherView.body,
+        'anotherView body should match payload'
+      )
+
+      t.end()
+    }
+  )
+
+  /**
+   * how about a 3rd view
+   */
+  await t.test(
+    'read ThirdProjection as a projection with cqrs.views.read() should still be of initial state',
+    async t => {
+      const ThirdProjection = await cqrs.ThirdProjection.read(aggregateId)
+      t.ok(
+        ThirdProjection,
+        'ThirdProjection should still exist, as it is not subscribed to delete event'
+      )
+      t.same(
+        aggregateId,
+        ThirdProjection._id,
+        'ThirdProjection _id should match aggregateId'
+      )
+      t.same(
+        'Lorem Ipsum',
+        ThirdProjection.body,
+        'ThirdProjection body should match payload'
+      )
+      t.same(
+        'ThirdProjection',
+        ThirdProjection.name,
+        'ThirdProjection name should be "ThirdProjection"'
+      )
+
       t.end()
     }
   )

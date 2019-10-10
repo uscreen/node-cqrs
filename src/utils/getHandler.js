@@ -15,12 +15,14 @@ module.exports = function getHandler(context, messageType) {
   }
 
   const privateHandlerName = `_${messageType}`
+
+  /* istanbul ignore else */
   if (
     privateHandlerName in context &&
     typeof context[privateHandlerName] === 'function'
   ) {
     return context[privateHandlerName]
+  } else {
+    return null
   }
-
-  return null
 }

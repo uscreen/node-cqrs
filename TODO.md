@@ -5,3 +5,5 @@
 - [ ] remove unused code
 - [ ] shouldn't we keep multiple snapshot versions?
 - [ ] check to also emit state to views
+- [ ] make EventStream a real stream
+- [ ] clearly document oin variants of declaring handles!

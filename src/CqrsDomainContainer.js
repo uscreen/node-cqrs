@@ -1,5 +1,7 @@
 'use strict'
 
+const assert = require('assert-plus')
+
 const Container = require('./di/Container')
 const SagaEventHandler = require('./SagaEventHandler')
 const AggregateCommandHandler = require('./AggregateCommandHandler')
@@ -16,10 +18,6 @@ function isClass(func) {
 
 /**
  * Dependency injection container with CQRS-specific methods
- *
- * @class CqrsDomainContainer
- * @extends {Container}
- * @implements {ICqrsDomainContainerBuilder & IContainer}
  */
 class CqrsDomainContainer extends Container {
   /**
@@ -33,8 +31,6 @@ class CqrsDomainContainer extends Container {
 
   /**
    * Register command handler, which will be subscribed to commandBus upon instance creation
-   *
-   * @param {function} typeOrFactory
    */
   registerCommandHandler(typeOrFactory) {
     super.register(container => {
@@ -46,8 +42,6 @@ class CqrsDomainContainer extends Container {
 
   /**
    * Register event receptor, which will be subscribed to eventStore upon instance creation
-   *
-   * @param {function} typeOrFactory
    */
   registerEventReceptor(typeOrFactory) {
     super.register(container => {
@@ -60,16 +54,12 @@ class CqrsDomainContainer extends Container {
   /**
    * Register projection, which will expose view and will be subscribed
    * to eventStore and will restore its state upon instance creation
-   *
-   * @param {function} ProjectionType
-   * @param {string} exposedViewName
    */
   registerProjection(ProjectionType, exposedViewName) {
-    if (!isClass(ProjectionType))
-      throw new TypeError(
-        'ProjectionType argument must be a constructor function'
-      )
-
+    assert.ok(
+      isClass(ProjectionType),
+      'ProjectionType argument must be a constructor function'
+    )
     super.register(
       container => {
         const projection = container.createInstance(ProjectionType)
@@ -83,15 +73,12 @@ class CqrsDomainContainer extends Container {
 
   /**
    * Register aggregate type in the container
-   *
-   * @param {IAggregateConstructor} AggregateType
    */
   registerAggregate(AggregateType) {
-    if (!isClass(AggregateType))
-      throw new TypeError(
-        'AggregateType argument must be a constructor function'
-      )
-
+    assert.ok(
+      isClass(AggregateType),
+      'AggregateType argument must be a constructor function'
+    )
     this.registerCommandHandler(
       container =>
         new AggregateCommandHandler({
@@ -105,13 +92,12 @@ class CqrsDomainContainer extends Container {
 
   /**
    * Register saga type in the container
-   *
-   * @param {ISagaConstructor} SagaType
    */
   registerSaga(SagaType) {
-    if (!isClass(SagaType))
-      throw new TypeError('SagaType argument must be a constructor function')
-
+    assert.ok(
+      isClass(SagaType),
+      'SagaType argument must be a constructor function'
+    )
     this.registerEventReceptor(
       container =>
         new SagaEventHandler({
