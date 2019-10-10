@@ -2,9 +2,9 @@
 
 > CQRS Starter Kit to start fast into DDD. Eventsourcing included. Some soldering required.
 
-> __Alpha-Warning:__ work in progress, not tested in production and subject of change in api, features and options
-
 This module is based on the work of and started as a fork of [snatalenko/node-cqrs](https://github.com/snatalenko/node-cqrs), so most credits go to Mr. Natalenko.
+
+> __Alpha-Warning:__ work in progress, not tested in production and subject of change in api, features and options
 
 ## Abstract
 

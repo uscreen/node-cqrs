@@ -1,5 +1,4 @@
 const tap = require('tap')
-const { wait } = require('../helper')
 const { createDomain } = require('../domain')
 
 tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
@@ -14,11 +13,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
     const payload = { body: 'Lorem Ipsum' }
     const context = { reqId: 1234 }
     await cqrs.commandBus.send('createEvent', id, { payload, context })
-    /**
-     * as cqrs acts async, we need a little time to wait for
-     * views to catch up... @todo: find an event
-     */
-    await wait(100)
+    await cqrs.eventStore.once('EventCreated')
 
     const found = await eventsCollection.findOne({ aggregateId: id })
     t.same(id, found.aggregateId, 'event should have been stored with given id')
@@ -54,11 +49,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
     const payload = { body: 'Baba Luga' }
     const context = { reqId: 5678 }
     await cqrs.commandBus.send('changeEvent', aggregateId, { payload, context })
-    /**
-     * as cqrs acts async, we need a little time to wait for
-     * views to catch up... @todo: find an event
-     */
-    await wait(100)
+    await cqrs.eventStore.once('EventChanged')
 
     const e = await eventsCollection
       .find({ aggregateId }, { sort: 'aggregateVersion' })
@@ -112,11 +103,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   await t.test('commit a remove with cqrs.commandBus.send()', async t => {
     const context = { reqId: 9012 }
     await cqrs.commandBus.send('deleteEvent', aggregateId, { context })
-    /**
-     * as cqrs acts async, we need a little time to wait for
-     * views to catch up... @todo: find an event
-     */
-    await wait(100)
+    await cqrs.eventStore.once('EventDeleted')
 
     const e = await eventsCollection
       .find({ aggregateId }, { sort: 'aggregateVersion' })
