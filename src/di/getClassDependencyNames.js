@@ -1,6 +1,8 @@
 /* eslint-disable */
 'use strict'
 
+const assert = require('assert-plus')
+
 const PARAMETER_OBJECT_NAME = 'options'
 const RX_CONSTRUCTOR = /(?:constructor|^function(?:.+\w+)?)\s?\(({?[^\{})]*}?)\)\s?{/
 const RX_PARAMETER_OBJECT = new RegExp(
@@ -19,13 +21,8 @@ function distinct(array) {
  * @return {Array} - a list of object names (e.g. ["someService"])
  */
 function* getParameterObjectPropertyNames(classBody, offset) {
-  /* istanbul ignore next */
-  if (typeof classBody !== 'string' || !classBody.length)
-    throw new TypeError('classBody argument must be a non-empty String')
-
-  /* istanbul ignore next */
-  if (typeof offset !== 'number')
-    throw new TypeError('offset argument must be a Number')
+  assert.string(classBody, 'classBody')
+  assert.number(offset, 'offset')
 
   let ctorBody
   for (let i = offset, openedBrackets = 1; i < classBody.length; i++) {
@@ -37,11 +34,7 @@ function* getParameterObjectPropertyNames(classBody, offset) {
     }
   }
 
-  /* istanbul ignore next */
-  if (!ctorBody)
-    throw new Error(
-      'constructor body could not be found, please do not use commented brackets in the constructor body'
-    )
+  assert.ok(ctorBody, 'constructor body could not be found, please do not use commented brackets in the constructor body')
 
   let match
   while ((match = RX_PARAMETER_OBJECT.exec(ctorBody))) {
@@ -62,13 +55,8 @@ function* getParameterObjectPropertyNames(classBody, offset) {
  *                         dependency will be an array too (e.g. [["someService", "anotherService"]])
  */
 module.exports = function getClassDependencyNames(type) {
-  /* istanbul ignore next */
-  if (!type) throw new TypeError('type argument required')
-  /* istanbul ignore next */
-  if (!type.prototype)
-    throw new TypeError(
-      'type argument must be a prototype function: ' + type.toString()
-    )
+  assert.ok(type, 'type')
+  assert.ok(type.prototype, 'type.prototype')
 
   const classBody = type.toString()
   const match = classBody.match(RX_CONSTRUCTOR)
