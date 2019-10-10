@@ -3,6 +3,7 @@ const {
   Container,
   AbstractAggregate,
   AbstractProjection,
+  AbstractSaga,
   MongoView,
   MongoEventStorage,
   MongoSnapshotStorage
@@ -172,6 +173,27 @@ const createDomain = async (t, ns = '', { skipSnapshot } = {}) => {
     }
   }
   cqrs.registerProjection(ThirdProjection, 'ThirdProjection')
+
+  /**
+   * add a saga
+   */
+
+  class Saga extends AbstractSaga {
+    static get startsWith() {
+      return ['EventCreated']
+    }
+
+    EventCreated(event) {
+      console.log('-------------> somethingHappened', event)
+      // super.enqueue('doSomething', undefined, { foo: 'bar' })
+    }
+
+    onError(error, { command, event }) {
+      console.log('onError', error)
+      // super.enqueue('fixError', undefined, { error, command, event })
+    }
+  }
+  cqrs.registerSaga(Saga)
 
   /**
    * create instances for DI

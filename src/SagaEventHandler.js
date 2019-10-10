@@ -1,6 +1,8 @@
 /* eslint new-cap: "off" */
 'use strict'
 
+const assert = require('assert-plus')
+
 const subscribe = require('./subscribe')
 const { isClass } = require('./utils')
 const info = require('debug')('cqrs:info')
@@ -10,9 +12,6 @@ const info = require('debug')('cqrs:info')
  * creates new saga or restores it from event store,
  * applies new events
  * and passes command(s) to command bus
- *
- * @class {SagaEventHandler}
- * @implements {IEventReceptor}
  */
 class SagaEventHandler {
   /**
@@ -27,31 +26,24 @@ class SagaEventHandler {
    * @param {string[]} [options.handles]
    */
   constructor(options) {
-    if (!options) throw new TypeError('options argument required')
-    if (!options.sagaType)
-      throw new TypeError('options.sagaType argument required')
-    if (!options.eventStore)
-      throw new TypeError('options.eventStore argument required')
-    if (!options.commandBus)
-      throw new TypeError('options.commandBus argument required')
+    assert.ok(options, 'options')
+    assert.ok(options.sagaType, 'options.sagaType')
+    assert.ok(options.eventStore, 'options.eventStore')
+    assert.ok(options.commandBus, 'options.commandBus')
 
     this._eventStore = options.eventStore
     this._commandBus = options.commandBus
     this._queueName = options.queueName
 
     if (isClass(options.sagaType)) {
-      /** @type {ISagaConstructor} */
-      // @ts-ignore
       const SagaType = options.sagaType
 
       this._sagaFactory = params => new SagaType(params)
       this._startsWith = SagaType.startsWith
       this._handles = SagaType.handles
     } else {
-      if (!Array.isArray(options.startsWith))
-        throw new TypeError('options.startsWith argument must be an Array')
-      if (!Array.isArray(options.handles))
-        throw new TypeError('options.handles argument must be an Array')
+      assert.array(options.startsWith, 'options.startsWith')
+      assert.array(options.handles, 'options.handles')
 
       this._sagaFactory = options.sagaType
       this._startsWith = options.startsWith

@@ -45,16 +45,25 @@ module.exports = class MongoEventStorage {
   }
 
   getSagaEvents(sagaId, { beforeEvent }) {
-    console.log('getSagaEvents', sagaId)
-    // return this._events.then(events =>
-    //   events.filter(
-    //     e => e.sagaId == sagaId && e.sagaVersion < beforeEvent.sagaVersion
-    //   )
-    // )
+    const query = {
+      sagaId: this.ObjectId(sagaId)
+    }
+
+    if (beforeEvent && beforeEvent.sagaVersion) {
+      query.sagaVersion = {
+        $lt: beforeEvent.sagaVersion
+      }
+    }
+
+    return this.collection
+      .find(query, {
+        projection: { _id: false },
+        sort: 'sagaVersion'
+      })
+      .toArray()
   }
 
   /**
-   * @todo check options on direct streaming from mongo
    * @todo when used?
    */
   getEvents(eventTypes, filter) {
