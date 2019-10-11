@@ -1,5 +1,7 @@
 'use strict'
 
+const assert = require('assert-plus')
+
 const { validateHandlers, getHandler, getClassName } = require('./utils')
 
 const _id = Symbol('id')
@@ -8,30 +10,19 @@ const _messages = Symbol('messages')
 
 /**
  * Base class for Saga definition
- *
- * @class {AbstractSaga}
- * @implements {ISaga}
  */
 class AbstractSaga {
   /**
    * List of events that start new saga, must be overridden in Saga implementation
-   *
-   * @type {string[]}
-   * @readonly
-   * @static
    */
   static get startsWith() {
-    throw new Error(
+    assert.fail(
       'startsWith must be overriden to return a list of event types that start saga'
     )
   }
 
   /**
    * List of event types being handled by Saga, must be overridden in Saga implementation
-   *
-   * @type {string[]}
-   * @readonly
-   * @static
    */
   static get handles() {
     return []
@@ -39,9 +30,6 @@ class AbstractSaga {
 
   /**
    * Saga ID
-   *
-   * @type {string|number}
-   * @readonly
    */
   get id() {
     return this[_id]
@@ -49,9 +37,6 @@ class AbstractSaga {
 
   /**
    * Saga version
-   *
-   * @type {number}
-   * @readonly
    */
   get version() {
     return this[_version]
@@ -59,9 +44,6 @@ class AbstractSaga {
 
   /**
    * Command execution queue
-   *
-   * @type {ICommand[]}
-   * @readonly
    */
   get uncommittedMessages() {
     return Array.from(this[_messages])
@@ -69,12 +51,10 @@ class AbstractSaga {
 
   /**
    * Creates an instance of AbstractSaga
-   *
-   * @param {TSagaParams} options
    */
   constructor(options) {
-    if (!options) throw new TypeError('options argument required')
-    if (!options.id) throw new TypeError('options.id argument required')
+    assert.ok(options, 'options')
+    assert.ok(options.id, 'options.id')
 
     this[_id] = options.id
     this[_version] = 0
@@ -83,6 +63,7 @@ class AbstractSaga {
     validateHandlers(this, 'startsWith')
     validateHandlers(this, 'handles')
 
+    /* istanbul ignore else */
     if (options.events) {
       options.events.forEach(e => this.apply(e))
       this.resetUncommittedMessages()
@@ -93,19 +74,16 @@ class AbstractSaga {
 
   /**
    * Modify saga state by applying an event
-   *
-   * @param {IEvent} event
-   * @returns {void|Promise<void>}
    */
   apply(event) {
-    if (!event) throw new TypeError('event argument required')
-    if (!event.type) throw new TypeError('event.type argument required')
+    assert(event, 'event')
+    assert(event.type, 'event.type')
 
     const handler = getHandler(this, event.type)
-    if (!handler)
-      throw new Error(
-        `'${event.type}' handler is not defined or not a function`
-      )
+    assert.func(
+      handler,
+      `'${event.type}' handler is not defined or not a function`
+    )
 
     const r = handler.call(this, event)
     if (r instanceof Promise) {
@@ -120,10 +98,6 @@ class AbstractSaga {
 
   /**
    * Format a command and put it to the execution queue
-   *
-   * @param {string} commandType
-   * @param {string|number} aggregateId
-   * @param {object} payload
    */
   enqueue(commandType, aggregateId, payload) {
     if (typeof commandType !== 'string' || !commandType.length)
@@ -144,8 +118,6 @@ class AbstractSaga {
 
   /**
    * Put a command to the execution queue
-   *
-   * @param {ICommand} command
    */
   enqueueRaw(command) {
     if (typeof command !== 'object' || !command)

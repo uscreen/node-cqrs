@@ -71,9 +71,9 @@ class SagaEventHandler {
    * @returns {Promise<void>}
    */
   async handle(event) {
-    if (!event) throw new TypeError('event argument required')
-    if (!event.type) throw new TypeError('event.type argument required')
-    if (!event.sagaId) throw new TypeError('event.sagaId argument required')
+    assert.ok(event, 'event')
+    assert.ok(event.type, 'event.type')
+    assert.ok(event.sagaId, 'event.sagaId')
 
     const saga = await this._restoreSaga(event)
 
@@ -110,19 +110,14 @@ class SagaEventHandler {
 
   /**
    * Restore saga from event store
-   *
-   * @param {IEvent} event Event that triggered saga execution
-   * @returns {Promise<ISaga>}
-   * @private
    */
   async _restoreSaga(event) {
-    if (!event.sagaId) throw new TypeError('event.sagaId argument required')
+    assert.ok(event.sagaId)
 
     const events = await this._eventStore.getSagaEvents(event.sagaId, {
       beforeEvent: event
     })
 
-    /** @type {ISaga} */
     const saga = this._sagaFactory.call(null, { id: event.sagaId, events })
     info('%s state restored from %s', saga, events)
 
