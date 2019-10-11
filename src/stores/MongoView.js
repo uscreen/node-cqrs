@@ -3,7 +3,11 @@
 module.exports = class MongoView {
   constructor({ ObjectId, collection }) {
     this.ObjectId = ObjectId
-    this.collection = collection
+    this._collection = collection
+  }
+
+  get collection() {
+    return this._collection
   }
 
   create(key, value = {}) {

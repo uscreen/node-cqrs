@@ -4,7 +4,7 @@ const { createDomain } = require('../domain')
 tap.test('Creating and using snapshots', async t => {
   const { cqrs, eventsCollection, snapshotsCollection } = await createDomain(
     t,
-    'snapTest'
+    'snapTest-'
   )
   let aggregateId
 

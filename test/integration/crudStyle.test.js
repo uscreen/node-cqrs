@@ -34,6 +34,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   await t.test(
     'read a view from a projection with cqrs.views.read()',
     async t => {
+      await wait(100)
       const view = await cqrs.Views.read(aggregateId)
       t.same(aggregateId, view._id, 'view _id should match aggregateId')
       t.same('Lorem Ipsum', view.body, 'body should match payload')
@@ -52,6 +53,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
     const context = { reqId: 5678 }
     await cqrs.commandBus.send('changeEvent', aggregateId, { payload, context })
     await cqrs.eventStore.once('EventChanged')
+    await wait(100)
 
     const e = await eventsCollection
       .find({ aggregateId }, { sort: 'aggregateVersion' })
@@ -106,6 +108,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
     const context = { reqId: 9012 }
     await cqrs.commandBus.send('deleteEvent', aggregateId, { context })
     await cqrs.eventStore.once('EventDeleted')
+    await wait(100)
 
     const e = await eventsCollection
       .find({ aggregateId }, { sort: 'aggregateVersion' })

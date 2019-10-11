@@ -3,23 +3,20 @@ const {
   Container,
   AbstractAggregate,
   AbstractProjection,
-  AbstractSaga,
   MongoView,
   MongoEventStorage,
   MongoSnapshotStorage
 } = require('../index')
 const { config, wait } = require('./helper')
 
-const createDomain = async (t, ns = '', { skipSnapshot } = {}) => {
+const createDomain = async (t, ns = 'test', { skipSnapshot } = {}) => {
   const client = await MongoClient.connect(config.mongoUri)
   const db = client.db()
-  const eventsCollection = db.collection(`${ns}events-test-1`)
-  const snapshotsCollection = db.collection(`${ns}snapshots-test-1`)
-  const viewsCollection = db.collection(`${ns}views-test-1`)
-  const anotherViewsCollection = db.collection(`${ns}another-views-test-1`)
-  const ThirdProjectionCollection = db.collection(
-    `${ns}ThirdProjection-views-test-1`
-  )
+  const eventsCollection = db.collection(`${ns}-events`)
+  const snapshotsCollection = db.collection(`${ns}-snapshots`)
+  const viewsCollection = db.collection(`${ns}-views`)
+  const anotherViewsCollection = db.collection(`${ns}-another-views`)
+  const ThirdProjectionCollection = db.collection(`${ns}-ThirdProjection-views`)
 
   try {
     await eventsCollection.drop()
@@ -32,6 +29,8 @@ const createDomain = async (t, ns = '', { skipSnapshot } = {}) => {
   t.teardown(async () => {
     await client.close()
   })
+
+  await wait(200)
 
   const cqrs = new Container()
 
@@ -78,6 +77,14 @@ const createDomain = async (t, ns = '', { skipSnapshot } = {}) => {
       await wait(10)
       this.emit('EventDeleted')
     }
+
+    doSomething(payload) {
+      this.emit('SomethingDone', payload)
+    }
+
+    doSomethingElse(payload) {
+      this.emit('SomethingElseDone', payload)
+    }
   }
   cqrs.registerAggregate(Aggregate)
 
@@ -106,6 +113,22 @@ const createDomain = async (t, ns = '', { skipSnapshot } = {}) => {
 
     EventDeleted({ aggregateId }) {
       this.view.delete(aggregateId)
+    }
+
+    async SomethingDone({ aggregateId }) {
+      await this.view.update(aggregateId, { SomethingDone: true })
+      await this.view.collection.findOneAndUpdate(
+        { _id: aggregateId },
+        { $push: { stack: 'SomethingDone' } }
+      )
+    }
+
+    async SomethingElseDone({ aggregateId }) {
+      await this.view.update(aggregateId, { SomethingElseDone: true })
+      await this.view.collection.findOneAndUpdate(
+        { _id: aggregateId },
+        { $push: { stack: 'SomethingElseDone' } }
+      )
     }
   }
   cqrs.registerProjection(Views, 'Views')
@@ -173,27 +196,6 @@ const createDomain = async (t, ns = '', { skipSnapshot } = {}) => {
     }
   }
   cqrs.registerProjection(ThirdProjection, 'ThirdProjection')
-
-  /**
-   * add a saga
-   */
-
-  class Saga extends AbstractSaga {
-    static get startsWith() {
-      return ['EventCreated']
-    }
-
-    EventCreated(event) {
-      console.log('-------------> somethingHappened', event)
-      // super.enqueue('doSomething', undefined, { foo: 'bar' })
-    }
-
-    onError(error, { command, event }) {
-      console.log('onError', error)
-      // super.enqueue('fixError', undefined, { error, command, event })
-    }
-  }
-  cqrs.registerSaga(Saga)
 
   /**
    * create instances for DI

@@ -7,3 +7,4 @@
 - [ ] check to also emit state to views
 - [ ] make EventStream a real stream
 - [ ] clearly document oin variants of declaring handles!
+- [ ] maybe better rename saga.enqueue to somthing command related

@@ -13,7 +13,8 @@ const _messages = Symbol('messages')
  */
 class AbstractSaga {
   /**
-   * List of events that start new saga, must be overridden in Saga implementation
+   * List of events that start new saga,
+   * must be overridden in Saga implementation
    */
   static get startsWith() {
     assert.fail(
@@ -22,7 +23,8 @@ class AbstractSaga {
   }
 
   /**
-   * List of event types being handled by Saga, must be overridden in Saga implementation
+   * List of event types being handled by Saga,
+   * must be overridden in Saga implementation
    */
   static get handles() {
     return []
@@ -102,7 +104,9 @@ class AbstractSaga {
   enqueue(commandType, aggregateId, payload) {
     if (typeof commandType !== 'string' || !commandType.length)
       throw new TypeError('commandType argument must be a non-empty String')
-    if (!['string', 'number', 'undefined'].includes(typeof aggregateId))
+    if (
+      !['string', 'number', 'undefined', 'object'].includes(typeof aggregateId)
+    )
       throw new TypeError(
         'aggregateId argument must be either string, number or undefined'
       )
@@ -120,10 +124,8 @@ class AbstractSaga {
    * Put a command to the execution queue
    */
   enqueueRaw(command) {
-    if (typeof command !== 'object' || !command)
-      throw new TypeError('command argument must be an Object')
-    if (typeof command.type !== 'string' || !command.type.length)
-      throw new TypeError('command.type argument must be a non-empty String')
+    assert.ok(command, 'command')
+    assert.string(command.type, 'command.type')
 
     this[_messages].push(command)
   }
