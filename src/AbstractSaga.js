@@ -102,14 +102,12 @@ class AbstractSaga {
    * Format a command and put it to the execution queue
    */
   enqueue(commandType, aggregateId, payload) {
-    if (typeof commandType !== 'string' || !commandType.length)
-      throw new TypeError('commandType argument must be a non-empty String')
-    if (
-      !['string', 'number', 'undefined', 'object'].includes(typeof aggregateId)
+    assert.string(commandType, 'commandType')
+
+    assert.ok(
+      ['string', 'number', 'undefined', 'object'].includes(typeof aggregateId),
+      'aggregateId argument must be either string, number or undefined'
     )
-      throw new TypeError(
-        'aggregateId argument must be either string, number or undefined'
-      )
 
     this.enqueueRaw({
       aggregateId,

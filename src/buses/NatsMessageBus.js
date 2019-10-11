@@ -9,38 +9,28 @@
 module.exports = class InMemoryMessageBus {
   /**
    * Indicates that message bus supports named queue subscriptions
-   *
-   * @type {boolean}
-   * @readonly
-   * @static
+   * @unused
    */
-  static get supportsQueues() {
-    return true
-  }
+  // static get supportsQueues() {
+  //   return true
+  // }
 
   /**
    * Creates an instance of InMemoryMessageBus
-   * @param {object} [options]
-   * @param {string} [options.name]
-   * @param {boolean} [options.uniqueEventHandlers]
    */
   constructor({ name, uniqueEventHandlers = !!name } = {}) {
     console.log('--------------------> nats bus')
-    /** @type {Map<string, Set<IMessageHandler>>} */
+
     this._handlers = new Map()
 
     this._name = name
     this._uniqueEventHandlers = uniqueEventHandlers
 
-    /** @type {Map<string, InMemoryMessageBus>} */
     this._queues = new Map()
   }
 
   /**
    * Subscribe to message type
-   *
-   * @param {string} messageType
-   * @param {IMessageHandler} handler
    */
   on(messageType, handler) {
     if (typeof messageType !== 'string' || !messageType.length)
@@ -69,9 +59,6 @@ module.exports = class InMemoryMessageBus {
   /**
    * Get or create a named queue.
    * Named queues support only one handler per event type.
-   *
-   * @param {string} name
-   * @returns {IObservable}
    */
   queue(name) {
     if (!this._queues.has(name))
@@ -85,9 +72,6 @@ module.exports = class InMemoryMessageBus {
 
   /**
    * Remove subscription
-   *
-   * @param {string} messageType
-   * @param {IMessageHandler} handler
    */
   off(messageType, handler) {
     if (typeof messageType !== 'string' || !messageType.length)
@@ -106,9 +90,6 @@ module.exports = class InMemoryMessageBus {
 
   /**
    * Send command to exactly 1 command handler
-   *
-   * @param {ICommand} command
-   * @returns {Promise<any>}
    */
   async send(command) {
     if (typeof command !== 'object' || !command)
@@ -129,9 +110,6 @@ module.exports = class InMemoryMessageBus {
 
   /**
    * Publish event to all subscribers (if any)
-   *
-   * @param {IEvent} event
-   * @returns {Promise<any>}
    */
   async publish(event) {
     if (typeof event !== 'object' || !event)

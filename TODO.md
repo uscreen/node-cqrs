@@ -1,6 +1,7 @@
 # TODOs
 
 - [x] check on all occurencies of `/* istanbul ignore ... */` for missing tests, or better syntax
+- [ ] Eventstore asserts next
 - [ ] remove unused files
 - [ ] remove unused code
 - [ ] shouldn't we keep multiple snapshot versions?

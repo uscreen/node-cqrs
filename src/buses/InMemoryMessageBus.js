@@ -8,10 +8,11 @@ const assert = require('assert-plus')
 module.exports = class InMemoryMessageBus {
   /**
    * Indicates that message bus supports named queue subscriptions
+   * @unused
    */
-  static get supportsQueues() {
-    return true
-  }
+  // static get supportsQueues() {
+  //   return true
+  // }
 
   /**
    * Creates an instance of InMemoryMessageBus
