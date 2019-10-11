@@ -1,4 +1,5 @@
 const tap = require('tap')
+const { wait } = require('../helper')
 const { createDomain } = require('../domain')
 
 tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
@@ -14,6 +15,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
     const context = { reqId: 1234 }
     await cqrs.commandBus.send('createEvent', id, { payload, context })
     await cqrs.eventStore.once('EventCreated')
+    await wait(100)
 
     const found = await eventsCollection.findOne({ aggregateId: id })
     t.same(id, found.aggregateId, 'event should have been stored with given id')
