@@ -78,11 +78,11 @@ const createDomain = async (t, ns = 'test', { skipSnapshot } = {}) => {
       this.emit('EventDeleted')
     }
 
-    doSomething(payload) {
+    async doSomething(payload) {
       this.emit('SomethingDone', payload)
     }
 
-    doSomethingElse(payload) {
+    async doSomethingElse(payload) {
       this.emit('SomethingElseDone', payload)
     }
   }

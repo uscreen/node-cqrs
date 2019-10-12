@@ -60,7 +60,7 @@ tap.test('Use with Saga', async t => {
   await t.test(
     'read a view from a projection with cqrs.views.read()',
     async t => {
-      await wait(300)
+      await wait(500)
       const view = await cqrs.Views.read(aggregateId)
       t.same(aggregateId, view._id, 'view _id should match aggregateId')
       t.same('Lorem Ipsum', view.body, 'body should match payload')
