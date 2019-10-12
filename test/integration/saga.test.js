@@ -69,6 +69,7 @@ tap.test('Use with Saga', async t => {
         view.stack,
         'stack should be in exact order'
       )
+      console.log(view)
       // fails on CI??
       // t.ok(view.SomethingDone)
       // t.ok(view.SomethingElseDone)
