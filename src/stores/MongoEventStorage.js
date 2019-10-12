@@ -16,13 +16,20 @@ module.exports = class MongoEventStorage {
 
   wrapEvent(event) {
     const evt = Object.assign({}, event)
-    evt.aggregateId = this.ObjectId(evt.aggregateId)
+    /* istanbul ignore else */
+    if (evt.aggregateId) {
+      evt.aggregateId = this.ObjectId(evt.aggregateId)
+    }
+    /* istanbul ignore else */
+    if (evt.sagaId) {
+      evt.sagaId = this.ObjectId(evt.sagaId)
+    }
     return evt
   }
 
   commitEvents(eventStream) {
     const events = eventStream.map(this.wrapEvent.bind(this))
-    return this.collection.insertMany(events)
+    return this.collection.insertMany(events, { w: 1 })
   }
 
   getAggregateEvents(aggregateId, { snapshot } = {}) {
@@ -49,6 +56,7 @@ module.exports = class MongoEventStorage {
       sagaId: this.ObjectId(sagaId)
     }
 
+    /* istanbul ignore if */
     if (beforeEvent && beforeEvent.sagaVersion) {
       query.sagaVersion = {
         $lt: beforeEvent.sagaVersion
@@ -66,6 +74,7 @@ module.exports = class MongoEventStorage {
   /**
    * @todo when used?
    */
+  /* istanbul ignore next */
   getEvents(eventTypes, filter) {
     console.log('getEvents', eventTypes, filter)
     return []
