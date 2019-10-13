@@ -65,6 +65,7 @@ class AbstractAggregate {
    */
   constructor(options) {
     const { id, state, events } = options
+
     assert.ok(id, 'id')
     assert.optionalObject(state, 'state')
     assert.optionalArray(events, 'events')
@@ -98,13 +99,14 @@ class AbstractAggregate {
    * Mutate aggregate state and increment aggregate version
    */
   mutate(event) {
-    if ('aggregateVersion' in event) this[_version] = event.aggregateVersion
+    assert.number(event.aggregateVersion)
+    this[_version] = event.aggregateVersion
 
     if (event.type === SNAPSHOT_EVENT_TYPE) {
       this[_snapshotVersion] = event.aggregateVersion
       this.restoreSnapshot(event)
-    } else if (this.state) {
-      const handler = this.state.mutate || getHandler(this.state, event.type)
+    } else {
+      const handler = getHandler(this.state, event.type)
       if (handler) handler.call(this.state, event)
     }
 
@@ -127,16 +129,21 @@ class AbstractAggregate {
     const event = {
       aggregateId: this.id,
       aggregateVersion: this.version,
+      state: this.state,
       type,
       payload
     }
 
-    if (sourceCommand) {
-      const { context, sagaId, sagaVersion } = sourceCommand
-      if (context !== undefined) event.context = context
-      if (sagaId !== undefined) event.sagaId = sagaId
-      if (sagaVersion !== undefined) event.sagaVersion = sagaVersion
-    }
+    const { context, sagaId, sagaVersion } = sourceCommand
+
+    /* istanbul ignore else */
+    if (context !== undefined) event.context = context
+
+    /* istanbul ignore else */
+    if (sagaId !== undefined) event.sagaId = sagaId
+
+    /* istanbul ignore else */
+    if (sagaVersion !== undefined) event.sagaVersion = sagaVersion
 
     return event
   }
