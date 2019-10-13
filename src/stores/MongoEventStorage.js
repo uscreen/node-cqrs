@@ -32,7 +32,7 @@ module.exports = class MongoEventStorage {
     return this.collection.insertMany(events, { w: 1 })
   }
 
-  getAggregateEvents(aggregateId, { snapshot } = {}) {
+  getAggregateEvents(aggregateId, { snapshot }) {
     const query = {
       aggregateId: this.ObjectId(aggregateId)
     }
