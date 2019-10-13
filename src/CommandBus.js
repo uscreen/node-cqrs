@@ -1,15 +1,25 @@
 'use strict'
 
-const InMemoryBus = require('./buses/InMemoryMessageBus')
+const assert = require('assert-plus')
 const debug = require('debug')('cqrs:debug:CommandBus')
 const info = require('debug')('cqrs:info:CommandBus')
+
+/**
+ * Ensure messageBus matches the expected format
+ */
+function validateMessageBus(messageBus) {
+  assert.object(messageBus, 'messageBus')
+  assert.func(messageBus.on, 'messageBus.on')
+  assert.func(messageBus.publish, 'messageBus.publish')
+}
 
 class CommandBus {
   /**
    * Creates an instance of CommandBus.
    */
   constructor(options) {
-    this._bus = (options && options.messageBus) || new InMemoryBus()
+    validateMessageBus(options.messageBus)
+    this._bus = options.messageBus
   }
 
   /**

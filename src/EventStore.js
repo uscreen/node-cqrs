@@ -1,6 +1,5 @@
 'use strict'
 
-const InMemoryBus = require('./buses/InMemoryMessageBus')
 const assert = require('assert-plus')
 const debug = require('debug')('cqrs:debug:EventStore')
 const info = require('debug')('cqrs:info:EventStore')
@@ -42,13 +41,6 @@ function validateEventStorage(storage) {
   assert.func(storage.getAggregateEvents, 'storage.getAggregateEvents')
   assert.func(storage.getSagaEvents, 'storage.getSagaEvents')
   assert.func(storage.getNewId, 'storage.getNewId')
-}
-
-/**
- * Check if storage emits events
- */
-function isEmitter(storage) {
-  return typeof storage.on === 'function'
 }
 
 /**
@@ -167,11 +159,10 @@ class EventStore {
    */
   constructor(options) {
     validateEventStorage(options.storage)
+    validateMessageBus(options.messageBus)
+
     if (options.snapshotStorage) {
       validateSnapshotStorage(options.snapshotStorage)
-    }
-    if (options.messageBus) {
-      validateMessageBus(options.messageBus)
     }
 
     assert.optionalFunc(options.eventValidator, 'options.eventValidator')
@@ -184,18 +175,8 @@ class EventStore {
     this._validator = options.eventValidator || validateEvent
 
     this._sagaStarters = []
-
-    if (options.messageBus) {
-      this._publishTo = options.messageBus
-      this._eventEmitter = options.messageBus
-    } else if (isEmitter(options.storage)) {
-      this._eventEmitter = options.storage
-    } else {
-      // @todo: better always require as options?
-      const internalMessageBus = new InMemoryBus()
-      this._publishTo = internalMessageBus
-      this._eventEmitter = internalMessageBus
-    }
+    this._publishTo = options.messageBus
+    this._eventEmitter = options.messageBus
   }
 
   /**

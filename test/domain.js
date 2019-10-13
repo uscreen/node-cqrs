@@ -5,7 +5,8 @@ const {
   AbstractProjection,
   MongoView,
   MongoEventStorage,
-  MongoSnapshotStorage
+  MongoSnapshotStorage,
+  InMemoryMessageBus
 } = require('../index')
 const { config, wait } = require('./helper')
 
@@ -35,6 +36,8 @@ const createDomain = async (t, ns = 'test', { skipSnapshot } = {}) => {
   const cqrs = new Container()
 
   cqrs.register(MongoEventStorage, 'storage')
+  cqrs.register(InMemoryMessageBus, 'messageBus')
+
   if (!skipSnapshot) {
     cqrs.register(MongoSnapshotStorage, 'snapshotStorage')
   }
