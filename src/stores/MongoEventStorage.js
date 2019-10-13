@@ -12,6 +12,7 @@ module.exports = class MongoEventStorage {
       { sagaId: 1, sagaVersion: 1 },
       { unique: false, sparse: true }
     )
+    this.collection.createIndex({ type: 1 }, { unique: false, sparse: true })
   }
 
   wrapEvent(event) {

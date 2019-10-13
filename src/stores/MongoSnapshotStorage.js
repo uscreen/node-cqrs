@@ -7,13 +7,25 @@ module.exports = class MongoSnapshotStorage {
   constructor({ ObjectId, SnapshotsCollection }) {
     this.ObjectId = ObjectId
     this.collection = SnapshotsCollection
+    this.collection.createIndex(
+      { aggregateId: 1, aggregateVersion: 1 },
+      { unique: true, sparse: true }
+    )
+    this.collection.createIndex(
+      { sagaId: 1, sagaVersion: 1 },
+      { unique: false, sparse: true }
+    )
+    this.collection.createIndex({ type: 1 }, { unique: false, sparse: true })
   }
 
   /**
    * Get latest aggregate snapshot
    */
   async getAggregateSnapshot(aggregateId) {
-    return this.collection.findOne({ _id: this.ObjectId(aggregateId) })
+    return this.collection.findOne(
+      { aggregateId: this.ObjectId(aggregateId) },
+      { sort: { aggregateVersion: -1 } }
+    )
   }
 
   wrapEvent(event) {
@@ -31,10 +43,6 @@ module.exports = class MongoSnapshotStorage {
    * Save new aggregate snapshot
    */
   async saveAggregateSnapshot(snapshotEvent) {
-    await this.collection.findOneAndUpdate(
-      { _id: this.ObjectId(snapshotEvent.aggregateId) },
-      { $set: this.wrapEvent(snapshotEvent) },
-      { returnOriginal: false, upsert: true }
-    )
+    return this.collection.insertOne(this.wrapEvent(snapshotEvent))
   }
 }

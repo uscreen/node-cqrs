@@ -52,7 +52,10 @@ tap.test('Creating and using snapshots', async t => {
       await cqrs.eventStore.once('EventChanged')
     }
 
-    const s = await snapshotsCollection.find().toArray()
+    const s = await snapshotsCollection
+      .find()
+      .sort({ aggregateVersion: -1 })
+      .toArray()
 
     t.same(aggregateId, s[0].aggregateId, 'aggregateId should match')
     t.same(22, s[0].aggregateVersion, 'version should be 22')
@@ -63,7 +66,7 @@ tap.test('Creating and using snapshots', async t => {
       'body should match payload'
     )
     t.same({ reqId: 5678 }, s[0].context, 'context should have provided data')
-    t.same(1, s.length, 'we should have found 1 snapshot now')
+    t.same(2, s.length, 'we should have found 2 snapshot now')
     t.end()
   })
 
