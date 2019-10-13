@@ -7,8 +7,8 @@ module.exports = class MongoView {
    * create a new view class
    */
   constructor({ ObjectId, collection }) {
-    assert.func(ObjectId)
-    assert.object(collection)
+    assert.func(ObjectId, '"ObjectId()" is required by MongoView')
+    assert.object(collection, 'a "collection" is required by MongoView')
 
     this.ObjectId = ObjectId
     this._collection = collection
