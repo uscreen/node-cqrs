@@ -4,7 +4,6 @@
 const assert = require('assert-plus')
 
 const subscribe = require('./subscribe')
-const { isClass } = require('./utils/validators')
 const info = require('debug')('cqrs:info')
 
 /**
@@ -30,25 +29,15 @@ class SagaEventHandler {
     assert.ok(options.sagaType, 'options.sagaType')
     assert.ok(options.eventStore, 'options.eventStore')
     assert.ok(options.commandBus, 'options.commandBus')
+    assert.array(options.startsWith, 'options.startsWith')
+    assert.array(options.handles, 'options.handles')
 
     this._eventStore = options.eventStore
     this._commandBus = options.commandBus
     this._queueName = options.queueName
-
-    if (isClass(options.sagaType)) {
-      const SagaType = options.sagaType
-
-      this._sagaFactory = params => new SagaType(params)
-      this._startsWith = SagaType.startsWith
-      this._handles = SagaType.handles
-    } else {
-      assert.array(options.startsWith, 'options.startsWith')
-      assert.array(options.handles, 'options.handles')
-
-      this._sagaFactory = options.sagaType
-      this._startsWith = options.startsWith
-      this._handles = options.handles
-    }
+    this._sagaFactory = options.sagaType
+    this._startsWith = options.startsWith
+    this._handles = options.handles
 
     this._eventStore.registerSagaStarters(options.startsWith)
   }

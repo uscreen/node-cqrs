@@ -60,8 +60,8 @@ const createDomain = async (t, ns = 'test', { skipSnapshot } = {}) => {
   }
 
   class Aggregate extends AbstractAggregate {
-    get state() {
-      return this._state || (this._state = new State())
+    constructor(options) {
+      super({ state: new State(), ...options })
     }
 
     get shouldTakeSnapshot() {
@@ -137,22 +137,17 @@ const createDomain = async (t, ns = 'test', { skipSnapshot } = {}) => {
   cqrs.registerProjection(Views, 'Views')
 
   class AnotherViews extends AbstractProjection {
-    get view() {
-      return (
-        this._view ||
-        (this._view = new MongoView({
+    constructor() {
+      super({
+        view: new MongoView({
           collection: anotherViewsCollection,
           ObjectId
-        }))
-      )
+        })
+      })
     }
 
     static get handles() {
       return ['EventCreated', 'EventChanged']
-    }
-
-    get shouldRestoreView() {
-      return false
     }
 
     EventCreated({ aggregateId, payload }) {

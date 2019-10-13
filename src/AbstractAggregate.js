@@ -67,7 +67,7 @@ class AbstractAggregate {
     const { id, state, events } = options
 
     assert.ok(id, 'id')
-    assert.optionalObject(state, 'state')
+    assert.object(state, 'state')
     assert.optionalArray(events, 'events')
 
     this[_id] = id
@@ -77,7 +77,7 @@ class AbstractAggregate {
 
     validateHandlers(this)
 
-    if (state) this.state = state
+    this.state = state
     if (events) events.forEach(event => this.mutate(event))
   }
 

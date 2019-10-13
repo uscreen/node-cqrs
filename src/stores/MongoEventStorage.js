@@ -24,6 +24,8 @@ module.exports = class MongoEventStorage {
     if (evt.sagaId) {
       evt.sagaId = this.ObjectId(evt.sagaId)
     }
+
+    delete evt.state
     return evt
   }
 

@@ -4,8 +4,8 @@ const assert = require('assert-plus')
 const info = require('debug')('cqrs:info')
 
 const subscribe = require('./subscribe')
-const { isClass } = require('./utils/validators')
-const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
+// const { isClass } = require('./utils/validators')
+// const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
 
 /**
  * Aggregate command handler.
@@ -21,17 +21,11 @@ class AggregateCommandHandler {
   constructor(options) {
     assert.ok(options.eventStore, 'options.eventStore')
     assert.ok(options.aggregateType, 'options.aggregateType')
+    assert.ok(options.handles, 'options.handles')
 
     this._eventStore = options.eventStore
-
-    if (isClass(options.aggregateType)) {
-      const AggregateType = options.aggregateType
-      this._aggregateFactory = params => new AggregateType(params)
-      this._handles = getHandledMessageTypes(AggregateType)
-    } else {
-      this._aggregateFactory = options.aggregateType
-      this._handles = options.handles
-    }
+    this._aggregateFactory = options.aggregateType
+    this._handles = options.handles
   }
 
   /**
