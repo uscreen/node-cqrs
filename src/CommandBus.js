@@ -1,17 +1,8 @@
 'use strict'
 
-const assert = require('assert-plus')
+const { validateMessageBus } = require('./utils/validators')
 const debug = require('debug')('cqrs:debug:CommandBus')
 const info = require('debug')('cqrs:info:CommandBus')
-
-/**
- * Ensure messageBus matches the expected format
- */
-function validateMessageBus(messageBus) {
-  assert.object(messageBus, 'messageBus')
-  assert.func(messageBus.on, 'messageBus.on')
-  assert.func(messageBus.publish, 'messageBus.publish')
-}
 
 class CommandBus {
   /**

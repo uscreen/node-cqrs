@@ -3,14 +3,11 @@
 const assert = require('assert-plus')
 const info = require('debug')('cqrs:info')
 
+const { isConcurrentView } = require('./utils/validators')
 const subscribe = require('./subscribe')
 const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
-const { validateHandlers, getHandler, getClassName } = require('./utils')
-
-const isConcurrentView = view =>
-  typeof view.lock === 'function' &&
-  typeof view.unlock === 'function' &&
-  typeof view.once === 'function'
+const { validateHandlers } = require('./utils/validators')
+const { getHandler, getClassName } = require('./utils')
 
 const asConcurrentView = view => (isConcurrentView(view) ? view : undefined)
 

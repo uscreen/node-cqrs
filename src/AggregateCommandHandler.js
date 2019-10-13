@@ -4,7 +4,7 @@ const assert = require('assert-plus')
 const info = require('debug')('cqrs:info')
 
 const subscribe = require('./subscribe')
-const { isClass } = require('./utils')
+const { isClass } = require('./utils/validators')
 const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
 
 /**

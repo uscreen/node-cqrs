@@ -1,5 +1,12 @@
 'use strict'
 
+const {
+  validateMessageBus,
+  validateEventStorage,
+  validateSnapshotStorage,
+  validateEvent
+} = require('./utils/validators')
+
 const assert = require('assert-plus')
 const debug = require('debug')('cqrs:debug:EventStore')
 const info = require('debug')('cqrs:info:EventStore')
@@ -9,62 +16,6 @@ const SNAPSHOT_EVENT_TYPE = 'snapshot'
 
 const _defaults = {
   publishAsync: true
-}
-
-/**
- * Validate event structure
- *
- * @param {IEvent} event
- */
-function validateEvent(event) {
-  assert.object(event, 'event')
-  assert.string(event.type, 'event.type')
-
-  assert.ok(
-    event.aggregateId || event.sagaId,
-    'either event.aggregateId or event.sagaId is required'
-  )
-
-  assert.ok(
-    !(event.sagaId && typeof event.sagaVersion === 'undefined'),
-    'event.sagaVersion is required, when event.sagaId is defined'
-  )
-}
-
-/**
- * Ensure provided eventStorage matches expected interface
- */
-function validateEventStorage(storage) {
-  assert.object(storage, 'storage')
-  assert.func(storage.commitEvents, 'storage.commitEvents')
-  assert.func(storage.getEvents, 'storage.getEvents')
-  assert.func(storage.getAggregateEvents, 'storage.getAggregateEvents')
-  assert.func(storage.getSagaEvents, 'storage.getSagaEvents')
-  assert.func(storage.getNewId, 'storage.getNewId')
-}
-
-/**
- * Ensure snapshotStorage matches the expected format
- */
-function validateSnapshotStorage(snapshotStorage) {
-  assert.object(snapshotStorage, 'snapshotStorage')
-  assert.func(
-    snapshotStorage.getAggregateSnapshot,
-    'snapshotStorage.getAggregateSnapshot'
-  )
-  assert.func(
-    snapshotStorage.saveAggregateSnapshot,
-    'snapshotStorage.saveAggregateSnapshot'
-  )
-}
-
-/**
- * Ensure messageBus matches the expected format
- */
-function validateMessageBus(messageBus) {
-  assert.object(messageBus, 'messageBus')
-  assert.func(messageBus.on, 'messageBus.on')
-  assert.func(messageBus.publish, 'messageBus.publish')
 }
 
 /**
@@ -153,7 +104,7 @@ class EventStore {
    * @param {object} options
    * @param {IEventStorage} options.storage
    * @param {IAggregateSnapshotStorage} [options.snapshotStorage]
-   * @param {IMessageBus} [options.messageBus]
+   * @param {IMessageBus} options.messageBus
    * @param {function(IEvent):void} [options.eventValidator]
    * @param {EventStoreConfig} [options.eventStoreConfig]
    */

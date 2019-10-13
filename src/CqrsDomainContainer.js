@@ -2,19 +2,13 @@
 
 const assert = require('assert-plus')
 
+const { isClass } = require('./utils/validators')
 const Container = require('./di/Container')
 const SagaEventHandler = require('./SagaEventHandler')
 const AggregateCommandHandler = require('./AggregateCommandHandler')
 const CommandBus = require('./CommandBus')
 const EventStore = require('./EventStore')
 const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
-
-function isClass(func) {
-  return (
-    typeof func === 'function' &&
-    Function.prototype.toString.call(func).startsWith('class')
-  )
-}
 
 /**
  * Dependency injection container with CQRS-specific methods

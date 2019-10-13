@@ -37,7 +37,8 @@
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
-    "debug": "^4.1.1"
+    "debug": "^4.1.1",
+    "rfdc": "^1.1.4"
   },
   "devDependencies": {
     "env-schema": "^1.1.0",

@@ -2,7 +2,8 @@
 
 const assert = require('assert-plus')
 
-const { validateHandlers, getHandler, getClassName } = require('./utils')
+const { validateHandlers } = require('./utils/validators')
+const { getHandler, getClassName } = require('./utils')
 
 const _id = Symbol('id')
 const _version = Symbol('version')

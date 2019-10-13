@@ -2,15 +2,9 @@
 
 const trace = require('debug')('cqrs:trace:Container')
 const getClassDependencyNames = require('./getClassDependencyNames')
+const { isClass } = require('../utils/validators')
 const _factories = Symbol('factories')
 const _instances = Symbol('instances')
-
-function isClass(func) {
-  return (
-    typeof func === 'function' &&
-    Function.prototype.toString.call(func).startsWith('class')
-  )
-}
 
 function isObject(instance) {
   return (

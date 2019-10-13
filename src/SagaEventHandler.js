@@ -4,7 +4,7 @@
 const assert = require('assert-plus')
 
 const subscribe = require('./subscribe')
-const { isClass } = require('./utils')
+const { isClass } = require('./utils/validators')
 const info = require('debug')('cqrs:info')
 
 /**

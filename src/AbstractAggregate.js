@@ -1,14 +1,11 @@
 'use strict'
 
 const assert = require('assert-plus')
+const clone = require('rfdc')()
 
-const { validateHandlers, getHandler, getClassName } = require('./utils')
+const { validateHandlers } = require('./utils/validators')
+const { getHandler, getClassName } = require('./utils')
 const EventStream = require('./EventStream')
-
-/**
- * Deep-clone simple JS object
- */
-const clone = obj => JSON.parse(JSON.stringify(obj))
 
 const SNAPSHOT_EVENT_TYPE = 'snapshot'
 
