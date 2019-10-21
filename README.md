@@ -1,5 +1,7 @@
 # @uscreen.de/cqrs-kit
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/uscreen/node-cqrs.svg)](https://greenkeeper.io/)
+
 ![Travis (.com)](https://img.shields.io/travis/com/uscreen/node-cqrs) ![Coveralls github](https://img.shields.io/coveralls/github/uscreen/node-cqrs)
 
 > CQRS Starter Kit to start fast into DDD. Eventsourcing included. Some soldering required.
