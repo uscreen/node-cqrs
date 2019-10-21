@@ -1,0 +1,20 @@
+language: node_js
+
+node_js:
+  - node
+  - lts/*
+
+services:
+  - mongodb
+
+branches:
+  only:
+    - master
+
+cache: yarn
+
+env:
+  - mongoServer=127.0.0.1:27017
+
+script:
+  - "yarn test"
