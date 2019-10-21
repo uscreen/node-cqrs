@@ -1,5 +1,7 @@
 # @uscreen.de/cqrs-kit
 
+![Travis (.com)](https://img.shields.io/travis/com/uscreen/node-cqrs)
+
 > CQRS Starter Kit to start fast into DDD. Eventsourcing included. Some soldering required.
 
 This module is based on the work of and started as a fork of [snatalenko/node-cqrs](https://github.com/snatalenko/node-cqrs), so most credits go to Mr. Natalenko.
