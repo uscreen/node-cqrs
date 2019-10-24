@@ -162,6 +162,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   await t.test(
     'read anotherView as a projection with cqrs.views.read()',
     async t => {
+      await wait(100)
       const anotherView = await cqrs.AnotherViews.read(aggregateId)
       t.ok(
         anotherView,
