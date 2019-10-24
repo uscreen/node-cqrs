@@ -53,7 +53,8 @@ class AbstractProjection {
       masterHandler: this.project
     })
 
-    await this.restore(eventStore)
+    const shouldRestore = await this.shouldRestoreView
+    if (shouldRestore) await this.restore(eventStore)
   }
 
   /**
@@ -85,10 +86,9 @@ class AbstractProjection {
     const concurrentView = asConcurrentView(this.view)
     if (concurrentView) await concurrentView.lock()
 
-    const shouldRestore = await this.shouldRestoreView
-    if (shouldRestore) await this._restore(eventStore)
+    await this._restore(eventStore)
 
-    if (concurrentView) concurrentView.unlock()
+    if (concurrentView) await concurrentView.unlock()
   }
 
   /**
@@ -102,6 +102,7 @@ class AbstractProjection {
 
     const messageTypes = getHandledMessageTypes(this)
     const events = await eventStore.getAllEvents(messageTypes)
+
     if (!events.length) return
 
     info('%s restoring from %d event(s)...', this, events.length)

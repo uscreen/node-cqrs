@@ -34,8 +34,6 @@ module.exports = class MongoSnapshotStorage {
     if (evt.aggregateId) {
       evt.aggregateId = this.ObjectId(evt.aggregateId)
     }
-
-    delete evt.state
     return evt
   }
 

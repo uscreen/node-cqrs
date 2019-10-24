@@ -129,7 +129,6 @@ class AbstractAggregate {
     const event = {
       aggregateId: this.id,
       aggregateVersion: this.version,
-      state: this.state,
       type,
       payload
     }

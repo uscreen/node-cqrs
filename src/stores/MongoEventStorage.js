@@ -25,8 +25,6 @@ module.exports = class MongoEventStorage {
     if (evt.sagaId) {
       evt.sagaId = this.ObjectId(evt.sagaId)
     }
-
-    delete evt.state
     return evt
   }
 
@@ -74,17 +72,17 @@ module.exports = class MongoEventStorage {
       .toArray()
   }
 
-  /**
-   * @todo when used?
-   */
-  /* istanbul ignore next */
-  getEvents(eventTypes, filter) {
-    console.log('getEvents', eventTypes, filter)
-    return []
-    // if (!eventTypes) return this._events
-    // return this._events.then(events =>
-    //   events.filter(e => eventTypes.includes(e.type))
-    // )
+  getEvents(eventTypes) {
+    const query = {
+      type: { $in: eventTypes },
+      payload: { $type: 3 } // payload is object
+    }
+    return this.collection
+      .find(query, {
+        projection: { _id: false },
+        sort: 'aggregateVersion'
+      })
+      .toArray()
   }
 
   getNewId() {
