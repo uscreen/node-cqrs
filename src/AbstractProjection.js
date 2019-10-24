@@ -40,9 +40,10 @@ class AbstractProjection {
   /**
    * Creates an instance of AbstractProjection
    */
-  constructor(options) {
+  constructor({ eventStore, view }) {
     validateHandlers(this)
-    if (options && options.view) this._view = options.view
+    if (view) this._view = view
+    if (eventStore) this._eventStore = eventStore
   }
 
   /**
@@ -54,7 +55,7 @@ class AbstractProjection {
     })
 
     const shouldRestore = await this.shouldRestoreView
-    if (shouldRestore) await this.restore(eventStore)
+    if (shouldRestore) await this.restore()
   }
 
   /**
@@ -80,13 +81,13 @@ class AbstractProjection {
   /**
    * Restore projection view from event store
    */
-  async restore(eventStore) {
+  async restore() {
     // lock the view to ensure same restoring procedure
     // won't be performed by another projection instance
     const concurrentView = asConcurrentView(this.view)
     if (concurrentView) await concurrentView.lock()
 
-    await this._restore(eventStore)
+    await this._restore()
 
     if (concurrentView) await concurrentView.unlock()
   }
@@ -94,14 +95,14 @@ class AbstractProjection {
   /**
    * Restore projection view from event store
    */
-  async _restore(eventStore) {
-    assert.ok(eventStore, 'eventStore')
-    assert.func(eventStore.getAllEvents, 'eventStore.getAllEvents')
+  async _restore() {
+    assert.ok(this._eventStore, 'this._eventStore')
+    assert.func(this._eventStore.getAllEvents, 'this._eventStore.getAllEvents')
 
     info('%s retrieving events...', this)
 
     const messageTypes = getHandledMessageTypes(this)
-    const events = await eventStore.getAllEvents(messageTypes)
+    const events = await this._eventStore.getAllEvents(messageTypes)
 
     if (!events.length) return
 
