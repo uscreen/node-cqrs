@@ -42,7 +42,13 @@ class AbstractProjection {
    */
   constructor({ eventStore, view }) {
     validateHandlers(this)
-    if (view) this._view = view
+    if (view) {
+      this._view = view
+
+      // decorate my view with a restore mixin
+      this._view.restore = () => this.restore()
+    }
+
     if (eventStore) this._eventStore = eventStore
   }
 
