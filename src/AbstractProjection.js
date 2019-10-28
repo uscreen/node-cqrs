@@ -43,13 +43,17 @@ class AbstractProjection {
    */
   constructor({ eventStore, view }) {
     validateHandlers(this)
+
+    /* istanbul ignore else */
     if (view) {
       this._view = view
 
       // decorate my view with a restore mixin
       this._view.restore = () => this.restore()
+      // this._view._EventEmitter = new EventEmitter()
     }
 
+    /* istanbul ignore else */
     if (eventStore) this._eventStore = eventStore
   }
 
@@ -73,11 +77,20 @@ class AbstractProjection {
   async project(event) {
     const concurrentView = asConcurrentView(this.view)
 
-    /* istanbul ignore next */
     if (concurrentView && !concurrentView.ready)
       await concurrentView.once('ready')
 
-    return this._project(event)
+    /* istanbul ignore else */
+    if (concurrentView) await concurrentView.lock()
+    const result = await this._project(event)
+
+    this.view._emitter.emit(event.type, result)
+    console.log('--------------->', event.type)
+
+    /* istanbul ignore else */
+    if (concurrentView) await concurrentView.unlock()
+
+    return result
   }
 
   /**
@@ -86,6 +99,7 @@ class AbstractProjection {
   async _project(event) {
     const handler = getHandler(this, event.type)
     assert.func(handler, 'handler')
+
     return handler.call(this, event)
   }
 
@@ -97,12 +111,12 @@ class AbstractProjection {
     // won't be performed by another projection instance
     const concurrentView = asConcurrentView(this.view)
 
-    /* istanbul ignore next */
+    /* istanbul ignore else */
     if (concurrentView) await concurrentView.lock()
 
     await this._restore()
 
-    /* istanbul ignore next */
+    /* istanbul ignore else */
     if (concurrentView) await concurrentView.unlock()
   }
 

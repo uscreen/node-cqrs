@@ -146,8 +146,9 @@ const createDomain = async (
   cqrs.registerProjection(Views, 'Views')
 
   class AnotherViews extends AbstractProjection {
-    constructor() {
+    constructor({ eventStore }) {
       super({
+        eventStore,
         view: new MongoView({
           collection: anotherViewsCollection,
           ObjectId
@@ -180,14 +181,14 @@ const createDomain = async (
   cqrs.registerProjection(AnotherViews, 'AnotherViews')
 
   class ThirdProjection extends AbstractProjection {
-    get view() {
-      return (
-        this._view ||
-        (this._view = new MongoView({
+    constructor({ eventStore }) {
+      super({
+        eventStore,
+        view: new MongoView({
           collection: ThirdProjectionCollection,
           ObjectId
-        }))
-      )
+        })
+      })
     }
 
     get handles() {

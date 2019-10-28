@@ -1,5 +1,6 @@
 'use strict'
 
+const EventEmitter = require('events')
 const assert = require('assert-plus')
 
 module.exports = class MongoView {
@@ -10,8 +11,44 @@ module.exports = class MongoView {
     assert.func(ObjectId, '"ObjectId()" is required by MongoView')
     assert.object(collection, 'a "collection" is required by MongoView')
 
+    this._ready = false
     this.ObjectId = ObjectId
     this._collection = collection
+    this._emitter = new EventEmitter()
+    this.unlock()
+  }
+
+  /**
+   * Whether the view is ready (not locked)
+   */
+  get ready() {
+    return this._ready
+  }
+
+  /**
+   * Lock the view to prevent concurrent modifications
+   */
+  async lock() {
+    if (this.ready === false) await this.once('ready')
+    this._ready = false
+  }
+
+  /**
+   * Release the lock
+   */
+  async unlock() {
+    this._ready = true
+    this._emitter.emit('ready')
+  }
+
+  /**
+   * Create a Promise which will resolve to a first emitted event of a given type
+   */
+  once(eventType) {
+    assert.string(eventType, 'eventType')
+    return new Promise(resolve => {
+      this._emitter.once(eventType, resolve)
+    })
   }
 
   /**

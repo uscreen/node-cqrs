@@ -66,6 +66,8 @@ tap.test('Use with Saga', async t => {
       t.same('Lorem Ipsum', view.body, 'body should match payload')
       t.ok(view.stack.includes('SomethingDone'))
       t.ok(view.stack.includes('SomethingElseDone'))
+      // t.ok(view.SomethingDone)
+      // t.ok(view.SomethingElseDone)
       // console.log(view)
 
       // fails on CI??
