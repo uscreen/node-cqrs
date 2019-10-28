@@ -39,6 +39,7 @@ tap.test('Creating and using snapshots', async t => {
     const event = await cqrs.eventStore.once('EventChanged')
     aggregateId = event.aggregateId
 
+    await wait(100)
     const view = await cqrs.Views.read(aggregateId)
     t.same(aggregateId, view._id, 'view _id should match aggregateId')
     t.same('Baba Luga', view.body, 'body should match payload')
@@ -55,6 +56,7 @@ tap.test('Creating and using snapshots', async t => {
 
       await cqrs.Views.restore()
 
+      await wait(100)
       const view = await cqrs.Views.read(aggregateId)
       t.same(aggregateId, view._id, 'view _id should match aggregateId')
       t.same('Baba Luga', view.body, 'body should match payload')
