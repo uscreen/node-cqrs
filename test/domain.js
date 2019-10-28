@@ -92,14 +92,14 @@ const createDomain = async (t, ns = 'test', { skipSnapshot } = {}) => {
   cqrs.registerAggregate(Aggregate)
 
   class Views extends AbstractProjection {
-    get view() {
-      return (
-        this._view ||
-        (this._view = new MongoView({
+    constructor({ eventStore }) {
+      super({
+        eventStore,
+        view: new MongoView({
           collection: viewsCollection,
           ObjectId
-        }))
-      )
+        })
+      })
     }
 
     get shouldRestoreView() {
@@ -107,15 +107,15 @@ const createDomain = async (t, ns = 'test', { skipSnapshot } = {}) => {
     }
 
     EventCreated({ aggregateId, payload }) {
-      this.view.create(aggregateId, payload)
+      return this.view.create(aggregateId, payload)
     }
 
     EventChanged({ aggregateId, payload }) {
-      this.view.update(aggregateId, payload)
+      return this.view.update(aggregateId, payload)
     }
 
-    EventDeleted({ aggregateId }) {
-      this.view.delete(aggregateId)
+    async EventDeleted({ aggregateId }) {
+      await this.view.delete(aggregateId)
     }
 
     async SomethingDone({ aggregateId }) {

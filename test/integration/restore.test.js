@@ -1,0 +1,66 @@
+const tap = require('tap')
+const { wait } = require('../helper')
+const { createDomain } = require('../domain')
+
+tap.test('Creating and using snapshots', async t => {
+  const { cqrs, eventsCollection, viewsCollection } = await createDomain(
+    t,
+    'restore-'
+  )
+  let aggregateId
+
+  /**
+   * 1st create
+   */
+  await t.test('write a command with cqrs.commandBus.send()', async t => {
+    const payload = { body: 'Lorem Ipsum' }
+    const context = { reqId: 1234 }
+    await cqrs.commandBus.send('createEvent', null, { payload, context })
+    const event = await cqrs.eventStore.once('EventCreated')
+    aggregateId = event.aggregateId
+
+    await wait(100)
+
+    const found = await eventsCollection.findOne({ aggregateId })
+    t.same('EventCreated', found.type, 'type should be "EventCreated"')
+    t.same({ body: 'Lorem Ipsum' }, found.payload, 'body should match payload')
+    t.same({ reqId: 1234 }, found.context, 'context should have provided data')
+
+    t.end()
+  })
+
+  /**
+   * 1st update
+   */
+  await t.test('commit a change with cqrs.commandBus.send()', async t => {
+    const payload = { body: 'Baba Luga' }
+    const context = { reqId: 5678 }
+    await cqrs.commandBus.send('changeEvent', aggregateId, { payload, context })
+    const event = await cqrs.eventStore.once('EventChanged')
+    aggregateId = event.aggregateId
+
+    const view = await cqrs.Views.read(aggregateId)
+    t.same(aggregateId, view._id, 'view _id should match aggregateId')
+    t.same('Baba Luga', view.body, 'body should match payload')
+    t.end()
+  })
+
+  /**
+   * delete & restore views
+   */
+  await t.test(
+    'deleted views should get restored by cqrs.Views.restore()',
+    async t => {
+      await viewsCollection.drop()
+
+      await cqrs.Views.restore()
+
+      const view = await cqrs.Views.read(aggregateId)
+      t.same(aggregateId, view._id, 'view _id should match aggregateId')
+      t.same('Baba Luga', view.body, 'body should match payload')
+      t.end()
+    }
+  )
+
+  t.end()
+})
