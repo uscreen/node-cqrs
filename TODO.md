@@ -7,11 +7,12 @@
 - [x] check to also emit state to views (is state current state?) => no should not be emited
 - [x] are sagas sequenced? => No, at least not yet
 - [x] shouldn't we keep multiple snapshot versions? => Yes, and we do :)
-- [ ] check for restore option/method
+- [x] check for restore option/method
 - [ ] restore from snapshot (optional?)
 - [ ] add a view event to listen for completion?
 - [ ] maybe better rename saga.enqueue to somthing command related
 - [ ] clearly document in variants of declaring handles!
+- [ ] review Saga implementation
 - [ ] make EventStream a real stream
 
 - [ ] remove unused files

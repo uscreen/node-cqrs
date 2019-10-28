@@ -6,11 +6,16 @@ const {
   MongoView,
   MongoEventStorage,
   MongoSnapshotStorage,
-  InMemoryMessageBus
+  InMemoryMessageBus,
+  NatsMessageBus
 } = require('../index')
 const { config, wait } = require('./helper')
 
-const createDomain = async (t, ns = 'test', { skipSnapshot } = {}) => {
+const createDomain = async (
+  t,
+  ns = 'test',
+  { skipSnapshot, useNatsBus } = {}
+) => {
   const client = await MongoClient.connect(config.mongoUri)
   const db = client.db()
   const eventsCollection = db.collection(`${ns}-events`)
@@ -36,7 +41,11 @@ const createDomain = async (t, ns = 'test', { skipSnapshot } = {}) => {
   const cqrs = new Container()
 
   cqrs.register(MongoEventStorage, 'storage')
-  cqrs.register(InMemoryMessageBus, 'messageBus')
+  if (useNatsBus) {
+    cqrs.register(NatsMessageBus, 'messageBus')
+  } else {
+    cqrs.register(InMemoryMessageBus, 'messageBus')
+  }
 
   if (!skipSnapshot) {
     cqrs.register(MongoSnapshotStorage, 'snapshotStorage')

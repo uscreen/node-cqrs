@@ -18,7 +18,7 @@ exports.AbstractProjection = require('./AbstractProjection')
 // exports.InMemoryView = require('./infrastructure/InMemoryView')
 
 exports.InMemoryMessageBus = require('./buses/InMemoryMessageBus')
-// exports.NatsMessageBus = require('./buses/NatsMessageBus')
+exports.NatsMessageBus = require('./buses/NatsMessageBus')
 
 exports.MongoEventStorage = require('./stores/MongoEventStorage')
 exports.MongoSnapshotStorage = require('./stores/MongoSnapshotStorage')
