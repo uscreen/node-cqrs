@@ -3,7 +3,7 @@
 const assert = require('assert-plus')
 
 const { validateHandlers } = require('./utils/validators')
-const { getHandler, getClassName } = require('./utils')
+const { getHandler } = require('./utils')
 
 const _id = Symbol('id')
 const _version = Symbol('version')
@@ -17,6 +17,7 @@ class AbstractSaga {
    * List of events that start new saga,
    * must be overridden in Saga implementation
    */
+  /* istanbul ignore next */
   static get startsWith() {
     assert.fail(
       'startsWith must be overriden to return a list of event types that start saga'
@@ -89,6 +90,7 @@ class AbstractSaga {
     )
 
     const r = handler.call(this, event)
+    /* istanbul ignore next */
     if (r instanceof Promise) {
       return r.then(() => {
         this[_version] += 1
@@ -134,13 +136,6 @@ class AbstractSaga {
    */
   resetUncommittedMessages() {
     this[_messages].length = 0
-  }
-
-  /**
-   * Get human-readable Saga name
-   */
-  toString() {
-    return `${getClassName(this)} ${this.id} (v${this.version})`
   }
 }
 

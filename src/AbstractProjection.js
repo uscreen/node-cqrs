@@ -9,6 +9,7 @@ const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
 const { validateHandlers } = require('./utils/validators')
 const { getHandler, getClassName } = require('./utils')
 
+/* istanbul ignore next */
 const asConcurrentView = view => (isConcurrentView(view) ? view : undefined)
 
 /**
@@ -26,7 +27,7 @@ class AbstractProjection {
    * View associated with projection
    */
   get view() {
-    return this._view || (this._view = new Map())
+    return this._view || /* istanbul ignore next */ (this._view = new Map())
   }
 
   /**
@@ -61,6 +62,8 @@ class AbstractProjection {
     })
 
     const shouldRestore = await this.shouldRestoreView
+
+    /* istanbul ignore next */
     if (shouldRestore) await this.restore()
   }
 
@@ -69,6 +72,8 @@ class AbstractProjection {
    */
   async project(event) {
     const concurrentView = asConcurrentView(this.view)
+
+    /* istanbul ignore next */
     if (concurrentView && !concurrentView.ready)
       await concurrentView.once('ready')
 
@@ -91,10 +96,13 @@ class AbstractProjection {
     // lock the view to ensure same restoring procedure
     // won't be performed by another projection instance
     const concurrentView = asConcurrentView(this.view)
+
+    /* istanbul ignore next */
     if (concurrentView) await concurrentView.lock()
 
     await this._restore()
 
+    /* istanbul ignore next */
     if (concurrentView) await concurrentView.unlock()
   }
 
@@ -110,6 +118,7 @@ class AbstractProjection {
     const messageTypes = getHandledMessageTypes(this)
     const events = await this._eventStore.getAllEvents(messageTypes)
 
+    /* istanbul ignore next */
     if (!events.length) return
 
     info('%s restoring from %d event(s)...', this, events.length)
@@ -117,7 +126,7 @@ class AbstractProjection {
     for (const event of events) {
       try {
         await this._project(event)
-      } catch (err) {
+      } catch (err) /* istanbul ignore next */ {
         info('%s view restoring has failed on event: %j', this, event)
         info(err)
         throw err
@@ -125,13 +134,6 @@ class AbstractProjection {
     }
 
     info('%s view restored (%s)', this, this.view)
-  }
-
-  /**
-   * Get human-readable Projection name
-   */
-  toString() {
-    return getClassName(this)
   }
 
   get name() {

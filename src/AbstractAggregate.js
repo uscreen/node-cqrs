@@ -4,7 +4,7 @@ const assert = require('assert-plus')
 const clone = require('rfdc')()
 
 const { validateHandlers } = require('./utils/validators')
-const { getHandler, getClassName } = require('./utils')
+const { getHandler } = require('./utils')
 const EventStream = require('./EventStream')
 
 const SNAPSHOT_EVENT_TYPE = 'snapshot'
@@ -56,6 +56,7 @@ class AbstractAggregate {
   /**
    * Override to define, whether an aggregate state snapshot should be taken
    */
+  /* istanbul ignore next */
   get shouldTakeSnapshot() {
     return false
   }
@@ -195,13 +196,6 @@ class AbstractAggregate {
     )
 
     Object.assign(this.state, clone(snapshotEvent.payload))
-  }
-
-  /**
-   * Get human-readable aggregate identifier
-   */
-  toString() {
-    return `${getClassName(this)} ${this.id} (v${this.version})`
   }
 }
 

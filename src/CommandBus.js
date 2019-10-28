@@ -22,9 +22,18 @@ class CommandBus {
 
   /**
    * Format and send a command for execution
+   * alias to send
+   */
+  commit(type, aggregateId, options) {
+    return this.sendRaw(Object.assign({ type, aggregateId }, options))
+  }
+
+  /**
+   * Format and send a command for execution
+   * alias to commit
    */
   send(type, aggregateId, options) {
-    return this.sendRaw(Object.assign({ type, aggregateId }, options))
+    return this.commit(type, aggregateId, options)
   }
 
   /**

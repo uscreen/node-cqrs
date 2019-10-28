@@ -68,7 +68,7 @@ const createDomain = async (t, ns = 'test', { skipSnapshot } = {}) => {
       return this.version - this.snapshotVersion > 10
     }
 
-    createEvent(payload) {
+    async createEvent(payload) {
       this.emit('EventCreated', payload)
     }
 
@@ -82,7 +82,7 @@ const createDomain = async (t, ns = 'test', { skipSnapshot } = {}) => {
     }
 
     async doSomething(payload) {
-      this.emit('SomethingDone', payload)
+      return this.emit('SomethingDone', payload)
     }
 
     async doSomethingElse(payload) {

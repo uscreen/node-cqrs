@@ -12,10 +12,10 @@ tap.test('Creating and using snapshots', async t => {
   /**
    * 1st create
    */
-  await t.test('write a command with cqrs.commandBus.send()', async t => {
+  await t.test('write a command with cqrs.commandBus.commit()', async t => {
     const payload = { body: 'Lorem Ipsum' }
     const context = { reqId: 1234 }
-    await cqrs.commandBus.send('createEvent', null, { payload, context })
+    await cqrs.commandBus.commit('createEvent', null, { payload, context })
     const event = await cqrs.eventStore.once('EventCreated')
     aggregateId = event.aggregateId
 
@@ -32,10 +32,13 @@ tap.test('Creating and using snapshots', async t => {
   /**
    * 1st update
    */
-  await t.test('commit a change with cqrs.commandBus.send()', async t => {
+  await t.test('commit a change with cqrs.commandBus.commit()', async t => {
     const payload = { body: 'Baba Luga' }
     const context = { reqId: 5678 }
-    await cqrs.commandBus.send('changeEvent', aggregateId, { payload, context })
+    await cqrs.commandBus.commit('changeEvent', aggregateId, {
+      payload,
+      context
+    })
     const event = await cqrs.eventStore.once('EventChanged')
     aggregateId = event.aggregateId
 
@@ -56,7 +59,7 @@ tap.test('Creating and using snapshots', async t => {
 
       await cqrs.Views.restore()
 
-      await wait(100)
+      // await wait(100)
       const view = await cqrs.Views.read(aggregateId)
       t.same(aggregateId, view._id, 'view _id should match aggregateId')
       t.same('Baba Luga', view.body, 'body should match payload')

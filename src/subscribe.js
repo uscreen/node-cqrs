@@ -9,7 +9,12 @@ const unique = arr => [...new Set(arr)]
 /**
  * Subscribe observer to observable
  */
-function subscribe(observable, observer, options = {}) {
+function subscribe(
+  observable,
+  observer,
+  /* istanbul ignore next */
+  options = {}
+) {
   assert.object(observable, 'observable')
   assert.func(observable.on, 'observable.on')
   assert.object(observer, 'observer')
@@ -30,7 +35,10 @@ function subscribe(observable, observer, options = {}) {
   )
 
   for (const messageType of unique(subscribeTo)) {
-    const handler = masterHandler || getHandler(observer, messageType)
+    const handler =
+      masterHandler ||
+      /* istanbul ignore next */
+      getHandler(observer, messageType)
     assert.func(handler, 'handler')
 
     if (queueName) {

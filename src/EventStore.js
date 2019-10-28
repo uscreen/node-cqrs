@@ -45,8 +45,12 @@ function setupOneTimeEmitterSubscription(
     let handled = false
 
     function filteredHandler(event) {
+      /* istanbul ignore next */
       if (filter && !filter(event)) return
+
+      /* istanbul ignore if */
       if (handled) return
+
       handled = true
 
       for (const messageType of messageTypes) {
@@ -59,6 +63,7 @@ function setupOneTimeEmitterSubscription(
         messageTypes.join(',')
       )
 
+      /* istanbul ignore if */
       if (handler) handler(event)
 
       resolve(event)
@@ -68,6 +73,7 @@ function setupOneTimeEmitterSubscription(
       emitter.on(messageType, filteredHandler)
     }
 
+    /* istanbul ignore next */
     debug(
       "set up one-time %s to '%s'",
       filter ? 'filtered subscription' : 'subscription',
@@ -142,6 +148,8 @@ class EventStore {
    */
   async getAllEvents(eventTypes, filter) {
     assert.optionalArray(eventTypes, 'eventTypes')
+
+    /* istanbul ignore next */
     debug('retrieving %s events...', eventTypes ? eventTypes.join(', ') : 'all')
 
     const events = await this._storage.getEvents(eventTypes, filter)
@@ -199,7 +207,10 @@ class EventStore {
    * Register event types that start sagas.
    * Upon such event commit a new sagaId will be assigned
    */
-  registerSagaStarters(eventTypes = []) {
+  registerSagaStarters(
+    /* istanbul ignore next */
+    eventTypes = []
+  ) {
     const uniqueEventTypes = eventTypes.filter(
       e => !this._sagaStarters.includes(e)
     )
@@ -223,6 +234,7 @@ class EventStore {
 
     // after events are saved to the persistent storage,
     // publish them to the event bus (i.e. RabbitMq)
+    /* istanbul ignore else */
     if (this._publishTo) await this.publish(eventStreamWithoutSnapshots)
 
     return eventStreamWithoutSnapshots
@@ -234,6 +246,7 @@ class EventStore {
   async _attachSagaIdToSagaStarterEvents(events) {
     const r = []
     for (const event of events) {
+      /* istanbul ignore else */
       if (this._sagaStarters.includes(event.type)) {
         assert.ok(
           !event.sagaId,
@@ -297,12 +310,14 @@ class EventStore {
         () => {
           debug('%s published', eventStream)
         },
+        /* istanbul ignore next */
         err => {
           info('%s publishing failed: %s', eventStream, err)
           throw err
         }
       )
 
+    /* istanbul ignore else */
     if (this.config.publishAsync) {
       debug('publishing %s asynchronously...', eventStream)
       setImmediate(publishEvents)
@@ -336,6 +351,7 @@ class EventStore {
    * Creates one-time subscription for one or multiple events that match a filter
    */
   once(messageTypes, handler, filter) {
+    /* istanbul ignore next */
     const subscribeTo = Array.isArray(messageTypes)
       ? messageTypes
       : [messageTypes]

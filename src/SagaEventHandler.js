@@ -67,11 +67,14 @@ class SagaEventHandler {
     const saga = await this._restoreSaga(event)
 
     const r = saga.apply(event)
+    /* istanbul ignore next */
     if (r instanceof Promise) await r
 
     while (saga.uncommittedMessages.length) {
       const commands = saga.uncommittedMessages
       saga.resetUncommittedMessages()
+
+      /* istanbul ignore next */
       info(
         '%s "%s" event processed, %s produced',
         event.type,
@@ -80,12 +83,15 @@ class SagaEventHandler {
 
       for (const command of commands) {
         // attach event context to produced command
-        if (command.context === undefined && event.context !== undefined)
+        /* istanbul ignore else */
+        if (command.context === undefined && event.context !== undefined) {
           command.context = event.context
+        }
 
         try {
           await this._commandBus.sendRaw(command)
         } catch (err) {
+          /* istanbul ignore next */
           if (typeof saga.onError === 'function') {
             // let saga to handle the error
             saga.onError(err, { event, command })
