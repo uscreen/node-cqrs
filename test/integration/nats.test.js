@@ -1,5 +1,4 @@
 const tap = require('tap')
-const { wait } = require('../helper')
 const { createDomain } = require('../domain')
 const { AbstractSaga } = require('../../index')
 
@@ -42,7 +41,8 @@ tap.test('Creating and using snapshots', async t => {
     const event = await cqrs.eventStore.once('EventCreated')
     aggregateId = event.aggregateId
 
-    await wait(200)
+    await cqrs.Views.once('SomethingDone')
+    await cqrs.Views.once('SomethingElseDone')
 
     const found = await eventsCollection.findOne({ aggregateId })
     t.same('EventCreated', found.type, 'type should be "EventCreated"')
@@ -63,6 +63,9 @@ tap.test('Creating and using snapshots', async t => {
       payload,
       context
     })
+
+    const event = await cqrs.eventStore.once('EventChanged')
+    aggregateId = event.aggregateId
 
     await cqrs.Views.once('EventChanged')
 
