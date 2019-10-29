@@ -12,10 +12,7 @@ exports.AbstractSaga = require('./AbstractSaga')
 exports.SagaEventHandler = require('./SagaEventHandler')
 exports.AbstractProjection = require('./AbstractProjection')
 
-// exports.InMemoryMessageBus = require('./infrastructure/InMemoryMessageBus')
-// exports.InMemoryEventStorage = require('./infrastructure/InMemoryEventStorage')
-// exports.InMemorySnapshotStorage = require('./infrastructure/InMemorySnapshotStorage')
-// exports.InMemoryView = require('./infrastructure/InMemoryView')
+exports.InMemoryLock = require('./locks/InMemoryLock')
 
 exports.InMemoryMessageBus = require('./buses/InMemoryMessageBus')
 exports.NatsMessageBus = require('./buses/NatsMessageBus')

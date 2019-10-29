@@ -1,39 +1,40 @@
 'use strict'
 
 const assert = require('assert-plus')
-const { Lock } = require('lock')
 const info = require('debug')('cqrs:info')
 
 const subscribe = require('./subscribe')
+const InMemoryLock = require('./locks/InMemoryLock')
 const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
 const { validateHandlers } = require('./utils/validators')
 const { getHandler, getClassName } = require('./utils')
 
-const lock = Lock()
-
-const locked = (key, cb) => {
-  return new Promise((resolve, reject) => {
-    // lock with given key
-    lock(key, async release => {
-      const result = await cb()
-      resolve(result)
-
-      // release lock of key and report any error
-      release(err => {
-        /* istanbul ignore next */
-        if (err) {
-          console.error(`${key} unlocked with error:`, err)
-          reject(err)
-        }
-      })()
-    })
-  })
-}
-
 /**
  * Base class for Projection definition
  */
-class AbstractProjection {
+module.exports = class AbstractProjection {
+  /**
+   * Creates an instance of AbstractProjection
+   */
+  constructor({ eventStore, view }) {
+    validateHandlers(this)
+    assert.object(view, 'view')
+    assert.object(eventStore, 'eventStore')
+
+    this._eventStore = eventStore
+    this._view = view
+
+    // decorate my view with a restore mixin (dirty?)
+    this._view.restore = () => this.restore()
+  }
+
+  /**
+   * Name of Instance (to be used in keys, etc.)
+   */
+  get name() {
+    return getClassName(this)
+  }
+
   /**
    * List of event types being handled by projection. Can be overridden in projection implementation
    */
@@ -49,30 +50,18 @@ class AbstractProjection {
   }
 
   /**
+   * Locker maybe overwritten by DI
+   */
+  get locker() {
+    return this._locker || (this._locker = new InMemoryLock())
+  }
+
+  /**
    * Indicates if view should be restored from EventStore on start.
    * Override for custom behavior.
    */
   get shouldRestoreView() {
     return this.view instanceof Map
-  }
-
-  /**
-   * Creates an instance of AbstractProjection
-   */
-  constructor({ eventStore, view }) {
-    validateHandlers(this)
-
-    /* istanbul ignore else */
-    if (view) {
-      this._view = view
-
-      // decorate my view with a restore mixin
-      this._view.restore = () => this.restore()
-      // this._view._EventEmitter = new EventEmitter()
-    }
-
-    /* istanbul ignore else */
-    if (eventStore) this._eventStore = eventStore
   }
 
   /**
@@ -93,7 +82,7 @@ class AbstractProjection {
    * Pass event to projection event handler
    */
   async project(event) {
-    return locked(`project-${event.aggregateId}`, async () => {
+    return this.locker.locked(`project-${event.aggregateId}`, async () => {
       const result = await this._project(event)
       this.view._emitter.emit(event.type, result)
       return result
@@ -113,7 +102,7 @@ class AbstractProjection {
    * Restore projection view from event store
    */
   async restore() {
-    return locked(`restore-${this.name}`, async () => {
+    return this.locker.locked(`restore-${this.name}`, async () => {
       const result = await this._restore()
       return result
     })
@@ -148,10 +137,4 @@ class AbstractProjection {
 
     info('%s view restored (%s)', this, this.view)
   }
-
-  get name() {
-    return getClassName(this)
-  }
 }
-
-module.exports = AbstractProjection
