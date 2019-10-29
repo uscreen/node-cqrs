@@ -86,17 +86,6 @@ module.exports.validateEvent = event => {
 }
 
 /**
- * determine locking features required
- * by concurrent views
- */
-module.exports.isConcurrentView = view =>
-  typeof view.lock === 'function' &&
-  /* istanbul ignore next */
-  typeof view.unlock === 'function' &&
-  /* istanbul ignore next */
-  typeof view.once === 'function'
-
-/**
  * returns true on functions creating a class
  */
 module.exports.isClass = func => {

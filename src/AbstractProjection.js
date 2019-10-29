@@ -1,16 +1,34 @@
 'use strict'
 
 const assert = require('assert-plus')
+const { Lock } = require('lock')
 const info = require('debug')('cqrs:info')
 
-const { isConcurrentView } = require('./utils/validators')
 const subscribe = require('./subscribe')
 const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
 const { validateHandlers } = require('./utils/validators')
 const { getHandler, getClassName } = require('./utils')
 
-/* istanbul ignore next */
-const asConcurrentView = view => (isConcurrentView(view) ? view : undefined)
+const lock = Lock()
+
+const locked = (key, cb) => {
+  return new Promise((resolve, reject) => {
+    // lock with given key
+    lock(key, async release => {
+      const result = await cb()
+      resolve(result)
+
+      // release lock of key and report any error
+      release(err => {
+        /* istanbul ignore next */
+        if (err) {
+          console.error(`${key} unlocked with error:`, err)
+          reject(err)
+        }
+      })()
+    })
+  })
+}
 
 /**
  * Base class for Projection definition
@@ -75,24 +93,11 @@ class AbstractProjection {
    * Pass event to projection event handler
    */
   async project(event) {
-    const concurrentView = asConcurrentView(this.view)
-
-    /* istanbul ignore next */
-    if (concurrentView && !concurrentView.ready) {
-      await concurrentView.once('ready')
-    }
-
-    /* istanbul ignore else */
-    if (concurrentView) await concurrentView.lock()
-    const result = await this._project(event)
-
-    this.view._emitter.emit(event.type, result)
-    // console.log('--------------->', event.type)
-
-    /* istanbul ignore else */
-    if (concurrentView) await concurrentView.unlock()
-
-    return result
+    return locked(`project-${event.aggregateId}`, async () => {
+      const result = await this._project(event)
+      this.view._emitter.emit(event.type, result)
+      return result
+    })
   }
 
   /**
@@ -101,7 +106,6 @@ class AbstractProjection {
   async _project(event) {
     const handler = getHandler(this, event.type)
     assert.func(handler, 'handler')
-
     return handler.call(this, event)
   }
 
@@ -109,17 +113,10 @@ class AbstractProjection {
    * Restore projection view from event store
    */
   async restore() {
-    // lock the view to ensure same restoring procedure
-    // won't be performed by another projection instance
-    const concurrentView = asConcurrentView(this.view)
-
-    /* istanbul ignore else */
-    if (concurrentView) await concurrentView.lock()
-
-    await this._restore()
-
-    /* istanbul ignore else */
-    if (concurrentView) await concurrentView.unlock()
+    return locked(`restore-${this.name}`, async () => {
+      const result = await this._restore()
+      return result
+    })
   }
 
   /**
