@@ -1,5 +1,5 @@
 const tap = require('tap')
-const { wait } = require('../helper')
+
 const { createDomain } = require('../domain')
 
 tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
@@ -15,7 +15,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
     const context = { reqId: 1234 }
     await cqrs.commandBus.send('createEvent', id, { payload, context })
     await cqrs.eventStore.once('EventCreated')
-    await wait(100)
+    await cqrs.Views.once('EventCreated')
 
     const found = await eventsCollection.findOne({ aggregateId: id })
     t.same(id, found.aggregateId, 'event should have been stored with given id')
@@ -34,7 +34,6 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   await t.test(
     'read a view from a projection with cqrs.views.read()',
     async t => {
-      await wait(100)
       const view = await cqrs.Views.read(aggregateId)
       t.same(aggregateId, view._id, 'view _id should match aggregateId')
       t.same('Lorem Ipsum', view.body, 'body should match payload')
@@ -53,7 +52,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
     const context = { reqId: 5678 }
     await cqrs.commandBus.send('changeEvent', aggregateId, { payload, context })
     await cqrs.eventStore.once('EventChanged')
-    await wait(100)
+    await cqrs.Views.once('EventChanged')
 
     const e = await eventsCollection
       .find({ aggregateId }, { sort: 'aggregateVersion' })
@@ -108,7 +107,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
     const context = { reqId: 9012 }
     await cqrs.commandBus.send('deleteEvent', aggregateId, { context })
     await cqrs.eventStore.once('EventDeleted')
-    await wait(100)
+    await cqrs.Views.once('EventDeleted')
 
     const e = await eventsCollection
       .find({ aggregateId }, { sort: 'aggregateVersion' })
@@ -162,7 +161,6 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   await t.test(
     'read anotherView as a projection with cqrs.views.read()',
     async t => {
-      await wait(100)
       const anotherView = await cqrs.AnotherViews.read(aggregateId)
       t.ok(
         anotherView,

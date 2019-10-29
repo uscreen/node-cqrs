@@ -30,13 +30,13 @@ const createDomain = async (
     await viewsCollection.drop()
     await anotherViewsCollection.drop()
     await ThirdProjectionCollection.drop()
+    await wait(500)
   } catch (_) {}
 
   t.teardown(async () => {
+    await wait(500)
     await client.close()
   })
-
-  await wait(200)
 
   const cqrs = new Container()
 
@@ -161,21 +161,21 @@ const createDomain = async (
     }
 
     EventCreated({ aggregateId, payload }) {
-      this.view.create(aggregateId, payload)
+      return this.view.create(aggregateId, payload)
     }
 
     /**
      * underscore prefixed should handled too
      */
     _EventChanged({ aggregateId, payload }) {
-      this.view.update(aggregateId, payload)
+      return this.view.update(aggregateId, payload)
     }
 
     /**
      * unlisteted handles should get used
      */
     EventDeleted({ aggregateId }) {
-      this.view.delete(aggregateId)
+      return this.view.delete(aggregateId)
     }
   }
   cqrs.registerProjection(AnotherViews, 'AnotherViews')
@@ -200,7 +200,10 @@ const createDomain = async (
     }
 
     EventCreated({ aggregateId, payload }) {
-      this.view.create(aggregateId, Object.assign({ name: this.name }, payload))
+      return this.view.create(
+        aggregateId,
+        Object.assign({ name: this.name }, payload)
+      )
     }
   }
   cqrs.registerProjection(ThirdProjection, 'ThirdProjection')

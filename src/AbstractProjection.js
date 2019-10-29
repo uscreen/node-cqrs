@@ -85,7 +85,7 @@ class AbstractProjection {
     const result = await this._project(event)
 
     this.view._emitter.emit(event.type, result)
-    console.log('--------------->', event.type)
+    // console.log('--------------->', event.type)
 
     /* istanbul ignore else */
     if (concurrentView) await concurrentView.unlock()
