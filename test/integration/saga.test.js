@@ -1,5 +1,4 @@
 const tap = require('tap')
-const { wait } = require('../helper')
 const { createDomain } = require('../domain')
 const { AbstractSaga } = require('../../index')
 
@@ -38,7 +37,10 @@ tap.test('Use with Saga', async t => {
     const context = { reqId: 1234 }
     await cqrs.commandBus.send('createEvent', id, { payload, context })
     await cqrs.eventStore.once('EventCreated')
-    await wait(100)
+    await cqrs.Views.once('EventCreated')
+
+    await cqrs.Views.once('SomethingDone')
+    await cqrs.Views.once('SomethingElseDone')
 
     const found = await eventsCollection.findOne({ aggregateId: id })
 
@@ -60,24 +62,22 @@ tap.test('Use with Saga', async t => {
   await t.test(
     'read a view from a projection with cqrs.views.read()',
     async t => {
-      await wait(500)
       const view = await cqrs.Views.read(aggregateId)
       t.same(aggregateId, view._id, 'view _id should match aggregateId')
       t.same('Lorem Ipsum', view.body, 'body should match payload')
       t.ok(view.stack.includes('SomethingDone'))
       t.ok(view.stack.includes('SomethingElseDone'))
-      // t.ok(view.SomethingDone)
-      // t.ok(view.SomethingElseDone)
-      // console.log(view)
+      t.ok(view.SomethingDone)
+      t.ok(view.SomethingElseDone)
+      console.log(view)
 
       // fails on CI??
-      // t.same(
-      //   ['SomethingDone', 'SomethingElseDone'],
-      //   view.stack,
-      //   'stack should be in exact order'
-      // )
-      // t.ok(view.SomethingDone)
-      // t.ok(view.SomethingElseDone)
+      t.same(
+        ['SomethingDone', 'SomethingElseDone'],
+        view.stack,
+        'stack should be in exact order'
+      )
+
       t.end()
     }
   )

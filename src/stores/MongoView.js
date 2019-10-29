@@ -29,6 +29,7 @@ module.exports = class MongoView {
    * Lock the view to prevent concurrent modifications
    */
   async lock() {
+    /* istanbul ignore next */
     if (this.ready === false) await this.once('ready')
     this._ready = false
   }

@@ -18,6 +18,8 @@ tap.test('Creating and using snapshots', async t => {
     const event = await cqrs.eventStore.once('EventCreated')
     aggregateId = event.aggregateId
 
+    await cqrs.Views.once('EventCreated')
+
     const found = await eventsCollection.findOne({ aggregateId })
     t.same('EventCreated', found.type, 'type should be "EventCreated"')
     t.same({ body: 'Lorem Ipsum' }, found.payload, 'body should match payload')
@@ -34,6 +36,7 @@ tap.test('Creating and using snapshots', async t => {
     const context = { reqId: 5678 }
     await cqrs.commandBus.send('changeEvent', aggregateId, { payload, context })
     await cqrs.eventStore.once('EventChanged')
+    await cqrs.Views.once('EventChanged')
     t.end()
   })
 
@@ -50,6 +53,7 @@ tap.test('Creating and using snapshots', async t => {
         context
       })
       await cqrs.eventStore.once('EventChanged')
+      await cqrs.Views.once('EventChanged')
     }
 
     const s = await snapshotsCollection
@@ -103,6 +107,7 @@ tap.test('Should give same results without snapshots', async t => {
     const context = { reqId: 1234 }
     await cqrs.commandBus.send('createEvent', id, { payload, context })
     await cqrs.eventStore.once('EventCreated')
+    await cqrs.Views.once('EventCreated')
 
     const found = await eventsCollection.findOne({ aggregateId: id })
     t.same('EventCreated', found.type, 'type should be "EventCreated"')
@@ -121,6 +126,7 @@ tap.test('Should give same results without snapshots', async t => {
     const context = { reqId: 5678 }
     await cqrs.commandBus.send('changeEvent', aggregateId, { payload, context })
     await cqrs.eventStore.once('EventChanged')
+    await cqrs.Views.once('EventChanged')
     t.end()
   })
 
@@ -137,6 +143,7 @@ tap.test('Should give same results without snapshots', async t => {
         context
       })
       await cqrs.eventStore.once('EventChanged')
+      await cqrs.Views.once('EventChanged')
     }
 
     const s = await snapshotsCollection.find().toArray()
