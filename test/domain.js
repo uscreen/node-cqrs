@@ -90,11 +90,11 @@ const createDomain = async (
       this.emit('EventDeleted')
     }
 
-    async doSomething(payload) {
-      return this.emit('SomethingDone', payload)
+    doSomething(payload) {
+      this.emit('SomethingDone', payload)
     }
 
-    async doSomethingElse(payload) {
+    doSomethingElse(payload) {
       this.emit('SomethingElseDone', payload)
     }
   }

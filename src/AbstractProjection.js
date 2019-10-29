@@ -77,8 +77,10 @@ class AbstractProjection {
   async project(event) {
     const concurrentView = asConcurrentView(this.view)
 
-    if (concurrentView && !concurrentView.ready)
+    /* istanbul ignore next */
+    if (concurrentView && !concurrentView.ready) {
       await concurrentView.once('ready')
+    }
 
     /* istanbul ignore else */
     if (concurrentView) await concurrentView.lock()

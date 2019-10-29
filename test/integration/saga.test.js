@@ -69,9 +69,6 @@ tap.test('Use with Saga', async t => {
       t.ok(view.stack.includes('SomethingElseDone'))
       t.ok(view.SomethingDone)
       t.ok(view.SomethingElseDone)
-      console.log(view)
-
-      // fails on CI??
       t.same(
         ['SomethingDone', 'SomethingElseDone'],
         view.stack,
