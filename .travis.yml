@@ -8,11 +8,13 @@ node_js:
 
 services:
   - mongodb
+  - redis-server
 
 cache: yarn
 
 env:
   - mongoServer=127.0.0.1:27017
+  - redisHost=127.0.0.1
 
 script:
   - "yarn test"

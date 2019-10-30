@@ -13,6 +13,7 @@ exports.SagaEventHandler = require('./SagaEventHandler')
 exports.AbstractProjection = require('./AbstractProjection')
 
 exports.InMemoryLock = require('./locks/InMemoryLock')
+exports.RedisLock = require('./locks/RedisLock')
 
 exports.InMemoryMessageBus = require('./buses/InMemoryMessageBus')
 exports.NatsMessageBus = require('./buses/NatsMessageBus')

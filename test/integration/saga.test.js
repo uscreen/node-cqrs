@@ -2,7 +2,7 @@ const tap = require('tap')
 const { createDomain } = require('../domain')
 const { AbstractSaga } = require('../../index')
 
-tap.test('Use with Saga', async t => {
+tap.test('Use Saga with default InMemoryLock', async t => {
   const { cqrs, eventsCollection } = await createDomain(t, 'sagaTest-')
   let aggregateId
 
