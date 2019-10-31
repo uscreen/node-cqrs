@@ -65,6 +65,7 @@ tap.test('Creating and using snapshots', async t => {
     })
 
     const event = await cqrs.eventStore.once('EventChanged')
+    console.log(event)
     aggregateId = event.aggregateId
 
     await cqrs.Views.once('EventChanged')

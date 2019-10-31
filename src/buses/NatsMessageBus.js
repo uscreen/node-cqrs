@@ -2,18 +2,46 @@
 
 const assert = require('assert-plus')
 
+const InMemoryMessageBus = require('./InMemoryMessageBus')
+
 /**
- * Default implementation of the message bus. Keeps all subscriptions and messages in memory.
+ * Default implementation of the message bus.
+ * Keeps all subscriptions and messages in memory.
  */
 module.exports = class NatsMessageBus {
   /**
-   * Creates an instance of InMemoryMessageBus
+   * Creates an instance of NatsMessageBus
    */
-  constructor({ name, uniqueEventHandlers = !!name } = {}) {
-    this._handlers = new Map()
+  constructor({ name, natsClient }) {
     this._name = name
-    this._uniqueEventHandlers = uniqueEventHandlers
+    this._handlers = new Map()
     this._queues = new Map()
+    this._nats = natsClient
+  }
+
+  _publish(type, event) {
+    this._nats.publish(type, event)
+  }
+
+  _subscribe(type, handler) {
+    this._nats.subscribe(type, handler)
+  }
+
+  /**
+   * Get or create a named queue.
+   * Named queues support only one handler per event type.
+   * used by sagas
+   */
+  queue(name) {
+    /* istanbul ignore else */
+    if (!this._queues.has(name)) {
+      this._queues.set(
+        name,
+        new InMemoryMessageBus({ name, uniqueEventHandlers: true })
+      )
+    }
+
+    return this._queues.get(name)
   }
 
   /**
@@ -22,38 +50,26 @@ module.exports = class NatsMessageBus {
   on(messageType, handler) {
     assert.string(messageType, 'messageType')
     assert.func(handler, 'handler')
+    this._subscribe(messageType, handler)
 
     // Events published to a named queue must be consumed only once.
     // For example, for sending a welcome email, NotificationReceptor will subscribe to "notifications:userCreated".
     // Since we use an in-memory bus, there is no need to track message handling by multiple distributed subscribers,
     // and we only need to make sure that no more than 1 such subscriber will be created
-    /* istanbul ignore else */
-    if (!this._handlers.has(messageType)) {
-      this._handlers.set(messageType, new Set())
-    } else if (this._uniqueEventHandlers) {
+    /* istanbul ignore next */
+    if (this._uniqueEventHandlers && this._handlers.has(messageType)) {
       throw new Error(
         `"${messageType}" handler is already set up on the "${this._name}" queue`
       )
     }
 
-    this._handlers.get(messageType).add(handler)
-  }
-
-  /**
-   * Get or create a named queue.
-   * Named queues support only one handler per event type.
-   * Used by sagas only
-   */
-  queue(name) {
-    /* istanbul ignore else */
-    if (!this._queues.has(name)) {
-      this._queues.set(
-        name,
-        new NatsMessageBus({ name, uniqueEventHandlers: true })
-      )
+    // no handlers assign yet, so create an empty set
+    if (!this._handlers.has(messageType)) {
+      this._handlers.set(messageType, new Set())
     }
 
-    return this._queues.get(name)
+    // add handler to given messageType
+    this._handlers.get(messageType).add(handler)
   }
 
   /**
@@ -61,6 +77,7 @@ module.exports = class NatsMessageBus {
    * @unused currently (0.27.0) no use case known
    */
   // off(messageType, handler) {
+  //   console.log('bus:off ---->', messageType)
   //   assert.string(messageType, 'messageType')
   //   assert.func(handler, 'handler')
   //   assert.ok(
@@ -71,7 +88,7 @@ module.exports = class NatsMessageBus {
   // }
 
   /**
-   * Send command to exactly 1 command handler
+   * Send command to exactly 1 local command handler
    */
   async send(command) {
     assert.object(command, 'command')
@@ -82,7 +99,6 @@ module.exports = class NatsMessageBus {
       handlers && handlers.size,
       `No '${command.type}' subscribers found`
     )
-
     assert.ok(
       handlers.size === 1, // or <==1
       `More than one '${command.type}' subscriber found`
@@ -99,9 +115,10 @@ module.exports = class NatsMessageBus {
   async publish(event) {
     assert.object(event, 'event')
     assert.string(event.type, 'event.type')
+    this._publish(event.type, event)
 
     const handlers = [
-      ...(this._handlers.get(event.type) || []),
+      ...(this._handlers.get(event.type) || /* istanbul ignore next */ []),
       ...Array.from(this._queues.values()).map(namedQueue => e =>
         namedQueue.publish(e)
       )

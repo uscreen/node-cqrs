@@ -10,6 +10,9 @@ const schema = {
     },
     redisHost: {
       default: '127.0.0.1'
+    },
+    natsHost: {
+      default: '127.0.0.1'
     }
   }
 }

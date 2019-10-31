@@ -23,7 +23,6 @@ module.exports = class InMemoryMessageBus {
    * used by sagas
    */
   queue(name) {
-    // console.log('bus:queue ---->', name)
     /* istanbul ignore else */
     if (!this._queues.has(name)) {
       this._queues.set(
@@ -39,7 +38,6 @@ module.exports = class InMemoryMessageBus {
    * Subscribe to message type
    */
   on(messageType, handler) {
-    // console.log('bus:on ---->', messageType)
     assert.string(messageType, 'messageType')
     assert.func(handler, 'handler')
 
@@ -64,7 +62,7 @@ module.exports = class InMemoryMessageBus {
    * @unused currently (0.27.0) no use case known
    */
   // off(messageType, handler) {
-  //   // console.log('bus:off ---->', messageType)
+
   //   assert.string(messageType, 'messageType')
   //   assert.func(handler, 'handler')
   //   assert.ok(
@@ -78,7 +76,6 @@ module.exports = class InMemoryMessageBus {
    * Send command to exactly 1 command handler
    */
   async send(command) {
-    // console.log('bus:sendCommand ---->', command.type)
     assert.object(command, 'command')
     assert.string(command.type, 'command.type')
 
@@ -101,7 +98,6 @@ module.exports = class InMemoryMessageBus {
    * Publish event to all subscribers (if any)
    */
   async publish(event) {
-    // console.log('bus:publishEvent ---->', event.type)
     assert.object(event, 'event')
     assert.string(event.type, 'event.type')
 

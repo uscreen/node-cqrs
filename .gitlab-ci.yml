@@ -8,6 +8,7 @@ cache:
 variables:
   mongoServer: "mongo:27017"
   redisHost: "redis"
+  natsHost: "nats"
 
 stages:
   - test
@@ -17,6 +18,7 @@ test:
   services:
     - mongo:latest
     - redis:latest
+    - nats:latest
   script:
     - yarn install --pure-lockfile --cache-folder .yarn
     - yarn test:ci

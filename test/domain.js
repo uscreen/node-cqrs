@@ -1,4 +1,5 @@
 const { MongoClient, ObjectId } = require('mongodb')
+const NATS = require('nats')
 const {
   Container,
   AbstractAggregate,
@@ -24,6 +25,13 @@ const createDomain = async (
   const anotherViewsCollection = db.collection(`${ns}-another-views`)
   const ThirdProjectionCollection = db.collection(`${ns}-ThirdProjection-views`)
 
+  const natsClient = useNatsBus
+    ? NATS.connect({
+        url: `nats://${config.natsHost}:4222`,
+        json: true
+      })
+    : null
+
   try {
     await eventsCollection.drop()
     await snapshotsCollection.drop()
@@ -36,12 +44,14 @@ const createDomain = async (
   t.teardown(async () => {
     await wait(500)
     await client.close()
+    if (useNatsBus) natsClient.close()
   })
 
   const cqrs = new Container()
 
   cqrs.register(MongoEventStorage, 'storage')
   if (useNatsBus) {
+    cqrs.registerInstance(natsClient, 'natsClient')
     cqrs.register(NatsMessageBus, 'messageBus')
   } else {
     cqrs.register(InMemoryMessageBus, 'messageBus')
