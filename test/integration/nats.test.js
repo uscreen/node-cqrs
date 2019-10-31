@@ -70,7 +70,6 @@ tap.test('Creating and using snapshots', async t => {
     await cqrs.Views.once('EventChanged')
 
     const view = await cqrs.Views.read(aggregateId)
-    console.log(view)
     t.same(aggregateId, view._id, 'view _id should match aggregateId')
     t.same('Baba Luga', view.body, 'body should match payload')
     t.ok(view.stack.includes('SomethingDone'))
