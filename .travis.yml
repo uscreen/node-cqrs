@@ -10,6 +10,10 @@ services:
   - mongodb
   - redis-server
 
+before_install:
+  - docker pull nats
+  - docker run -d --name nats-main -p 4222:4222 nats
+
 cache: yarn
 
 env:
