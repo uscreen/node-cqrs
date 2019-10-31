@@ -7,22 +7,12 @@ const assert = require('assert-plus')
  */
 module.exports = class InMemoryMessageBus {
   /**
-   * Indicates that message bus supports named queue subscriptions
-   * @unused
-   */
-  // static get supportsQueues() {
-  //   return true
-  // }
-
-  /**
    * Creates an instance of InMemoryMessageBus
    */
   constructor({ name, uniqueEventHandlers = !!name } = {}) {
-    this._handlers = new Map()
-
     this._name = name
     this._uniqueEventHandlers = uniqueEventHandlers
-
+    this._handlers = new Map()
     this._queues = new Map()
   }
 
@@ -90,7 +80,6 @@ module.exports = class InMemoryMessageBus {
       handlers && handlers.size,
       `No '${command.type}' subscribers found`
     )
-
     assert.ok(
       handlers.size === 1, // or <==1
       `More than one '${command.type}' subscriber found`
