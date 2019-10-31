@@ -3,7 +3,8 @@
 const assert = require('assert-plus')
 
 /**
- * Default implementation of the message bus. Keeps all subscriptions and messages in memory.
+ * Default implementation of the message bus.
+ * Keeps all subscriptions and messages in memory.
  */
 module.exports = class InMemoryMessageBus {
   /**
@@ -17,9 +18,28 @@ module.exports = class InMemoryMessageBus {
   }
 
   /**
+   * Get or create a named queue.
+   * Named queues support only one handler per event type.
+   * used by sagas
+   */
+  queue(name) {
+    console.log('bus:queue ---->', name)
+    /* istanbul ignore else */
+    if (!this._queues.has(name)) {
+      this._queues.set(
+        name,
+        new InMemoryMessageBus({ name, uniqueEventHandlers: true })
+      )
+    }
+
+    return this._queues.get(name)
+  }
+
+  /**
    * Subscribe to message type
    */
   on(messageType, handler) {
+    console.log('bus:on ---->', messageType)
     assert.string(messageType, 'messageType')
     assert.func(handler, 'handler')
 
@@ -40,38 +60,25 @@ module.exports = class InMemoryMessageBus {
   }
 
   /**
-   * Get or create a named queue.
-   * Named queues support only one handler per event type.
-   */
-  queue(name) {
-    /* istanbul ignore else */
-    if (!this._queues.has(name)) {
-      this._queues.set(
-        name,
-        new InMemoryMessageBus({ name, uniqueEventHandlers: true })
-      )
-    }
-
-    return this._queues.get(name)
-  }
-
-  /**
    * Remove subscription
+   * @unused currently (0.27.0) no use case known
    */
-  off(messageType, handler) {
-    assert.string(messageType, 'messageType')
-    assert.func(handler, 'handler')
-    assert.ok(
-      this._handlers.has(messageType),
-      `No ${messageType} subscribers found`
-    )
-    this._handlers.get(messageType).delete(handler)
-  }
+  // off(messageType, handler) {
+  //   console.log('bus:off ---->', messageType)
+  //   assert.string(messageType, 'messageType')
+  //   assert.func(handler, 'handler')
+  //   assert.ok(
+  //     this._handlers.has(messageType),
+  //     `No ${messageType} subscribers found`
+  //   )
+  //   this._handlers.get(messageType).delete(handler)
+  // }
 
   /**
    * Send command to exactly 1 command handler
    */
   async send(command) {
+    console.log('bus:sendCommand ---->', command.type)
     assert.object(command, 'command')
     assert.string(command.type, 'command.type')
 
@@ -94,6 +101,7 @@ module.exports = class InMemoryMessageBus {
    * Publish event to all subscribers (if any)
    */
   async publish(event) {
+    console.log('bus:publishEvent ---->', event.type)
     assert.object(event, 'event')
     assert.string(event.type, 'event.type')
 

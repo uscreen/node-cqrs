@@ -1,5 +1,7 @@
 'use strict'
 
+const EventEmitter = require('events')
+
 const {
   validateMessageBus,
   validateEventStorage,
@@ -16,70 +18,6 @@ const SNAPSHOT_EVENT_TYPE = 'snapshot'
 
 const _defaults = {
   publishAsync: true
-}
-
-/**
- * Create one-time eventEmitter subscription for one or multiple events that match a filter
- *
- * @param {IEventEmitter} emitter
- * @param {string[]} messageTypes Array of event type to subscribe to
- * @param {function(IEvent):any} [handler] Optional handler to execute for a first event received
- * @param {function(IEvent):boolean} [filter] Optional filter to apply before executing a handler
- * @return {Promise<IEvent>} Resolves to first event that passes filter
- */
-function setupOneTimeEmitterSubscription(
-  emitter,
-  messageTypes,
-  filter,
-  handler
-) {
-  assert.object(emitter, 'emitter')
-  assert.arrayOfString(messageTypes, 'messageTypes')
-  assert.optionalFunc(handler, 'handler')
-  assert.optionalFunc(filter, 'filter')
-
-  return new Promise(resolve => {
-    // handler will be invoked only once,
-    // even if multiple events have been emitted before subscription was destroyed
-    // https://nodejs.org/api/events.html#events_emitter_removelistener_eventname_listener
-    let handled = false
-
-    function filteredHandler(event) {
-      /* istanbul ignore next */
-      if (filter && !filter(event)) return
-
-      /* istanbul ignore if */
-      if (handled) return
-
-      handled = true
-
-      for (const messageType of messageTypes) {
-        emitter.off(messageType, filteredHandler)
-      }
-
-      debug(
-        "'%s' received, one-time subscription to '%s' removed",
-        event.type,
-        messageTypes.join(',')
-      )
-
-      /* istanbul ignore if */
-      if (handler) handler(event)
-
-      resolve(event)
-    }
-
-    for (const messageType of messageTypes) {
-      emitter.on(messageType, filteredHandler)
-    }
-
-    /* istanbul ignore next */
-    debug(
-      "set up one-time %s to '%s'",
-      filter ? 'filtered subscription' : 'subscription',
-      messageTypes.join(',')
-    )
-  })
 }
 
 class EventStore {
@@ -134,6 +72,9 @@ class EventStore {
     this._sagaStarters = []
     this._publishTo = options.messageBus
     this._eventEmitter = options.messageBus
+
+    // for internal `once` subscriptions
+    this._internalEmitter = new EventEmitter()
   }
 
   /**
@@ -305,7 +246,11 @@ class EventStore {
   async publish(eventStream) {
     const publishEvents = () =>
       Promise.all(
-        eventStream.map(event => this._publishTo.publish(event))
+        eventStream.map(event => {
+          const published = this._publishTo.publish(event)
+          this._internalEmitter.emit(event.type, event)
+          return published
+        })
       ).then(
         () => {
           debug('%s published', eventStream)
@@ -348,20 +293,13 @@ class EventStore {
   }
 
   /**
-   * Creates one-time subscription for one or multiple events that match a filter
+   * Create a Promise which will resolve to a first emitted event of a given type
    */
-  once(messageTypes, handler, filter) {
-    /* istanbul ignore next */
-    const subscribeTo = Array.isArray(messageTypes)
-      ? messageTypes
-      : [messageTypes]
-
-    return setupOneTimeEmitterSubscription(
-      this._eventEmitter,
-      subscribeTo,
-      filter,
-      handler
-    )
+  once(messageTypes) {
+    assert.string(messageTypes, 'messageTypes')
+    return new Promise(resolve => {
+      this._internalEmitter.once(messageTypes, resolve)
+    })
   }
 }
 
