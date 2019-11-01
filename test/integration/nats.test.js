@@ -2,8 +2,10 @@ const tap = require('tap')
 const { createDomain } = require('../domain')
 const { AbstractSaga } = require('../../index')
 
-tap.test('Use Saga with default InMemoryLock', async t => {
-  const { cqrs, eventsCollection } = await createDomain(t, 'sagaTest-')
+tap.test('Creating and using snapshots', async t => {
+  const { cqrs, eventsCollection } = await createDomain(t, 'nats-', {
+    useNatsBus: true
+  })
   let aggregateId
 
   /**
