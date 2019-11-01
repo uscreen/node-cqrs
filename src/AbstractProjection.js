@@ -24,9 +24,8 @@ module.exports = class AbstractProjection {
     this._eventStore = eventStore
     this._view = view
 
-    // decorate my view with extra mixins (dirty?)
+    // decorate my view with a restore mixin (dirty?)
     this._view.restore = () => this.restore()
-    this._view.once = t => this._eventStore.once(t)
   }
 
   /**
@@ -85,8 +84,7 @@ module.exports = class AbstractProjection {
   async project(event) {
     return this.locker.locked(`project-${event.aggregateId}`, async () => {
       const result = await this._project(event)
-      // console.log('project::emit ------>', event.type)
-      this._eventStore.emit(event.type, result)
+      this.view._emitter.emit(event.type, result)
       return result
     })
   }

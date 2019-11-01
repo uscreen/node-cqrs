@@ -1,6 +1,5 @@
 'use strict'
 
-const EventEmitter = require('events')
 const assert = require('assert-plus')
 
 const InMemoryMessageBus = require('./InMemoryMessageBus')
@@ -18,9 +17,6 @@ module.exports = class NatsMessageBus {
     this._handlers = new Map()
     this._queues = new Map()
     this._nats = natsClient
-
-    // for internal `once` subscriptions
-    this._internalEmitter = new EventEmitter()
   }
 
   _publish(type, event) {
@@ -77,21 +73,19 @@ module.exports = class NatsMessageBus {
   }
 
   /**
-   * Create a Promise which will resolve to a first emitted event of a given type
+   * Remove subscription
+   * @unused currently (0.27.0) no use case known
    */
-  once(eventType) {
-    assert.string(eventType, 'eventType')
-    return new Promise(resolve => {
-      this._internalEmitter.once(eventType, resolve)
-    })
-  }
-
-  /**
-   * plain emit without any further side effects
-   */
-  emit(eventType, result) {
-    this._internalEmitter.emit(eventType, result)
-  }
+  // off(messageType, handler) {
+  //   console.log('bus:off ---->', messageType)
+  //   assert.string(messageType, 'messageType')
+  //   assert.func(handler, 'handler')
+  //   assert.ok(
+  //     this._handlers.has(messageType),
+  //     `No ${messageType} subscribers found`
+  //   )
+  //   this._handlers.get(messageType).delete(handler)
+  // }
 
   /**
    * Send command to exactly 1 local command handler
@@ -112,9 +106,7 @@ module.exports = class NatsMessageBus {
 
     const commandHandler = handlers.values().next().value
 
-    const result = await commandHandler(command)
-    this.emit(command.type, command)
-    return result
+    return commandHandler(command)
   }
 
   /**
@@ -131,9 +123,6 @@ module.exports = class NatsMessageBus {
         namedQueue.publish(e)
       )
     ]
-
-    // emit internal
-    this.emit(event.type, event)
 
     return Promise.all(handlers.map(handler => handler(event)))
   }

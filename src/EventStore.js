@@ -301,10 +301,6 @@ class EventStore {
       this._internalEmitter.once(messageTypes, resolve)
     })
   }
-
-  emit(eventType, result) {
-    this._eventEmitter.emit(eventType, result)
-  }
 }
 
 module.exports = EventStore
