@@ -73,21 +73,6 @@ module.exports = class NatsMessageBus {
   }
 
   /**
-   * Remove subscription
-   * @unused currently (0.27.0) no use case known
-   */
-  // off(messageType, handler) {
-  //   console.log('bus:off ---->', messageType)
-  //   assert.string(messageType, 'messageType')
-  //   assert.func(handler, 'handler')
-  //   assert.ok(
-  //     this._handlers.has(messageType),
-  //     `No ${messageType} subscribers found`
-  //   )
-  //   this._handlers.get(messageType).delete(handler)
-  // }
-
-  /**
    * Send command to exactly 1 local command handler
    */
   async send(command) {

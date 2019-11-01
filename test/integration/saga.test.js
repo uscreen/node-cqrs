@@ -38,7 +38,6 @@ tap.test('Use Saga with default InMemoryLock', async t => {
     await cqrs.commandBus.send('createEvent', id, { payload, context })
     await cqrs.eventStore.once('EventCreated')
     await cqrs.Views.once('EventCreated')
-
     await cqrs.Views.once('SomethingDone')
     await cqrs.Views.once('SomethingElseDone')
 

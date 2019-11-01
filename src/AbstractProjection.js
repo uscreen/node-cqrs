@@ -46,7 +46,7 @@ module.exports = class AbstractProjection {
    * View associated with projection
    */
   get view() {
-    return this._view || /* istanbul ignore next */ (this._view = new Map())
+    return this._view
   }
 
   /**
