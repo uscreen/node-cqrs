@@ -1,7 +1,5 @@
 'use strict'
 
-const EventEmitter = require('events')
-
 const {
   validateMessageBus,
   validateEventStorage,
@@ -74,7 +72,7 @@ class EventStore {
     this._eventEmitter = options.messageBus
 
     // for internal `once` subscriptions
-    this._internalEmitter = new EventEmitter()
+    // this._internalEmitter = new EventEmitter()
   }
 
   /**
@@ -241,16 +239,12 @@ class EventStore {
   }
 
   /**
-   * After events are
+   * After events are saved the get published
    */
   async publish(eventStream) {
     const publishEvents = () =>
       Promise.all(
-        eventStream.map(event => {
-          const published = this._publishTo.publish(event)
-          this._internalEmitter.emit(event.type, event)
-          return published
-        })
+        eventStream.map(event => this._publishTo.publish(event))
       ).then(
         () => {
           debug('%s published', eventStream)
@@ -295,11 +289,9 @@ class EventStore {
   /**
    * Create a Promise which will resolve to a first emitted event of a given type
    */
-  once(messageTypes) {
-    assert.string(messageTypes, 'messageTypes')
-    return new Promise(resolve => {
-      this._internalEmitter.once(messageTypes, resolve)
-    })
+  once(type) {
+    assert.string(type, 'type')
+    return this._eventEmitter.once(type)
   }
 }
 

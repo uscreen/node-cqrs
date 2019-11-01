@@ -19,10 +19,10 @@ module.exports = class MongoView {
   /**
    * Create a Promise which will resolve to a first emitted event of a given type
    */
-  once(eventType) {
-    assert.string(eventType, 'eventType')
+  once(type) {
+    assert.string(type, 'type')
     return new Promise(resolve => {
-      this._emitter.once(eventType, resolve)
+      this._emitter.once(type, resolve)
     })
   }
 
