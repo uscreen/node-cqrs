@@ -98,7 +98,7 @@ module.exports = class InMemoryMessageBus {
     const commandHandler = handlers.values().next().value
 
     const result = await commandHandler(command)
-    this.emit(command.type, command)
+
     return result
   }
 
