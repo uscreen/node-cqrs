@@ -41,7 +41,7 @@ class CommandBus {
    */
   sendRaw(command) {
     debug(`sending '${command.type}' command...`)
-    return this._bus.send(command).then(
+    return this._bus.sendCommand(command).then(
       r => {
         debug(`'${command.type}' processed`)
         return r

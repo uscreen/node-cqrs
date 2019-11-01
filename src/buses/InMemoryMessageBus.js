@@ -75,7 +75,7 @@ module.exports = class InMemoryMessageBus {
   /**
    * Send command to exactly 1 command handler
    */
-  async send(command) {
+  async sendCommand(command) {
     assert.object(command, 'command')
     assert.string(command.type, 'command.type')
 
