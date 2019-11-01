@@ -96,7 +96,7 @@ module.exports = class NatsMessageBus {
   /**
    * Send command to exactly 1 local command handler
    */
-  async sendCommand(command) {
+  async send(command) {
     assert.object(command, 'command')
     assert.string(command.type, 'command.type')
 
