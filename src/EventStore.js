@@ -293,6 +293,10 @@ class EventStore {
     assert.string(type, 'type')
     return this._eventEmitter.once(type)
   }
+
+  emit(eventType, result) {
+    this._eventEmitter.emit(eventType, result)
+  }
 }
 
 module.exports = EventStore

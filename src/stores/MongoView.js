@@ -1,6 +1,5 @@
 'use strict'
 
-const EventEmitter = require('events')
 const assert = require('assert-plus')
 
 module.exports = class MongoView {
@@ -13,17 +12,6 @@ module.exports = class MongoView {
 
     this.ObjectId = ObjectId
     this._collection = collection
-    this._emitter = new EventEmitter()
-  }
-
-  /**
-   * Create a Promise which will resolve to a first emitted event of a given type
-   */
-  once(type) {
-    assert.string(type, 'type')
-    return new Promise(resolve => {
-      this._emitter.once(type, resolve)
-    })
   }
 
   /**

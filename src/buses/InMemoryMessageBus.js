@@ -72,6 +72,13 @@ module.exports = class InMemoryMessageBus {
   }
 
   /**
+   * plain emit without any further side effects
+   */
+  emit(eventType, result) {
+    this._internalEmitter.emit(eventType, result)
+  }
+
+  /**
    * Remove subscription
    * @unused currently (0.27.0) no use case known
    */
@@ -106,7 +113,7 @@ module.exports = class InMemoryMessageBus {
     const commandHandler = handlers.values().next().value
 
     const result = await commandHandler(command)
-    this._internalEmitter.emit(command.type, command)
+    this.emit(command.type, command)
     return result
   }
 
@@ -126,7 +133,7 @@ module.exports = class InMemoryMessageBus {
     ]
 
     // emit internal
-    this._internalEmitter.emit(event.type, event)
+    this.emit(event.type, event)
 
     // call all handlers
     return Promise.all(handlers.map(handler => handler(event)))
