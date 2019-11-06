@@ -47,7 +47,7 @@ module.exports = class NatsMessageBus {
   /**
    * Subscribe to message type
    */
-  on(messageType, handler) {
+  onCommand(messageType, handler) {
     assert.string(messageType, 'messageType')
     assert.func(handler, 'handler')
     this._subscribe(messageType, handler)
@@ -64,12 +64,22 @@ module.exports = class NatsMessageBus {
     }
 
     // no handlers assign yet, so create an empty set
+    /* istanbul ignore else */
     if (!this._handlers.has(messageType)) {
       this._handlers.set(messageType, new Set())
     }
 
     // add handler to given messageType
     this._handlers.get(messageType).add(handler)
+  }
+
+  /**
+   * Subscribe to message type
+   */
+  on(messageType, handler) {
+    assert.string(messageType, 'messageType')
+    assert.func(handler, 'handler')
+    this._subscribe(messageType, handler)
   }
 
   /**
@@ -102,13 +112,10 @@ module.exports = class NatsMessageBus {
     assert.string(event.type, 'event.type')
     this._publish(event.type, event)
 
-    const handlers = [
-      ...(this._handlers.get(event.type) || /* istanbul ignore next */ []),
-      ...Array.from(this._queues.values()).map(namedQueue => e =>
-        namedQueue.publish(e)
-      )
-    ]
-
-    return Promise.all(handlers.map(handler => handler(event)))
+    // start sagas on events
+    const sagaHandlers = Array.from(this._queues.values()).map(
+      namedQueue => e => namedQueue.publish(e)
+    )
+    return Promise.all(sagaHandlers.map(handler => handler(event)))
   }
 }

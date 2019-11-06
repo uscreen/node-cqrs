@@ -37,6 +37,29 @@ module.exports = class InMemoryMessageBus {
   /**
    * Subscribe to message type
    */
+  onCommand(messageType, handler) {
+    assert.string(messageType, 'messageType')
+    assert.func(handler, 'handler')
+
+    // Events published to a named queue must be consumed only once.
+    // For example, for sending a welcome email, NotificationReceptor will subscribe to "notifications:userCreated".
+    // Since we use an in-memory bus, there is no need to track message handling by multiple distributed subscribers,
+    // and we only need to make sure that no more than 1 such subscriber will be created
+    /* istanbul ignore else */
+    if (!this._handlers.has(messageType)) {
+      this._handlers.set(messageType, new Set())
+    } else if (this._uniqueEventHandlers) {
+      throw new Error(
+        `"${messageType}" handler is already set up on the "${this._name}" queue`
+      )
+    }
+
+    this._handlers.get(messageType).add(handler)
+  }
+
+  /**
+   * Subscribe to message type
+   */
   on(messageType, handler) {
     assert.string(messageType, 'messageType')
     assert.func(handler, 'handler')

@@ -17,7 +17,7 @@ class CommandBus {
    * Set up a command handler
    */
   on(commandType, handler) {
-    return this._bus.on(commandType, handler)
+    return this._bus.onCommand(commandType, handler)
   }
 
   /**

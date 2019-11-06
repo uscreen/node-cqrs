@@ -140,7 +140,7 @@ const createDomain = async (
     async SomethingDone({ aggregateId }) {
       await this.view.update(aggregateId, { SomethingDone: true })
       await this.view.collection.findOneAndUpdate(
-        { _id: aggregateId },
+        { _id: this.view.ObjectId(aggregateId) },
         { $push: { stack: 'SomethingDone' } }
       )
     }
@@ -148,7 +148,7 @@ const createDomain = async (
     async SomethingElseDone({ aggregateId }) {
       await this.view.update(aggregateId, { SomethingElseDone: true })
       await this.view.collection.findOneAndUpdate(
-        { _id: aggregateId },
+        { _id: this.view.ObjectId(aggregateId) },
         { $push: { stack: 'SomethingElseDone' } }
       )
     }

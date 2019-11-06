@@ -44,7 +44,9 @@ module.exports = class MongoView {
   create(key, value) {
     assert.ok(key)
     assert.object(value)
-    return this.collection.insertOne(Object.assign(value, { _id: key }))
+    return this.collection.insertOne(
+      Object.assign(value, { _id: this.ObjectId(key) })
+    )
   }
 
   /**
