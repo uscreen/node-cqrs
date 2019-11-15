@@ -12,9 +12,12 @@ variables:
 
 stages:
   - test
+  - audit
 
 test:
   stage: test
+  except:
+    - schedules
   services:
     - mongo:latest
     - redis:latest
@@ -23,3 +26,10 @@ test:
     - yarn install --pure-lockfile --cache-folder .yarn
     - yarn test:ci
   coverage: '/^Statements\s*:\s*([^%]+)/'
+
+audit:
+  stage: audit
+  only:
+  - schedules
+  script:
+    - yarn audit
