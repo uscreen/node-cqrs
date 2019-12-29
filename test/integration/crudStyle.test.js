@@ -1,6 +1,7 @@
 const tap = require('tap')
-
 const { createDomain } = require('../domain')
+
+// passed
 
 tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   const { cqrs, eventsCollection, viewsCollection } = await createDomain(t)
@@ -10,21 +11,24 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
    * 1st create
    */
   await t.test('write a command with cqrs.commandBus.send()', async t => {
-    const id = await cqrs.eventStore.getNewId()
     const payload = { body: 'Lorem Ipsum' }
     const context = { reqId: 1234 }
-    await cqrs.commandBus.send('createEvent', id, { payload, context })
-    await cqrs.eventStore.once('EventCreated')
+    await cqrs.commandBus.send('createEvent', null, { payload, context })
+    const event = await cqrs.eventStore.once('EventCreated')
+    aggregateId = event.aggregateId
     await cqrs.Views.once('EventCreated')
 
-    const found = await eventsCollection.findOne({ aggregateId: id })
-    t.same(id, found.aggregateId, 'event should have been stored with given id')
+    const found = await eventsCollection.findOne({ aggregateId })
+    t.same(
+      aggregateId,
+      found.aggregateId,
+      'event should have been stored with given id'
+    )
     t.same(0, found.aggregateVersion, 'version should be 0')
     t.same('EventCreated', found.type, 'type should be "EventCreated"')
     t.same({ body: 'Lorem Ipsum' }, found.payload, 'body should match payload')
     t.same({ reqId: 1234 }, found.context, 'context should have provided data')
 
-    aggregateId = id
     t.end()
   })
 
@@ -35,10 +39,13 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
     'read a view from a projection with cqrs.views.read()',
     async t => {
       const view = await cqrs.Views.read(aggregateId)
-      t.same(aggregateId, view._id, 'view _id should match aggregateId')
+      t.same(aggregateId, view.id, 'view id should match aggregateId')
       t.same('Lorem Ipsum', view.body, 'body should match payload')
 
-      const found = await viewsCollection.findOne({ _id: aggregateId })
+      const found = await viewsCollection.findOne(
+        { id: aggregateId },
+        { projection: { _id: false } }
+      )
       t.same(view, found, 'view should be the same as read raw from mongo')
       t.end()
     }
@@ -80,10 +87,13 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
     'read that view from a projection with cqrs.views.read()',
     async t => {
       const view = await cqrs.Views.read(aggregateId)
-      t.same(aggregateId, view._id, 'view _id should match aggregateId')
+      t.same(aggregateId, view.id, 'view id should match aggregateId')
       t.same('Baba Luga', view.body, 'body should match payload')
 
-      const found = await viewsCollection.findOne({ _id: aggregateId })
+      const found = await viewsCollection.findOne(
+        { id: aggregateId },
+        { projection: { _id: false } }
+      )
       t.same(view, found, 'view should be the same as read raw from mongo')
       t.end()
     }
@@ -95,7 +105,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   await t.test('list all view without filter cqrs.views.list()', async t => {
     const views = await cqrs.Views.list()
     t.same(1, views.length, 'we should have found 1 view now')
-    t.same(aggregateId, views[0]._id, 'view _id should match aggregateId')
+    t.same(aggregateId, views[0].id, 'view id should match aggregateId')
     t.same('Baba Luga', views[0].body, 'body should match payload')
     t.end()
   })
@@ -148,7 +158,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
       const view = await cqrs.Views.read(aggregateId)
       t.same(null, view, 'no view should have been found')
 
-      const found = await viewsCollection.findOne({ _id: aggregateId })
+      const found = await viewsCollection.findOne({ id: aggregateId })
       t.same(null, found, 'no view exists in collection')
 
       t.end()
@@ -168,8 +178,8 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
       )
       t.same(
         aggregateId,
-        anotherView._id,
-        'anotherView _id should match aggregateId'
+        anotherView.id,
+        'anotherView id should match aggregateId'
       )
       t.same(
         'Baba Luga',
@@ -194,8 +204,8 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
       )
       t.same(
         aggregateId,
-        ThirdProjection._id,
-        'ThirdProjection _id should match aggregateId'
+        ThirdProjection.id,
+        'ThirdProjection id should match aggregateId'
       )
       t.same(
         'Lorem Ipsum',

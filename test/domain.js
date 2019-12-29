@@ -1,4 +1,4 @@
-const { MongoClient, ObjectId } = require('mongodb')
+const { MongoClient } = require('mongodb')
 const NATS = require('nats')
 const {
   Container,
@@ -62,7 +62,6 @@ const createDomain = async (
   }
   cqrs.registerInstance(eventsCollection, 'EventsCollection')
   cqrs.registerInstance(snapshotsCollection, 'SnapshotsCollection')
-  cqrs.registerInstance(ObjectId, 'ObjectId')
 
   class State {
     EventCreated({ payload }) {
@@ -115,8 +114,7 @@ const createDomain = async (
       super({
         eventStore,
         view: new MongoView({
-          collection: viewsCollection,
-          ObjectId
+          collection: viewsCollection
         })
       })
     }
@@ -140,7 +138,7 @@ const createDomain = async (
     async SomethingDone({ aggregateId }) {
       await this.view.update(aggregateId, { SomethingDone: true })
       await this.view.collection.findOneAndUpdate(
-        { _id: this.view.ObjectId(aggregateId) },
+        { id: aggregateId },
         { $push: { stack: 'SomethingDone' } }
       )
     }
@@ -148,7 +146,7 @@ const createDomain = async (
     async SomethingElseDone({ aggregateId }) {
       await this.view.update(aggregateId, { SomethingElseDone: true })
       await this.view.collection.findOneAndUpdate(
-        { _id: this.view.ObjectId(aggregateId) },
+        { id: aggregateId },
         { $push: { stack: 'SomethingElseDone' } }
       )
     }
@@ -160,8 +158,7 @@ const createDomain = async (
       super({
         eventStore,
         view: new MongoView({
-          collection: anotherViewsCollection,
-          ObjectId
+          collection: anotherViewsCollection
         })
       })
     }
@@ -195,8 +192,7 @@ const createDomain = async (
       super({
         eventStore,
         view: new MongoView({
-          collection: ThirdProjectionCollection,
-          ObjectId
+          collection: ThirdProjectionCollection
         })
       })
     }

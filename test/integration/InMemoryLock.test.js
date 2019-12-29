@@ -2,6 +2,8 @@ const tap = require('tap')
 const { wait } = require('../helper')
 const { InMemoryLock } = require('../../index')
 
+// passed
+
 tap.test('InMemoryLock', async t => {
   const locker = new InMemoryLock()
 

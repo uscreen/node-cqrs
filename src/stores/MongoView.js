@@ -7,12 +7,10 @@ module.exports = class MongoView {
   /**
    * create a new view class
    */
-  constructor({ ObjectId, collection }) {
-    assert.func(ObjectId, '"ObjectId()" is required by MongoView')
+  constructor({ collection }) {
     assert.object(collection, 'a "collection" is required by MongoView')
-
-    this.ObjectId = ObjectId
     this._collection = collection
+    this._collection.createIndex({ id: 1 }, { unique: true, sparse: true })
     this._emitter = new EventEmitter()
   }
 
@@ -39,46 +37,42 @@ module.exports = class MongoView {
   }
 
   /**
-   * create a new record, fails on exiting _id
+   * create a new record, fails on exiting id
    */
-  create(key, value) {
-    assert.ok(key)
+  create(id, value) {
+    assert.ok(id)
     assert.object(value)
-    return this.collection.insertOne(
-      Object.assign(value, { _id: this.ObjectId(key) })
-    )
+    return this.collection.insertOne(Object.assign(value, { id }))
   }
 
   /**
    * read existing record, returns empty results on fail
    */
-  read(key) {
-    assert.ok(key)
-    return this.findOne({ _id: this.ObjectId(key) })
+  read(id) {
+    assert.ok(id)
+    return this.findOne({ id })
   }
 
   /**
    * atomically update exiting records.
    * `$set: value` should only update given attributes
    */
-  update(key, value) {
-    assert.ok(key)
+  update(id, value) {
+    assert.ok(id)
     assert.object(value)
     return this.collection.findOneAndUpdate(
-      { _id: this.ObjectId(key) },
+      { id },
       { $set: value },
       { returnOriginal: false, upsert: false }
     )
   }
 
   /**
-   * delete one existing record by _id
+   * delete one existing record by id
    */
-  delete(key) {
-    assert.ok(key)
-    return this.collection.findOneAndDelete({
-      _id: this.ObjectId(key)
-    })
+  delete(id) {
+    assert.ok(id)
+    return this.collection.findOneAndDelete({ id })
   }
 
   /**
@@ -93,7 +87,7 @@ module.exports = class MongoView {
    */
   findOne(query) {
     assert.object(query)
-    return this.collection.findOne(query)
+    return this.collection.findOne(query, { projection: { _id: false } })
   }
 
   /**
@@ -101,6 +95,6 @@ module.exports = class MongoView {
    */
   list(query) {
     assert.optionalObject(query)
-    return this.collection.find(query).toArray()
+    return this.collection.find(query, { projection: { _id: false } }).toArray()
   }
 }

@@ -1,8 +1,9 @@
 'use strict'
 
+const uuidv4 = require('uuid/v4')
+
 module.exports = class MongoEventStorage {
-  constructor({ ObjectId, EventsCollection }) {
-    this.ObjectId = ObjectId
+  constructor({ EventsCollection }) {
     this.collection = EventsCollection
     this.collection.createIndex(
       { aggregateId: 1, aggregateVersion: 1 },
@@ -17,14 +18,6 @@ module.exports = class MongoEventStorage {
 
   wrapEvent(event) {
     const evt = Object.assign({}, event)
-    /* istanbul ignore else */
-    if (evt.aggregateId) {
-      evt.aggregateId = this.ObjectId(evt.aggregateId)
-    }
-    /* istanbul ignore else */
-    if (evt.sagaId) {
-      evt.sagaId = this.ObjectId(evt.sagaId)
-    }
     return evt
   }
 
@@ -35,7 +28,7 @@ module.exports = class MongoEventStorage {
 
   getAggregateEvents(aggregateId, { snapshot }) {
     const query = {
-      aggregateId: this.ObjectId(aggregateId)
+      aggregateId: aggregateId
     }
 
     if (snapshot && snapshot.aggregateVersion) {
@@ -54,7 +47,7 @@ module.exports = class MongoEventStorage {
 
   getSagaEvents(sagaId, { beforeEvent }) {
     const query = {
-      sagaId: this.ObjectId(sagaId)
+      sagaId: sagaId
     }
 
     /* istanbul ignore if */
@@ -85,6 +78,6 @@ module.exports = class MongoEventStorage {
   }
 
   getNewId() {
-    return new this.ObjectId()
+    return uuidv4()
   }
 }

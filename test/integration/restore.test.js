@@ -1,12 +1,10 @@
 const tap = require('tap')
-// const { wait } = require('../helper')
 const { createDomain } = require('../domain')
 
+// passed
+
 tap.test('Creating and using snapshots', async t => {
-  const { cqrs, eventsCollection, viewsCollection } = await createDomain(
-    t,
-    'restore-'
-  )
+  const { cqrs, eventsCollection } = await createDomain(t, 'restore-')
   let aggregateId
 
   /**
@@ -45,7 +43,7 @@ tap.test('Creating and using snapshots', async t => {
     await cqrs.Views.once('EventChanged')
 
     const view = await cqrs.Views.read(aggregateId)
-    t.same(aggregateId, view._id, 'view _id should match aggregateId')
+    t.same(aggregateId, view.id, 'view id should match aggregateId')
     t.same('Baba Luga', view.body, 'body should match payload')
     t.end()
   })
@@ -56,12 +54,11 @@ tap.test('Creating and using snapshots', async t => {
   await t.test(
     'deleted views should get restored by cqrs.Views.restore()',
     async t => {
-      await viewsCollection.drop()
-
+      await cqrs.Views.clear()
       await cqrs.Views.restore()
 
       const view = await cqrs.Views.read(aggregateId)
-      t.same(aggregateId, view._id, 'view _id should match aggregateId')
+      t.same(aggregateId, view.id, 'view id should match aggregateId')
       t.same('Baba Luga', view.body, 'body should match payload')
       t.end()
     }

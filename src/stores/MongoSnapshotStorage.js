@@ -4,8 +4,7 @@ module.exports = class MongoSnapshotStorage {
   /**
    * Creates an instance of MongoSnapshotStorage
    */
-  constructor({ ObjectId, SnapshotsCollection }) {
-    this.ObjectId = ObjectId
+  constructor({ SnapshotsCollection }) {
     this.collection = SnapshotsCollection
     this.collection.createIndex(
       { aggregateId: 1, aggregateVersion: 1 },
@@ -23,17 +22,13 @@ module.exports = class MongoSnapshotStorage {
    */
   async getAggregateSnapshot(aggregateId) {
     return this.collection.findOne(
-      { aggregateId: this.ObjectId(aggregateId) },
+      { aggregateId: aggregateId },
       { sort: { aggregateVersion: -1 } }
     )
   }
 
   wrapEvent(event) {
     const evt = Object.assign({}, event)
-    /* istanbul ignore else */
-    if (evt.aggregateId) {
-      evt.aggregateId = this.ObjectId(evt.aggregateId)
-    }
     return evt
   }
 

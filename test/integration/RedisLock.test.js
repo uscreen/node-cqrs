@@ -3,6 +3,8 @@ const Redis = require('ioredis')
 const { config, wait } = require('../helper')
 const { RedisLock } = require('../../index')
 
+// passed
+
 tap.test('RedisLock', async t => {
   const redis = new Redis({
     host: config.redisHost

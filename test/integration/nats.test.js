@@ -35,27 +35,31 @@ tap.test('Creating and using snapshots', async t => {
    * 1st create
    */
   await t.test('write a command with cqrs.commandBus.send()', async t => {
-    const id = await cqrs.eventStore.getNewId()
     const payload = { body: 'Lorem Ipsum' }
     const context = { reqId: 1234 }
-    await cqrs.commandBus.send('createEvent', id, { payload, context })
+    await cqrs.commandBus.send('createEvent', null, { payload, context })
+    const eventData = await cqrs.eventStore.once('EventCreated')
+    aggregateId = eventData.aggregateId
     await Promise.all([
       cqrs.Views.once('EventCreated'),
       cqrs.Views.once('SomethingDone'),
-      cqrs.eventStore.once('EventCreated'),
       cqrs.Views.once('SomethingElseDone')
     ])
 
-    const found = await eventsCollection.findOne({ aggregateId: id })
+    const found = await eventsCollection.findOne({ aggregateId })
 
-    t.same(id, found.aggregateId, 'event should have been stored with given id')
+    t.same(
+      aggregateId,
+      found.aggregateId,
+      'event should have been stored with given id'
+    )
     t.same(0, found.aggregateVersion, 'aggregateVersion should be 0')
     t.same('EventCreated', found.type, 'type should be "EventCreated"')
     t.same({ body: 'Lorem Ipsum' }, found.payload, 'body should match payload')
     t.same({ reqId: 1234 }, found.context, 'context should have provided data')
     t.ok(found.sagaId, 'event should have been stored with a sagaId')
     t.same(0, found.sagaVersion, 'sagaVersion should be 0')
-    aggregateId = id
+
     t.end()
   })
 
@@ -67,7 +71,7 @@ tap.test('Creating and using snapshots', async t => {
     async t => {
       const view = await cqrs.Views.read(aggregateId)
 
-      t.same(aggregateId, view._id, 'view _id should match aggregateId')
+      t.same(aggregateId, view.id, 'view id should match aggregateId')
       t.same('Lorem Ipsum', view.body, 'body should match payload')
 
       t.ok(view.stack.includes('SomethingDone'))

@@ -1,6 +1,8 @@
 const tap = require('tap')
 const { createDomain } = require('../domain')
 
+// passed
+
 tap.test('Creating and using snapshots', async t => {
   const { cqrs, eventsCollection, snapshotsCollection } = await createDomain(
     t,
@@ -81,7 +83,7 @@ tap.test('Creating and using snapshots', async t => {
     'read that view from a projection with cqrs.views.read()',
     async t => {
       const view = await cqrs.Views.read(aggregateId)
-      t.same(aggregateId, view._id, 'view _id should match aggregateId')
+      t.same(aggregateId, view.id, 'view id should match aggregateId')
       t.same('Baba Luga (19)', view.body, 'body should match payload')
       t.end()
     }
@@ -102,19 +104,19 @@ tap.test('Should give same results without snapshots', async t => {
    * 1st create
    */
   await t.test('write a command with cqrs.commandBus.send()', async t => {
-    const id = await cqrs.eventStore.getNewId()
     const payload = { body: 'Lorem Ipsum' }
     const context = { reqId: 1234 }
-    await cqrs.commandBus.send('createEvent', id, { payload, context })
-    await cqrs.eventStore.once('EventCreated')
+    await cqrs.commandBus.send('createEvent', null, { payload, context })
+
+    const event = await cqrs.eventStore.once('EventCreated')
+    aggregateId = event.aggregateId
     await cqrs.Views.once('EventCreated')
 
-    const found = await eventsCollection.findOne({ aggregateId: id })
+    const found = await eventsCollection.findOne({ aggregateId })
     t.same('EventCreated', found.type, 'type should be "EventCreated"')
     t.same({ body: 'Lorem Ipsum' }, found.payload, 'body should match payload')
     t.same({ reqId: 1234 }, found.context, 'context should have provided data')
 
-    aggregateId = id
     t.end()
   })
 
@@ -158,7 +160,7 @@ tap.test('Should give same results without snapshots', async t => {
     'read that view from a projection with cqrs.views.read()',
     async t => {
       const view = await cqrs.Views.read(aggregateId)
-      t.same(aggregateId, view._id, 'view _id should match aggregateId')
+      t.same(aggregateId, view.id, 'view id should match aggregateId')
       t.same('Baba Luga (19)', view.body, 'body should match payload')
       t.end()
     }

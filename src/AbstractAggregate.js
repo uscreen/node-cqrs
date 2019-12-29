@@ -4,7 +4,7 @@ const assert = require('assert-plus')
 const clone = require('rfdc')()
 
 const { validateHandlers } = require('./utils/validators')
-const { getHandler } = require('./utils')
+const { getHandler, getClassName } = require('./utils')
 const EventStream = require('./EventStream')
 
 const SNAPSHOT_EVENT_TYPE = 'snapshot'
@@ -23,6 +23,13 @@ class AbstractAggregate {
    */
   static get handles() {
     return undefined
+  }
+
+  /**
+   * Name of Instance (to be used in keys, etc.)
+   */
+  get name() {
+    return getClassName(this)
   }
 
   /**
@@ -66,12 +73,11 @@ class AbstractAggregate {
    */
   constructor(options) {
     const { id, state, events } = options
-
     assert.ok(id, 'id')
     assert.object(state, 'state')
     assert.optionalArray(events, 'events')
 
-    this[_id] = id
+    this[_id] = id.startsWith(`${this.name}-`) ? id : `${this.name}-${id}`
     this[_changes] = []
     this[_version] = 0
     this[_snapshotVersion] = 0
