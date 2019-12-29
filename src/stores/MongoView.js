@@ -82,6 +82,13 @@ module.exports = class MongoView {
   }
 
   /**
+   * delete all records
+   */
+  clear() {
+    return this.collection.deleteMany({})
+  }
+
+  /**
    * find one record by search query
    */
   findOne(query) {

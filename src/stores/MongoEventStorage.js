@@ -74,8 +74,7 @@ module.exports = class MongoEventStorage {
 
   getEvents(eventTypes) {
     const query = {
-      type: { $in: eventTypes },
-      payload: { $type: 3 } // payload is object
+      type: { $in: eventTypes }
     }
     return this.collection
       .find(query, {
