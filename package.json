@@ -24,7 +24,7 @@
     "lint": "eslint '**/*.js' --fix",
     "test": "tap test/**/*.test.js",
     "test:cov": "tap --coverage-report=html test/**/*.test.js",
-    "test:ci": "tap --coverage-report=text-summary test/**/*.test.js"
+    "test:ci": "tap --100 --coverage-report=text-summary test/**/*.test.js"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
