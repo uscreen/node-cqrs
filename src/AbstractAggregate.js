@@ -29,7 +29,7 @@ class AbstractAggregate {
    * Name of Instance (to be used in keys, etc.)
    */
   get name() {
-    return getClassName(this)
+    return getClassName(this).toLowerCase()
   }
 
   /**
@@ -136,6 +136,7 @@ class AbstractAggregate {
     const event = {
       aggregateId: this.id,
       aggregateVersion: this.version,
+      aggregateTimestamp: new Date(),
       type,
       payload
     }

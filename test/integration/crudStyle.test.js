@@ -1,4 +1,5 @@
 const tap = require('tap')
+const { wait } = require('../helper')
 const { createDomain } = require('../domain')
 
 // passed
@@ -25,6 +26,11 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
       'event should have been stored with given id'
     )
     t.same(0, found.aggregateVersion, 'version should be 0')
+    t.ok(found.aggregateTimestamp, 'aggregateTimestamp should be present')
+    t.ok(
+      found.aggregateId.startsWith('aggregate-'),
+      'aggregateId should be prefixed with aggregate name'
+    )
     t.same('EventCreated', found.type, 'type should be "EventCreated"')
     t.same({ body: 'Lorem Ipsum' }, found.payload, 'body should match payload')
     t.same({ reqId: 1234 }, found.context, 'context should have provided data')
@@ -46,6 +52,8 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
         { id: aggregateId },
         { projection: { _id: false } }
       )
+
+      t.ok(found.created, 'created should be present')
       t.same(view, found, 'view should be the same as read raw from mongo')
       t.end()
     }
@@ -89,11 +97,12 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
       const view = await cqrs.Views.read(aggregateId)
       t.same(aggregateId, view.id, 'view id should match aggregateId')
       t.same('Baba Luga', view.body, 'body should match payload')
-
       const found = await viewsCollection.findOne(
         { id: aggregateId },
         { projection: { _id: false } }
       )
+      t.ok(found.modified, 'modified should be present')
+      t.ok(found.created, 'created should be present')
       t.same(view, found, 'view should be the same as read raw from mongo')
       t.end()
     }
@@ -171,6 +180,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   await t.test(
     'read anotherView as a projection with cqrs.views.read()',
     async t => {
+      await wait(200)
       const anotherView = await cqrs.AnotherViews.read(aggregateId)
       t.ok(
         anotherView,
@@ -197,6 +207,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   await t.test(
     'read ThirdProjection as a projection with cqrs.views.read() should still be of initial state',
     async t => {
+      await wait(200)
       const ThirdProjection = await cqrs.ThirdProjection.read(aggregateId)
       t.ok(
         ThirdProjection,

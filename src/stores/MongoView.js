@@ -42,7 +42,9 @@ module.exports = class MongoView {
   create(id, value) {
     assert.ok(id)
     assert.object(value)
-    return this.collection.insertOne(Object.assign(value, { id }))
+    return this.collection.insertOne(
+      Object.assign(value, { id, created: new Date() })
+    )
   }
 
   /**
@@ -62,7 +64,7 @@ module.exports = class MongoView {
     assert.object(value)
     return this.collection.findOneAndUpdate(
       { id },
-      { $set: value },
+      { $set: value, $currentDate: { modified: true } },
       { returnOriginal: false, upsert: false }
     )
   }

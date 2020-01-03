@@ -90,7 +90,7 @@ const createDomain = async (
       this.emit('EventCreated', payload)
     }
 
-    changeEvent(payload) {
+    async changeEvent(payload) {
       this.emit('EventChanged', payload)
     }
 
