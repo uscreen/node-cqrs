@@ -1,15 +1,13 @@
 'use strict'
 
 const assert = require('assert-plus')
-const { getHandler } = require('./utils')
+const { getHandler, unique } = require('./utils')
 const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
-
-const unique = arr => [...new Set(arr)]
 
 /**
  * Subscribe observer to observable
  */
-function subscribe(
+module.exports = function subscribe(
   observable,
   observer,
   /* istanbul ignore next */
@@ -48,5 +46,3 @@ function subscribe(
     }
   }
 }
-
-module.exports = subscribe
