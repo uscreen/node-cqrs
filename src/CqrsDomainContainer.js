@@ -2,13 +2,13 @@
 
 const assert = require('assert-plus')
 
-const { isClass } = require('./utils/validators')
 const Container = require('./di/Container')
-const SagaEventHandler = require('./SagaEventHandler')
-const AggregateCommandHandler = require('./AggregateCommandHandler')
+const { isClass } = require('./utils/validators')
+const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
 const CommandBus = require('./CommandBus')
 const EventStore = require('./EventStore')
-const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
+const AggregateCommandHandler = require('./AggregateCommandHandler')
+const SagaEventHandler = require('./SagaEventHandler')
 
 /**
  * Dependency injection container with CQRS-specific methods
@@ -19,12 +19,13 @@ class CqrsDomainContainer extends Container {
    */
   constructor() {
     super()
-    this.register(EventStore, 'eventStore')
     this.register(CommandBus, 'commandBus')
+    this.register(EventStore, 'eventStore')
   }
 
   /**
-   * Register command handler, which will be subscribed to commandBus upon instance creation
+   * Register command handler, which will be subscribed
+   * to commandBus upon instance creation
    */
   registerCommandHandler(typeOrFactory) {
     super.register(container => {
@@ -35,7 +36,8 @@ class CqrsDomainContainer extends Container {
   }
 
   /**
-   * Register event receptor, which will be subscribed to eventStore upon instance creation
+   * Register event receptor, which will be subscribed
+   * to eventStore upon instance creation
    */
   registerEventReceptor(typeOrFactory) {
     super.register(container => {

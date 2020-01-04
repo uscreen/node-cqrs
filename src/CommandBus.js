@@ -1,8 +1,6 @@
 'use strict'
 
 const { validateMessageBus } = require('./utils/validators')
-const debug = require('debug')('cqrs:debug:CommandBus')
-const info = require('debug')('cqrs:info:CommandBus')
 
 class CommandBus {
   /**
@@ -40,18 +38,7 @@ class CommandBus {
    * Send a command for execution
    */
   sendRaw(command) {
-    debug(`sending '${command.type}' command...`)
-    return this._bus.send(command).then(
-      r => {
-        debug(`'${command.type}' processed`)
-        return r
-      },
-      /* istanbul ignore next */
-      err => {
-        info(`'${command.type}' processing has failed: ${err}`)
-        throw err
-      }
-    )
+    return this._bus.send(command)
   }
 }
 
