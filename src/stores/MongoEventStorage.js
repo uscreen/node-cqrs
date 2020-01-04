@@ -44,7 +44,7 @@ module.exports = class MongoEventStorage {
       sagaId: sagaId
     }
 
-    /* istanbul ignore if */
+    /* istanbul ignore if: @TODO needs test with beforeEvent.sagaVersion > 0 */
     if (beforeEvent && beforeEvent.sagaVersion) {
       query.sagaVersion = {
         $lt: beforeEvent.sagaVersion

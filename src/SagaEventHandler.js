@@ -1,4 +1,3 @@
-/* eslint new-cap: "off" */
 'use strict'
 
 const assert = require('assert-plus')

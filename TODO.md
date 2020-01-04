@@ -14,6 +14,7 @@
 - [ ] clearly document in variants of declaring handles!
 - [ ] review & refactor Saga implementation
 - [ ] make EventStream a real stream
+- [ ] recheck EventStore.publish() async/await sequence vs. parallel
 
 - [ ] remove unused files
 - [ ] remove unused code

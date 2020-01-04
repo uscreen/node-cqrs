@@ -1,6 +1,7 @@
 'use strict'
 
 const EventEmitter = require('events')
+const assert = require('assert-plus')
 
 const {
   validateMessageBus,
@@ -8,33 +9,10 @@ const {
   validateSnapshotStorage,
   validateEvent
 } = require('./utils/validators')
-
-const assert = require('assert-plus')
-const debug = require('debug')('cqrs:debug:EventStore')
-const info = require('debug')('cqrs:info:EventStore')
 const EventStream = require('./EventStream')
-
 const SNAPSHOT_EVENT_TYPE = 'snapshot'
 
-const _defaults = {
-  publishAsync: true
-}
-
 class EventStore {
-  /**
-   * Default configuration
-   */
-  static get defaults() {
-    return _defaults
-  }
-
-  /**
-   * Configuration
-   */
-  get config() {
-    return this._config
-  }
-
   /**
    * Whether storage supports aggregate snapshots
    */
@@ -44,36 +22,21 @@ class EventStore {
 
   /**
    * Creates an instance of EventStore.
-   *
-   * @param {object} options
-   * @param {IEventStorage} options.storage
-   * @param {IAggregateSnapshotStorage} [options.snapshotStorage]
-   * @param {IMessageBus} options.messageBus
-   * @param {function(IEvent):void} [options.eventValidator]
-   * @param {EventStoreConfig} [options.eventStoreConfig]
    */
   constructor(options) {
     validateEventStorage(options.storage)
     validateMessageBus(options.messageBus)
-
     if (options.snapshotStorage) {
       validateSnapshotStorage(options.snapshotStorage)
     }
-
     assert.optionalFunc(options.eventValidator, 'options.eventValidator')
 
-    this._config = Object.freeze(
-      Object.assign({}, EventStore.defaults, options.eventStoreConfig)
-    )
     this._storage = options.storage
     this._snapshotStorage = options.snapshotStorage
     this._validator = options.eventValidator || validateEvent
-
     this._sagaStarters = []
     this._publishTo = options.messageBus
     this._eventEmitter = options.messageBus
-
-    // for internal `once` subscriptions
     this._internalEmitter = new EventEmitter()
   }
 
@@ -87,17 +50,11 @@ class EventStore {
   /**
    * Retrieve all events of specific types
    */
-  async getAllEvents(eventTypes, filter) {
+  async getAllEvents(eventTypes) {
     assert.optionalArray(eventTypes, 'eventTypes')
 
-    /* istanbul ignore next */
-    debug('retrieving %s events...', eventTypes ? eventTypes.join(', ') : 'all')
-
-    const events = await this._storage.getEvents(eventTypes, filter)
-    const eventStream = new EventStream(events)
-    debug('%s retrieved', eventStream)
-
-    return eventStream
+    const events = await this._storage.getEvents(eventTypes)
+    return new EventStream(events)
   }
 
   /**
@@ -105,21 +62,14 @@ class EventStore {
    */
   async getAggregateEvents(aggregateId) {
     assert.ok(aggregateId, 'aggregateId')
-    debug(`retrieving event stream for aggregate ${aggregateId}...`)
 
     const snapshot = this.snapshotsSupported
       ? await this._snapshotStorage.getAggregateSnapshot(aggregateId)
       : undefined
-
     const events = await this._storage.getAggregateEvents(aggregateId, {
       snapshot
     })
-    const eventStream = new EventStream(
-      snapshot ? [snapshot, ...events] : events
-    )
-    debug('%s retrieved', eventStream)
-
-    return eventStream
+    return new EventStream(snapshot ? [snapshot, ...events] : events)
   }
 
   /**
@@ -127,31 +77,20 @@ class EventStore {
    */
   async getSagaEvents(sagaId, filter) {
     assert.ok(sagaId, 'sagaId')
-    assert.ok(filter, 'filter')
-    assert.ok(filter.beforeEvent, 'filter.beforeEvent')
-    assert.number(
-      filter.beforeEvent.sagaVersion,
-      'filter.beforeEvent.sagaVersion'
-    )
-    debug(
-      `retrieving event stream for saga ${sagaId}, v${filter.beforeEvent.sagaVersion}...`
-    )
+    assert.object(filter, 'filter')
+    assert.object(filter.beforeEvent, 'filter.beforeEvent')
+    assert.number(filter.beforeEvent.sagaVersion, 'beforeEvent.sagaVersion')
 
     const events = await this._storage.getSagaEvents(sagaId, filter)
-    const eventStream = new EventStream(events)
-    debug('%s retrieved', eventStream)
-
-    return eventStream
+    return new EventStream(events)
   }
 
   /**
    * Register event types that start sagas.
    * Upon such event commit a new sagaId will be assigned
    */
-  registerSagaStarters(
-    /* istanbul ignore next */
-    eventTypes = []
-  ) {
+  registerSagaStarters(eventTypes) {
+    assert.arrayOfString(eventTypes, 'eventTypes')
     const uniqueEventTypes = eventTypes.filter(
       e => !this._sagaStarters.includes(e)
     )
@@ -159,48 +98,40 @@ class EventStore {
   }
 
   /**
-   * Validate events, commit to storage and publish to messageBus, if needed
+   * Validate events, persist and publish
    */
   async commit(events) {
     assert.array(events, 'events')
 
-    const containsSagaStarters =
-      this._sagaStarters.length &&
-      events.some(e => this._sagaStarters.includes(e.type))
-    const augmentedEvents = containsSagaStarters
-      ? await this._attachSagaIdToSagaStarterEvents(events)
-      : events
-
+    const augmentedEvents = await this._attachSagaIdToSagaStarterEvents(events)
     const eventStreamWithoutSnapshots = await this.save(augmentedEvents)
-
-    // after events are saved to the persistent storage,
-    // publish them to the event bus (i.e. RabbitMq)
-    /* istanbul ignore else */
-    if (this._publishTo) await this.publish(eventStreamWithoutSnapshots)
+    await this.publish(eventStreamWithoutSnapshots)
 
     return eventStreamWithoutSnapshots
   }
 
   /**
    * Generate and attach sagaId to events that start new sagas
+   * @TODO rework a bit
    */
   async _attachSagaIdToSagaStarterEvents(events) {
     const r = []
+
+    const containsSagaStarters =
+      this._sagaStarters.length &&
+      events.some(e => this._sagaStarters.includes(e.type))
+
     for (const event of events) {
-      /* istanbul ignore else */
-      if (this._sagaStarters.includes(event.type)) {
+      if (containsSagaStarters && this._sagaStarters.includes(event.type)) {
         assert.ok(
           !event.sagaId,
           `Event "${event.type}" already contains sagaId. Multiple sagas with same event type are not supported`
         )
         r.push(
-          Object.assign(
-            {
-              sagaId: await this.getNewId(),
-              sagaVersion: 0
-            },
-            event
-          )
+          Object.assign(event, {
+            sagaId: await this.getNewId(),
+            sagaVersion: 0
+          })
         )
       } else {
         r.push(event)
@@ -216,6 +147,7 @@ class EventStore {
     assert.array(events, 'events')
 
     const snapshotEvents = events.filter(e => e.type === SNAPSHOT_EVENT_TYPE)
+
     assert.ok(
       !(snapshotEvents.length > 1),
       `cannot commit a stream with more than 1 ${SNAPSHOT_EVENT_TYPE} event`
@@ -227,12 +159,10 @@ class EventStore {
 
     const snapshot = snapshotEvents[0]
     const eventStream = new EventStream(events.filter(e => e !== snapshot))
-
-    debug('validating %s...', eventStream)
     eventStream.forEach(this._validator)
 
-    debug('saving %s...', eventStream)
     await this._storage.commitEvents(eventStream)
+
     if (snapshot) {
       await this._snapshotStorage.saveAggregateSnapshot(snapshot)
     }
@@ -242,34 +172,18 @@ class EventStore {
 
   /**
    * After events are
+   * @TODO recheck setImmediate sequence... or parallel
    */
   async publish(eventStream) {
-    const publishEvents = () =>
+    setImmediate(() =>
       Promise.all(
         eventStream.map(event => {
           const published = this._publishTo.publish(event)
           this._internalEmitter.emit(event.type, event)
           return published
         })
-      ).then(
-        () => {
-          debug('%s published', eventStream)
-        },
-        /* istanbul ignore next */
-        err => {
-          info('%s publishing failed: %s', eventStream, err)
-          throw err
-        }
       )
-
-    /* istanbul ignore else */
-    if (this.config.publishAsync) {
-      debug('publishing %s asynchronously...', eventStream)
-      setImmediate(publishEvents)
-    } else {
-      debug('publishing %s synchronously...', eventStream)
-      await publishEvents()
-    }
+    )
   }
 
   /**
@@ -294,6 +208,7 @@ class EventStore {
 
   /**
    * Create a Promise which will resolve to a first emitted event of a given type
+   * @TODO check to attach to _eventEmitter?
    */
   once(messageTypes) {
     assert.string(messageTypes, 'messageTypes')

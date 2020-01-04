@@ -1,7 +1,7 @@
 'use strict'
 
 /**
- * An collection of events
+ * A collection of events
  */
 class EventStream extends Array {
   /**
