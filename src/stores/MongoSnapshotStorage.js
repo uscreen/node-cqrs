@@ -27,15 +27,10 @@ module.exports = class MongoSnapshotStorage {
     )
   }
 
-  wrapEvent(event) {
-    const evt = Object.assign({}, event)
-    return evt
-  }
-
   /**
    * Save new aggregate snapshot
    */
   async saveAggregateSnapshot(snapshotEvent) {
-    return this.collection.insertOne(this.wrapEvent(snapshotEvent))
+    return this.collection.insertOne(snapshotEvent)
   }
 }

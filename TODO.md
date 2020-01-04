@@ -9,10 +9,10 @@
 - [x] shouldn't we keep multiple snapshot versions? => Yes, and we do :)
 - [x] check for restore option/method
 - [x] add a view event to listen for completion?
-- [ ] restore from snapshot (optional?)
+- [x] restore from snapshot
 - [ ] maybe better rename saga.enqueue to somthing command related
 - [ ] clearly document in variants of declaring handles!
-- [ ] review Saga implementation
+- [ ] review & refactor Saga implementation
 - [ ] make EventStream a real stream
 
 - [ ] remove unused files

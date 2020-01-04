@@ -16,13 +16,7 @@ module.exports = class MongoEventStorage {
     this.collection.createIndex({ type: 1 }, { unique: false, sparse: true })
   }
 
-  wrapEvent(event) {
-    const evt = Object.assign({}, event)
-    return evt
-  }
-
-  commitEvents(eventStream) {
-    const events = eventStream.map(this.wrapEvent.bind(this))
+  commitEvents(events) {
     return this.collection.insertMany(events, { w: 1 })
   }
 

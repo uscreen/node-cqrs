@@ -1,7 +1,7 @@
 'use strict'
 
 /**
- * An immutable collection of events
+ * An collection of events
  */
 class EventStream extends Array {
   /**
@@ -10,8 +10,7 @@ class EventStream extends Array {
   constructor(...args) {
     super()
     const events = [].concat(...args)
-    for (const e of events) super.push(Object.freeze(e))
-    Object.freeze(this)
+    for (const e of events) super.push(e)
   }
 
   /**
