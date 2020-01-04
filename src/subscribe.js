@@ -1,48 +1,34 @@
 'use strict'
 
 const assert = require('assert-plus')
-const { getHandler, unique } = require('./utils')
-const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
+const { unique, getHandledMessageTypes } = require('./utils')
 
 /**
  * Subscribe observer to observable
  */
-module.exports = function subscribe(
-  observable,
-  observer,
-  /* istanbul ignore next */
-  options = {}
-) {
+module.exports = (observable, observer, options) => {
   assert.object(observable, 'observable')
   assert.func(observable.on, 'observable.on')
   assert.object(observer, 'observer')
-
-  const { masterHandler, messageTypes, queueName } = options
-
-  assert.func(masterHandler, 'masterHandler')
+  assert.object(options, 'options')
+  assert.func(options.masterHandler, 'options.masterHandler')
   assert.ok(
-    !(queueName && typeof observable.queue !== 'function'),
-    'observable.queue, when queueName is specified, must be a Function'
+    !(options.queueName && typeof observable.queue !== 'function'),
+    'when options.queueName is specified observable.queue must be a Function'
   )
 
+  const { masterHandler, messageTypes, queueName } = options
   const subscribeTo = messageTypes || getHandledMessageTypes(observer)
-
   assert.array(
     subscribeTo,
     'either options.messageTypes, observer.handles or ObserverType.handles is required'
   )
 
   for (const messageType of unique(subscribeTo)) {
-    const handler =
-      masterHandler ||
-      /* istanbul ignore next */
-      getHandler(observer, messageType)
-    assert.func(handler, 'handler')
-
     if (queueName) {
-      observable.queue(queueName).on(messageType, handler.bind(observer))
+      observable.queue(queueName).on(messageType, masterHandler.bind(observer))
     } else {
-      observable.on(messageType, handler.bind(observer))
+      observable.on(messageType, masterHandler.bind(observer))
     }
   }
 }
