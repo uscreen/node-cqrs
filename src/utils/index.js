@@ -1,7 +1,6 @@
 'use strict'
 
-exports.getClassName = require('./getClassName')
-exports.getHandler = require('./getHandler')
-exports.getHandledMessageTypes = require('./getHandledMessageTypes')
-
-exports.unique = arr => [...new Set(arr)]
+module.exports.getClassName = require('./getClassName')
+module.exports.getHandler = require('./getHandler')
+module.exports.getHandledMessageTypes = require('./getHandledMessageTypes')
+module.exports.unique = arr => [...new Set(arr)]
