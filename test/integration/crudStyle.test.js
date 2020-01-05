@@ -224,9 +224,9 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
         'ThirdProjection body should match payload'
       )
       t.same(
-        'ThirdProjection',
+        'thirdprojection',
         ThirdProjection.name,
-        'ThirdProjection name should be "ThirdProjection"'
+        'ThirdProjection name should be "thirdprojection"'
       )
 
       t.end()

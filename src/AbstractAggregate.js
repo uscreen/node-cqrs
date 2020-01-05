@@ -19,7 +19,9 @@ const _snapshotVersion = Symbol('snapshotVersion')
  */
 class AbstractAggregate {
   /**
-   * List of commands handled by Aggregate. Can be overridden in aggregate implementation
+   * List of commands handled by Aggregate.
+   * Can be overridden in aggregate implementation
+   * @todo still in use?
    */
   static get handles() {
     return undefined
@@ -143,13 +145,10 @@ class AbstractAggregate {
 
     const { context, sagaId, sagaVersion } = sourceCommand
 
-    /* istanbul ignore else */
+    /* istanbul ignore else: @todo needs test */
     if (context !== undefined) event.context = context
 
-    /* istanbul ignore else */
     if (sagaId !== undefined) event.sagaId = sagaId
-
-    /* istanbul ignore else */
     if (sagaVersion !== undefined) event.sagaVersion = sagaVersion
 
     return event

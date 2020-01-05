@@ -1,42 +1,27 @@
 'use strict'
 
 const assert = require('assert-plus')
-const info = require('debug')('cqrs:info')
 
 const subscribe = require('./subscribe')
 const InMemoryLock = require('./locks/InMemoryLock')
-const getHandledMessageTypes = require('./utils/getHandledMessageTypes')
 const { validateHandlers } = require('./utils/validators')
-const { getHandler, getClassName } = require('./utils')
+const { getHandler, getClassName, getHandledMessageTypes } = require('./utils')
 
 /**
  * Base class for Projection definition
  */
 module.exports = class AbstractProjection {
   /**
-   * Creates an instance of AbstractProjection
-   */
-  constructor({ eventStore, view }) {
-    validateHandlers(this)
-    assert.object(view, 'view')
-    assert.object(eventStore, 'eventStore')
-
-    this._eventStore = eventStore
-    this._view = view
-
-    // decorate my view with a restore mixin (dirty?)
-    this._view.restore = () => this.restore()
-  }
-
-  /**
    * Name of Instance (to be used in keys, etc.)
    */
   get name() {
-    return getClassName(this)
+    return getClassName(this).toLowerCase()
   }
 
   /**
-   * List of event types being handled by projection. Can be overridden in projection implementation
+   * List of event types being handled by projection.
+   * Can be overridden in projection implementation
+   * @todo still used??
    */
   static get handles() {
     return undefined
@@ -65,6 +50,21 @@ module.exports = class AbstractProjection {
   }
 
   /**
+   * Creates an instance of AbstractProjection
+   */
+  constructor({ eventStore, view }) {
+    validateHandlers(this)
+    assert.object(view, 'view')
+    assert.object(eventStore, 'eventStore')
+
+    this._eventStore = eventStore
+    this._view = view
+
+    // decorate my view with a restore mixin (dirty?)
+    this._view.restore = () => this.restore()
+  }
+
+  /**
    * Subscribe to event store
    */
   async subscribe(eventStore) {
@@ -74,12 +74,12 @@ module.exports = class AbstractProjection {
 
     const shouldRestore = await this.shouldRestoreView
 
-    /* istanbul ignore next */
+    /* istanbul ignore next: @TODO needs unit test  */
     if (shouldRestore) await this.restore()
   }
 
   /**
-   * Pass event to projection event handler
+   * Lock and pass event to handler
    */
   async project(event) {
     return this.locker.locked(`project-${event.aggregateId}`, async () => {
@@ -90,7 +90,7 @@ module.exports = class AbstractProjection {
   }
 
   /**
-   * Pass event to projection event handler, without awaiting for restore operation to complete
+   * Pass event to projection event handler
    */
   async _project(event) {
     const handler = getHandler(this, event.type)
@@ -99,13 +99,10 @@ module.exports = class AbstractProjection {
   }
 
   /**
-   * Restore projection view from event store
+   * Lock and start restore of projection
    */
   async restore() {
-    return this.locker.locked(`restore-${this.name}`, async () => {
-      const result = await this._restore()
-      return result
-    })
+    return this.locker.locked(`restore-${this.name}`, () => this._restore())
   }
 
   /**
@@ -115,26 +112,11 @@ module.exports = class AbstractProjection {
     assert.ok(this._eventStore, 'this._eventStore')
     assert.func(this._eventStore.getAllEvents, 'this._eventStore.getAllEvents')
 
-    info('%s retrieving events...', this)
-
     const messageTypes = getHandledMessageTypes(this)
     const events = await this._eventStore.getAllEvents(messageTypes)
 
-    /* istanbul ignore next */
-    if (!events.length) return
-
-    info('%s restoring from %d event(s)...', this, events.length)
-
     for (const event of events) {
-      try {
-        await this._project(event)
-      } catch (err) /* istanbul ignore next */ {
-        info('%s view restoring has failed on event: %j', this, event)
-        info(err)
-        throw err
-      }
+      await this._project(event)
     }
-
-    info('%s view restored (%s)', this, this.view)
   }
 }

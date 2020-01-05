@@ -10,6 +10,8 @@
 - [x] check for restore option/method
 - [x] add a view event to listen for completion?
 - [x] restore from snapshot
+- [ ] './utils/validators' => './utils'
+- [ ] recheck TODOs
 - [ ] rename some methods to align with semantics cqrs.nu
 - [ ] maybe better rename saga.enqueue to somthing command related
 - [ ] clearly document in variants of declaring handles!
