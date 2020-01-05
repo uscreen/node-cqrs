@@ -2,7 +2,7 @@
 
 const trace = require('debug')('cqrs:trace:Container')
 const getClassDependencyNames = require('./getClassDependencyNames')
-const { isClass } = require('../utils/validators')
+const { isClass } = require('../utils')
 const _factories = Symbol('factories')
 const _instances = Symbol('instances')
 

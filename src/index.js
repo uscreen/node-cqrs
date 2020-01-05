@@ -52,5 +52,4 @@ exports.MongoView = require('./stores/MongoView')
  * misc
  * @TODO shouldn't be needed?
  */
-exports.getMessageHandlerNames = require('./utils/getMessageHandlerNames')
 exports.subscribe = require('./subscribe')

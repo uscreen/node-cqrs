@@ -6,9 +6,9 @@ const assert = require('assert-plus')
 const {
   validateMessageBus,
   validateEventStorage,
-  validateSnapshotStorage,
-  validateEvent
+  validateSnapshotStorage
 } = require('./utils/validators')
+const { validateEvent } = require('./utils')
 const EventStream = require('./EventStream')
 const SNAPSHOT_EVENT_TYPE = 'snapshot'
 
