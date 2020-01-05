@@ -3,8 +3,7 @@
 const assert = require('assert-plus')
 const clone = require('rfdc')()
 
-const { validateHandlers } = require('./utils/validators')
-const { getHandler, getClassName } = require('./utils')
+const { getHandler, getClassName, validateHandlers } = require('./utils')
 const EventStream = require('./EventStream')
 
 const SNAPSHOT_EVENT_TYPE = 'snapshot'

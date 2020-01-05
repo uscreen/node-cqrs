@@ -4,11 +4,11 @@ const EventEmitter = require('events')
 const assert = require('assert-plus')
 
 const {
-  validateMessageBus,
+  validateEvent,
   validateEventStorage,
+  validateMessageBus,
   validateSnapshotStorage
-} = require('./utils/validators')
-const { validateEvent } = require('./utils')
+} = require('./utils')
 const EventStream = require('./EventStream')
 const SNAPSHOT_EVENT_TYPE = 'snapshot'
 

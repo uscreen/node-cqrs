@@ -4,8 +4,13 @@ const assert = require('assert-plus')
 
 const subscribe = require('./subscribe')
 const InMemoryLock = require('./locks/InMemoryLock')
-const { validateHandlers } = require('./utils/validators')
-const { getHandler, getClassName, getHandledMessageTypes } = require('./utils')
+
+const {
+  getHandler,
+  getClassName,
+  getHandledMessageTypes,
+  validateHandlers
+} = require('./utils')
 
 /**
  * Base class for Projection definition

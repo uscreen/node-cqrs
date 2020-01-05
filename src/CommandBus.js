@@ -1,6 +1,6 @@
 'use strict'
 
-const { validateMessageBus } = require('./utils/validators')
+const { validateMessageBus } = require('./utils')
 
 class CommandBus {
   /**
