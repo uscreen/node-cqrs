@@ -1,7 +1,8 @@
 'use strict'
 
 const assert = require('assert-plus')
-const { unique, getHandledMessageTypes } = require('./utils')
+const unique = require('./unique')
+const getHandledMessageTypes = require('./getHandledMessageTypes')
 
 /**
  * Subscribe observer to observable

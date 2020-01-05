@@ -47,9 +47,3 @@ exports.NatsMessageBus = require('./buses/NatsMessageBus')
 exports.MongoEventStorage = require('./stores/MongoEventStorage')
 exports.MongoSnapshotStorage = require('./stores/MongoSnapshotStorage')
 exports.MongoView = require('./stores/MongoView')
-
-/**
- * misc
- * @TODO shouldn't be needed?
- */
-exports.subscribe = require('./subscribe')

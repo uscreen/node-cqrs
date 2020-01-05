@@ -2,7 +2,7 @@
 
 const assert = require('assert-plus')
 
-const subscribe = require('./subscribe')
+const { subscribe } = require('./utils')
 
 /**
  * Aggregate command handler.

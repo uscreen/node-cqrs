@@ -2,7 +2,7 @@
 
 const assert = require('assert-plus')
 
-const subscribe = require('./subscribe')
+const { subscribe } = require('./utils')
 const InMemoryLock = require('./locks/InMemoryLock')
 
 const {
