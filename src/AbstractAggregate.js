@@ -65,7 +65,7 @@ class AbstractAggregate {
   /**
    * Override to define, whether an aggregate state snapshot should be taken
    */
-  /* istanbul ignore next */
+  /* istanbul ignore next: @TODO needs unit test */
   get shouldTakeSnapshot() {
     return false
   }

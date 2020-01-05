@@ -10,15 +10,19 @@
 - [x] check for restore option/method
 - [x] add a view event to listen for completion?
 - [x] restore from snapshot
+- [x] recheck for any eslint disable
+- [x] remove unused files
+- [x] remove unused code
+
 - [ ] './utils/validators' => './utils'
+
 - [ ] recheck TODOs
+- [ ] refactor/review busses
+- [ ] refactor/review di/Container
 - [ ] rename some methods to align with semantics cqrs.nu
 - [ ] maybe better rename saga.enqueue to somthing command related
 - [ ] clearly document in variants of declaring handles!
 - [ ] review & refactor Saga implementation
 - [ ] make EventStream a real stream
 - [ ] recheck EventStore.publish() async/await sequence vs. parallel
-
-- [ ] remove unused files
-- [ ] remove unused code
 - [ ] recheck `/* istanbul ignore` and add appropiate unit/regeression tests

@@ -33,7 +33,7 @@ module.exports = class NatsMessageBus {
    * used by sagas
    */
   queue(name) {
-    /* istanbul ignore else */
+    /* istanbul ignore else: @TODO needs unit test */
     if (!this._queues.has(name)) {
       this._queues.set(
         name,
@@ -56,7 +56,7 @@ module.exports = class NatsMessageBus {
     // For example, for sending a welcome email, NotificationReceptor will subscribe to "notifications:userCreated".
     // Since we use an in-memory bus, there is no need to track message handling by multiple distributed subscribers,
     // and we only need to make sure that no more than 1 such subscriber will be created
-    /* istanbul ignore next */
+    /* istanbul ignore next: @TODO needs unit test */
     if (this._uniqueEventHandlers && this._handlers.has(messageType)) {
       throw new Error(
         `"${messageType}" handler is already set up on the "${this._name}" queue`
@@ -64,7 +64,7 @@ module.exports = class NatsMessageBus {
     }
 
     // no handlers assign yet, so create an empty set
-    /* istanbul ignore else */
+    /* istanbul ignore else: @TODO needs unit test */
     if (!this._handlers.has(messageType)) {
       this._handlers.set(messageType, new Set())
     }

@@ -1,10 +1,9 @@
-/* eslint-disable */
 'use strict'
 
 const assert = require('assert-plus')
 
 const PARAMETER_OBJECT_NAME = 'options'
-const RX_CONSTRUCTOR = /(?:constructor|^function(?:.+\w+)?)\s?\(({?[^\{})]*}?)\)\s?{/
+const RX_CONSTRUCTOR = /(?:constructor|^function(?:.+\w+)?)\s?\(({?[^{})]*}?)\)\s?{/
 const RX_PARAMETER_OBJECT = new RegExp(
   PARAMETER_OBJECT_NAME + '\\.([\\w]+)',
   'g'
@@ -34,7 +33,10 @@ function* getParameterObjectPropertyNames(classBody, offset) {
     }
   }
 
-  assert.ok(ctorBody, 'constructor body could not be found, please do not use commented brackets in the constructor body')
+  assert.ok(
+    ctorBody,
+    'constructor body could not be found, please do not use commented brackets in the constructor body'
+  )
 
   let match
   while ((match = RX_PARAMETER_OBJECT.exec(ctorBody))) {
@@ -61,13 +63,12 @@ module.exports = function getClassDependencyNames(type) {
   const classBody = type.toString()
   const match = classBody.match(RX_CONSTRUCTOR)
   if (!match) {
-    const parentType = type.__proto__
-    /* istanbul ignore else */
+    const parentType = Object.getPrototypeOf(type)
+
     if (parentType && parentType.prototype) {
       return getClassDependencyNames(parentType)
-    } else {
-      return null
     }
+    return null
   }
 
   const args = match[1]
@@ -85,7 +86,7 @@ module.exports = function getClassDependencyNames(type) {
       .map(n => n.trim())
       .filter(n => n)
     return parameters.map(parameterName => {
-      /* istanbul ignore else */
+      /* istanbul ignore else: @TODO needs unit test */
       if (parameterName === PARAMETER_OBJECT_NAME) {
         const constructorBodyOffset = match.index + match[0].length
         return distinct(
