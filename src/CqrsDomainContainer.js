@@ -2,9 +2,8 @@
 
 const assert = require('assert-plus')
 
-const Container = require('./di/Container')
 const { isClass, getHandledMessageTypes } = require('./utils')
-
+const Container = require('./di/Container')
 const CommandBus = require('./CommandBus')
 const EventStore = require('./EventStore')
 const AggregateCommandHandler = require('./AggregateCommandHandler')

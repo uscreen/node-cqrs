@@ -11,6 +11,7 @@ const {
   validateSnapshotStorage
 } = require('./utils')
 const EventStream = require('./EventStream')
+
 const SNAPSHOT_EVENT_TYPE = 'snapshot'
 
 class EventStore {
@@ -46,7 +47,6 @@ class EventStore {
    */
   async getAllEvents(eventTypes) {
     assert.optionalArray(eventTypes, 'eventTypes')
-
     const events = await this._storage.getEvents(eventTypes)
     return new EventStream(events)
   }

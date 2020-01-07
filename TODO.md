@@ -15,13 +15,16 @@
 - [x] remove unused code
 - [x] './utils/validators' => './utils'
 
+- [ ] refactor/review di/Container
 - [ ] recheck TODOs
 - [ ] refactor/review busses
-- [ ] refactor/review di/Container
+- [ ] refactor/review EventStore (ie. publish() async/await sequence vs. parallel)
 - [ ] rename some methods to align with semantics cqrs.nu
-- [ ] maybe better rename saga.enqueue to somthing command related
 - [ ] clearly document in variants of declaring handles!
-- [ ] review & refactor Saga implementation
 - [ ] make EventStream a real stream
-- [ ] recheck EventStore.publish() async/await sequence vs. parallel
 - [ ] recheck `/* istanbul ignore` and add appropiate unit/regeression tests
+
+## Epic: Saga
+
+- [ ] maybe better rename saga.enqueue to somthing command related
+- [ ] review & refactor Saga implementation
