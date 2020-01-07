@@ -15,14 +15,17 @@
 - [x] remove unused code
 - [x] './utils/validators' => './utils'
 
-- [ ] refactor/review di/Container
+- [ ] rename some methods to align with semantics cqrs.nu
 - [ ] recheck TODOs
+- [ ] recheck `/* istanbul ignore` and add appropiate unit/regeression tests
 - [ ] refactor/review busses
 - [ ] refactor/review EventStore (ie. publish() async/await sequence vs. parallel)
-- [ ] rename some methods to align with semantics cqrs.nu
+
+## next interation
+
+- [ ] refactor/review di/Container
 - [ ] clearly document in variants of declaring handles!
 - [ ] make EventStream a real stream
-- [ ] recheck `/* istanbul ignore` and add appropiate unit/regeression tests
 
 ## Epic: Saga
 

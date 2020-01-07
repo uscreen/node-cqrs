@@ -37,7 +37,6 @@
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
-    "debug": "^4.1.1",
     "lock": "^1.1.0",
     "nats": "^1.3.2",
     "redis-lock": "^0.1.4",

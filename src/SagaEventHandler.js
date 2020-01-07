@@ -3,7 +3,6 @@
 const assert = require('assert-plus')
 
 const { subscribe } = require('./utils')
-const info = require('debug')('cqrs:info')
 
 /**
  * Listens to Saga events,
@@ -14,14 +13,6 @@ const info = require('debug')('cqrs:info')
 class SagaEventHandler {
   /**
    * Creates an instance of SagaEventHandler
-   *
-   * @param {object} options
-   * @param {ISagaConstructor | ISagaFactory} options.sagaType
-   * @param {IEventStore} options.eventStore
-   * @param {ICommandBus} options.commandBus
-   * @param {string} [options.queueName]
-   * @param {string[]} [options.startsWith]
-   * @param {string[]} [options.handles]
    */
   constructor(options) {
     assert.ok(options, 'options')
@@ -54,9 +45,6 @@ class SagaEventHandler {
 
   /**
    * Handle saga event
-   *
-   * @param {IEvent} event
-   * @returns {Promise<void>}
    */
   async handle(event) {
     assert.ok(event, 'event')
@@ -72,13 +60,6 @@ class SagaEventHandler {
     while (saga.uncommittedMessages.length) {
       const commands = saga.uncommittedMessages
       saga.resetUncommittedMessages()
-
-      /* istanbul ignore next */
-      info(
-        '%s "%s" event processed, %s produced',
-        event.type,
-        commands.map(c => c.type).join(',') || 'no commands'
-      )
 
       for (const command of commands) {
         // attach event context to produced command
@@ -113,7 +94,6 @@ class SagaEventHandler {
     })
 
     const saga = this._sagaFactory.call(null, { id: event.sagaId, events })
-    info('%s state restored from %s', saga, events)
 
     return saga
   }
