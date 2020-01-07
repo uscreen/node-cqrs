@@ -2,6 +2,7 @@
 
 const EventEmitter = require('events')
 const assert = require('assert-plus')
+const uuidv4 = require('uuid/v4')
 
 const {
   validateEvent,
@@ -38,13 +39,6 @@ class EventStore {
     this._publishTo = options.messageBus
     this._eventEmitter = options.messageBus
     this._internalEmitter = new EventEmitter()
-  }
-
-  /**
-   * Retrieve new ID from the storage
-   */
-  async getNewId() {
-    return this._storage.getNewId()
   }
 
   /**
@@ -129,7 +123,7 @@ class EventStore {
         )
         r.push(
           Object.assign(event, {
-            sagaId: await this.getNewId(),
+            sagaId: uuidv4(),
             sagaVersion: 0
           })
         )

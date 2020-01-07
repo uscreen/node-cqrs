@@ -2,15 +2,14 @@
 
 const assert = require('assert-plus')
 
-const { subscribe } = require('./utils')
-const InMemoryLock = require('./locks/InMemoryLock')
-
 const {
-  getHandler,
   getClassName,
   getHandledMessageTypes,
+  getHandler,
+  subscribe,
   validateHandlers
 } = require('./utils')
+const { InMemoryLock } = require('./locks')
 
 /**
  * Base class for Projection definition
@@ -21,15 +20,6 @@ module.exports = class AbstractProjection {
    */
   get name() {
     return getClassName(this).toLowerCase()
-  }
-
-  /**
-   * List of event types being handled by projection.
-   * Can be overridden in projection implementation
-   * @todo still used??
-   */
-  static get handles() {
-    return undefined
   }
 
   /**
@@ -57,13 +47,15 @@ module.exports = class AbstractProjection {
   /**
    * Creates an instance of AbstractProjection
    */
-  constructor({ eventStore, view }) {
+  constructor({ eventStore, view, locking }) {
     validateHandlers(this)
     assert.object(view, 'view')
     assert.object(eventStore, 'eventStore')
 
+    // assigned by DI
     this._eventStore = eventStore
     this._view = view
+    this._locker = locking
 
     // decorate my view with a restore mixin (dirty?)
     this._view.restore = () => this.restore()

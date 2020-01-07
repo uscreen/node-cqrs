@@ -2,6 +2,7 @@
 
 const assert = require('assert-plus')
 const clone = require('rfdc')()
+const uuidv4 = require('uuid/v4')
 
 const { getHandler, getClassName, validateHandlers } = require('./utils')
 const EventStream = require('./EventStream')
@@ -17,15 +18,6 @@ const _snapshotVersion = Symbol('snapshotVersion')
  * Base class for Aggregate definition
  */
 class AbstractAggregate {
-  /**
-   * List of commands handled by Aggregate.
-   * Can be overridden in aggregate implementation
-   * @todo still in use?
-   */
-  static get handles() {
-    return undefined
-  }
-
   /**
    * Name of Instance (to be used in keys, etc.)
    */
@@ -73,10 +65,11 @@ class AbstractAggregate {
    * Creates an instance of AbstractAggregate.
    */
   constructor(options) {
-    const { id, state, events } = options
-    assert.ok(id, 'id')
+    const { state, events } = options
     assert.object(state, 'state')
     assert.optionalArray(events, 'events')
+
+    const id = options.id || uuidv4()
 
     this[_id] = id.startsWith(`${this.name}-`) ? id : `${this.name}-${id}`
     this[_changes] = []
@@ -146,7 +139,6 @@ class AbstractAggregate {
 
     /* istanbul ignore else: @todo needs test */
     if (context !== undefined) event.context = context
-
     if (sagaId !== undefined) event.sagaId = sagaId
     if (sagaVersion !== undefined) event.sagaVersion = sagaVersion
 

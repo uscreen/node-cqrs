@@ -1,4 +1,5 @@
 const { MongoClient } = require('mongodb')
+const Redis = require('ioredis')
 const NATS = require('nats')
 const {
   Container,
@@ -8,7 +9,9 @@ const {
   MongoEventStorage,
   MongoSnapshotStorage,
   InMemoryMessageBus,
-  NatsMessageBus
+  NatsMessageBus,
+  InMemoryLock,
+  RedisLock
 } = require('../index')
 const { config, wait } = require('./helper')
 
@@ -17,6 +20,9 @@ const createDomain = async (
   ns = 'test',
   { skipSnapshot, useNatsBus } = {}
 ) => {
+  const redis = new Redis({
+    host: config.redisHost
+  })
   const client = await MongoClient.connect(config.mongoUri)
   const db = client.db()
   const eventsCollection = db.collection(`${ns}-events`)
@@ -44,12 +50,14 @@ const createDomain = async (
   t.teardown(async () => {
     await wait(500)
     await client.close()
+    redis.quit()
     if (useNatsBus) natsClient.close()
   })
 
   const cqrs = new Container()
 
   cqrs.register(MongoEventStorage, 'storage')
+  cqrs.register(InMemoryLock, 'locking')
   if (useNatsBus) {
     cqrs.registerInstance(natsClient, 'natsClient')
     cqrs.register(NatsMessageBus, 'messageBus')
@@ -110,9 +118,10 @@ const createDomain = async (
   cqrs.registerAggregate(Aggregate)
 
   class Views extends AbstractProjection {
-    constructor({ eventStore }) {
+    constructor({ eventStore, locking }) {
       super({
         eventStore,
+        locking,
         view: new MongoView({
           collection: viewsCollection
         })
@@ -191,6 +200,7 @@ const createDomain = async (
     constructor({ eventStore }) {
       super({
         eventStore,
+        locking: new RedisLock({ Redis: redis }),
         view: new MongoView({
           collection: ThirdProjectionCollection
         })

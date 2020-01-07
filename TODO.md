@@ -13,8 +13,7 @@
 - [x] recheck for any eslint disable
 - [x] remove unused files
 - [x] remove unused code
-
-- [ ] './utils/validators' => './utils'
+- [x] './utils/validators' => './utils'
 
 - [ ] recheck TODOs
 - [ ] refactor/review busses

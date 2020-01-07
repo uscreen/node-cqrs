@@ -11,5 +11,4 @@ module.exports = storage => {
   assert.func(storage.getEvents, 'storage.getEvents')
   assert.func(storage.getAggregateEvents, 'storage.getAggregateEvents')
   assert.func(storage.getSagaEvents, 'storage.getSagaEvents')
-  assert.func(storage.getNewId, 'storage.getNewId')
 }

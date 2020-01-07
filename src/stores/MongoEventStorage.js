@@ -1,7 +1,5 @@
 'use strict'
 
-const uuidv4 = require('uuid/v4')
-
 module.exports = class MongoEventStorage {
   constructor({ EventsCollection }) {
     this.collection = EventsCollection
@@ -69,9 +67,5 @@ module.exports = class MongoEventStorage {
         sort: 'aggregateVersion'
       })
       .toArray()
-  }
-
-  getNewId() {
-    return uuidv4()
   }
 }

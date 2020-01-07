@@ -3,47 +3,47 @@
 /**
  * DI Container
  */
-exports.Container = require('./CqrsDomainContainer')
+module.exports.Container = require('./CqrsDomainContainer')
 
 /**
  * CQRS/ES: Commands & Events
  */
-exports.CommandBus = require('./CommandBus')
-exports.EventStore = require('./EventStore')
-exports.EventStream = require('./EventStream')
+module.exports.CommandBus = require('./CommandBus')
+module.exports.EventStore = require('./EventStore')
+module.exports.EventStream = require('./EventStream')
 
 /**
  * CQRS/ES: write
  */
-exports.AbstractAggregate = require('./AbstractAggregate')
-exports.AggregateCommandHandler = require('./AggregateCommandHandler')
+module.exports.AbstractAggregate = require('./AbstractAggregate')
+module.exports.AggregateCommandHandler = require('./AggregateCommandHandler')
 
 /**
  * CQRS/ES: read
  */
-exports.AbstractProjection = require('./AbstractProjection')
+module.exports.AbstractProjection = require('./AbstractProjection')
 
 /**
  * Saga
  */
-exports.AbstractSaga = require('./AbstractSaga')
-exports.SagaEventHandler = require('./SagaEventHandler')
+module.exports.AbstractSaga = require('./AbstractSaga')
+module.exports.SagaEventHandler = require('./SagaEventHandler')
 
 /**
  * Locks
  */
-exports.InMemoryLock = require('./locks/InMemoryLock')
-exports.RedisLock = require('./locks/RedisLock')
+module.exports.InMemoryLock = require('./locks/InMemoryLock')
+module.exports.RedisLock = require('./locks/RedisLock')
 
 /**
  * Busses
  */
-exports.InMemoryMessageBus = require('./buses/InMemoryMessageBus')
-exports.NatsMessageBus = require('./buses/NatsMessageBus')
+module.exports.InMemoryMessageBus = require('./buses/InMemoryMessageBus')
+module.exports.NatsMessageBus = require('./buses/NatsMessageBus')
 
 /**
  * Storages
  */
-exports.MongoEventStorage = require('./stores/MongoEventStorage')
-exports.MongoSnapshotStorage = require('./stores/MongoSnapshotStorage')
-exports.MongoView = require('./stores/MongoView')
+module.exports.MongoEventStorage = require('./stores/MongoEventStorage')
+module.exports.MongoSnapshotStorage = require('./stores/MongoSnapshotStorage')
+module.exports.MongoView = require('./stores/MongoView')
