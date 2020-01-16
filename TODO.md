@@ -15,6 +15,7 @@
 - [x] remove unused code
 - [x] './utils/validators' => './utils'
 
+- [ ] restore -> redux?, https://medium.com/@sderosiaux/cqrs-what-why-how-945543482313 (We often have a function to replay everything at once, sometimes called a calculator, reducer, replayer:)
 - [ ] rename some methods to align with semantics cqrs.nu
 - [ ] recheck TODOs
 - [ ] recheck `/* istanbul ignore` and add appropiate unit/regeression tests
