@@ -29,7 +29,9 @@ module.exports = class MongoEventStorage {
   }
 
   commitEvents(events) {
-    return this.collection.insertMany(events, { w: 1 })
+    if (events.length) {
+      return this.collection.insertMany(events, { w: 1 })
+    }
   }
 
   getAggregateEvents(aggregateId, { snapshot }) {

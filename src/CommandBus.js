@@ -35,6 +35,18 @@ class CommandBus {
   }
 
   /**
+   * Format and send a command for execution
+   * @param {string} type type of command, ie. 'Something.add'
+   * @param {object} payload containing: { payload, context }
+   */
+  submit(type, payload) {
+    return this._bus.send({
+      type,
+      ...payload
+    })
+  }
+
+  /**
    * Send a command for execution
    */
   sendRaw(command) {
