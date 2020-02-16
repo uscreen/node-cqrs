@@ -19,10 +19,9 @@ module.exports = class MongoView {
    * awaiting the promise, constructor can't be async, so..
    */
   async createIndex() {
-    await this._collection.createIndex(
-      { id: 1 },
-      { unique: true, sparse: true }
-    )
+    await this._collection
+      .createIndex({ id: 1 }, { unique: true, sparse: true })
+      .catch(e => {})
   }
 
   /**
