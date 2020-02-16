@@ -10,8 +10,19 @@ module.exports = class MongoView {
   constructor({ collection }) {
     assert.object(collection, 'a "collection" is required by MongoView')
     this._collection = collection
-    this._collection.createIndex({ id: 1 }, { unique: true, sparse: true })
     this._emitter = new EventEmitter()
+    this.createIndex()
+  }
+
+  /**
+   * creating indecies now (mongodb >= 3.5.x) requires
+   * awaiting the promise, constructor can't be async, so..
+   */
+  async createIndex() {
+    await this._collection.createIndex(
+      { id: 1 },
+      { unique: true, sparse: true }
+    )
   }
 
   /**

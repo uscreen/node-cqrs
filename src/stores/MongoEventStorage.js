@@ -3,15 +3,26 @@
 module.exports = class MongoEventStorage {
   constructor({ EventsCollection }) {
     this.collection = EventsCollection
-    this.collection.createIndex(
+    this.createIndex()
+  }
+
+  /**
+   * creating indecies now (mongodb >= 3.5.x) requires
+   * awaiting the promise, constructor can't be async, so..
+   */
+  async createIndex() {
+    await this.collection.createIndex(
       { aggregateId: 1, aggregateVersion: 1 },
       { unique: true, sparse: true }
     )
-    this.collection.createIndex(
+    await this.collection.createIndex(
       { sagaId: 1, sagaVersion: 1 },
       { unique: false, sparse: true }
     )
-    this.collection.createIndex({ type: 1 }, { unique: false, sparse: true })
+    await this.collection.createIndex(
+      { type: 1 },
+      { unique: false, sparse: true }
+    )
   }
 
   commitEvents(events) {
