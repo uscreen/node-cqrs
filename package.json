@@ -41,7 +41,7 @@
     "nats": "^1.4.0",
     "redis-lock": "^0.1.4",
     "rfdc": "^1.1.4",
-    "uuid": "^3.4.0"
+    "uuid": "^7.0.0"
   },
   "devDependencies": {
     "env-schema": "^1.1.0",
