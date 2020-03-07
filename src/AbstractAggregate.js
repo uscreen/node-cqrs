@@ -2,7 +2,7 @@
 
 const assert = require('assert-plus')
 const clone = require('rfdc')()
-const uuidv4 = require('uuid/v4')
+const { v4: uuidv4 } = require('uuid')
 
 const { getHandler, getClassName, validateHandlers } = require('./utils')
 const EventStream = require('./EventStream')
