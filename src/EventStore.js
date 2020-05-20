@@ -86,7 +86,7 @@ class EventStore {
   registerSagaStarters(eventTypes) {
     assert.arrayOfString(eventTypes, 'eventTypes')
     const uniqueEventTypes = eventTypes.filter(
-      e => !this._sagaStarters.includes(e)
+      (e) => !this._sagaStarters.includes(e)
     )
     this._sagaStarters.push(...uniqueEventTypes)
   }
@@ -113,7 +113,7 @@ class EventStore {
 
     const containsSagaStarters =
       this._sagaStarters.length &&
-      events.some(e => this._sagaStarters.includes(e.type))
+      events.some((e) => this._sagaStarters.includes(e.type))
 
     for (const event of events) {
       if (containsSagaStarters && this._sagaStarters.includes(event.type)) {
@@ -140,7 +140,7 @@ class EventStore {
   async save(events) {
     assert.array(events, 'events')
 
-    const snapshotEvents = events.filter(e => e.type === SNAPSHOT_EVENT_TYPE)
+    const snapshotEvents = events.filter((e) => e.type === SNAPSHOT_EVENT_TYPE)
 
     assert.ok(
       !(snapshotEvents.length > 1),
@@ -152,7 +152,7 @@ class EventStore {
     )
 
     const snapshot = snapshotEvents[0]
-    const eventStream = new EventStream(events.filter(e => e !== snapshot))
+    const eventStream = new EventStream(events.filter((e) => e !== snapshot))
     eventStream.forEach(this._validator)
 
     await this._storage.commitEvents(eventStream)
@@ -171,7 +171,7 @@ class EventStore {
   async publish(eventStream) {
     setImmediate(() =>
       Promise.all(
-        eventStream.map(event => {
+        eventStream.map((event) => {
           const published = this._publishTo.publish(event)
           this._internalEmitter.emit(event.type, event)
           return published
@@ -206,7 +206,7 @@ class EventStore {
    */
   once(messageTypes) {
     assert.string(messageTypes, 'messageTypes')
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       this._internalEmitter.once(messageTypes, resolve)
     })
   }

@@ -21,9 +21,9 @@ module.exports = class InMemoryLock {
    */
   locked(key, cb) {
     return new Promise((resolve, reject) => {
-      this.lock(key, async release => {
+      this.lock(key, async (release) => {
         resolve(await cb().catch(reject))
-        release(err => {
+        release((err) => {
           /* istanbul ignore next: @TODO needs unit test */
           if (err) {
             console.error(`${key} unlocked with error:`, err)

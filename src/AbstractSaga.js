@@ -68,7 +68,7 @@ class AbstractSaga {
 
     /* istanbul ignore else */
     if (options.events) {
-      options.events.forEach(e => this.apply(e))
+      options.events.forEach((e) => this.apply(e))
       this.resetUncommittedMessages()
     }
 

@@ -21,7 +21,7 @@ module.exports = class RedisLock {
    */
   locked(key, cb) {
     return new Promise((resolve, reject) => {
-      this.lock(key, async release => {
+      this.lock(key, async (release) => {
         resolve(await cb().catch(reject))
         release()
       })

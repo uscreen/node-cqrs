@@ -27,7 +27,7 @@ class CqrsDomainContainer extends Container {
    * to commandBus upon instance creation
    */
   registerCommandHandler(typeOrFactory) {
-    super.register(container => {
+    super.register((container) => {
       const handler = container.createInstance(typeOrFactory)
       handler.subscribe(container.commandBus)
       return handler
@@ -39,7 +39,7 @@ class CqrsDomainContainer extends Container {
    * to eventStore upon instance creation
    */
   registerEventReceptor(typeOrFactory) {
-    super.register(container => {
+    super.register((container) => {
       const receptor = container.createInstance(typeOrFactory)
       receptor.subscribe(container.eventStore)
       return receptor
@@ -56,13 +56,13 @@ class CqrsDomainContainer extends Container {
       'ProjectionType argument must be a constructor function'
     )
     super.register(
-      container => {
+      (container) => {
         const projection = container.createInstance(ProjectionType)
         projection.subscribe(container.eventStore)
         return projection
       },
       exposedViewName,
-      p => p.view
+      (p) => p.view
     )
   }
 
@@ -75,10 +75,10 @@ class CqrsDomainContainer extends Container {
       'AggregateType argument must be a constructor function'
     )
     this.registerCommandHandler(
-      container =>
+      (container) =>
         new AggregateCommandHandler({
           eventStore: container.eventStore,
-          aggregateType: options =>
+          aggregateType: (options) =>
             container.createInstance(AggregateType, options),
           handles: getHandledMessageTypes(AggregateType)
         })
@@ -94,11 +94,11 @@ class CqrsDomainContainer extends Container {
       'SagaType argument must be a constructor function'
     )
     this.registerEventReceptor(
-      container =>
+      (container) =>
         new SagaEventHandler({
           eventStore: container.eventStore,
           commandBus: container.commandBus,
-          sagaType: options => container.createInstance(SagaType, options),
+          sagaType: (options) => container.createInstance(SagaType, options),
           handles: SagaType.handles,
           startsWith: SagaType.startsWith,
           queueName: SagaType.name

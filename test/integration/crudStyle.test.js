@@ -4,14 +4,14 @@ const { createDomain } = require('../domain')
 
 // passed
 
-tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
+tap.test('Use MongoEventStorage in a CRUD alike way', async (t) => {
   const { cqrs, eventsCollection, viewsCollection } = await createDomain(t)
   let aggregateId
 
   /**
    * 1st create
    */
-  await t.test('write a command with cqrs.commandBus.send()', async t => {
+  await t.test('write a command with cqrs.commandBus.send()', async (t) => {
     const payload = { body: 'Lorem Ipsum' }
     const context = { reqId: 1234 }
     await cqrs.commandBus.send('createEvent', null, { payload, context })
@@ -43,7 +43,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
    */
   await t.test(
     'read a view from a projection with cqrs.views.read()',
-    async t => {
+    async (t) => {
       const view = await cqrs.Views.read(aggregateId)
       t.same(aggregateId, view.id, 'view id should match aggregateId')
       t.same('Lorem Ipsum', view.body, 'body should match payload')
@@ -62,7 +62,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   /**
    * 1st update
    */
-  await t.test('commit a change with cqrs.commandBus.send()', async t => {
+  await t.test('commit a change with cqrs.commandBus.send()', async (t) => {
     const payload = { body: 'Baba Luga' }
     const context = { reqId: 5678 }
     await cqrs.commandBus.send('changeEvent', aggregateId, { payload, context })
@@ -93,7 +93,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
    */
   await t.test(
     'read that view from a projection with cqrs.views.read()',
-    async t => {
+    async (t) => {
       const view = await cqrs.Views.read(aggregateId)
       t.same(aggregateId, view.id, 'view id should match aggregateId')
       t.same('Baba Luga', view.body, 'body should match payload')
@@ -111,7 +111,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   /**
    * 1st list
    */
-  await t.test('list all view without filter cqrs.views.list()', async t => {
+  await t.test('list all view without filter cqrs.views.list()', async (t) => {
     const views = await cqrs.Views.list()
     t.same(1, views.length, 'we should have found 1 view now')
     t.same(aggregateId, views[0].id, 'view id should match aggregateId')
@@ -122,7 +122,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   /**
    * 1st delete
    */
-  await t.test('commit a remove with cqrs.commandBus.send()', async t => {
+  await t.test('commit a remove with cqrs.commandBus.send()', async (t) => {
     const context = { reqId: 9012 }
     await cqrs.commandBus.send('deleteEvent', aggregateId, { context })
     await cqrs.eventStore.once('EventDeleted')
@@ -152,7 +152,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
   /**
    * 2nd list
    */
-  await t.test('list all view without filter after removal', async t => {
+  await t.test('list all view without filter after removal', async (t) => {
     const views = await cqrs.Views.list()
     t.same(0, views.length, 'we should have found 0 view now')
     t.end()
@@ -163,7 +163,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
    */
   await t.test(
     'read that view from a projection with cqrs.views.read()',
-    async t => {
+    async (t) => {
       const view = await cqrs.Views.read(aggregateId)
       t.same(null, view, 'no view should have been found')
 
@@ -179,7 +179,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
    */
   await t.test(
     'read anotherView as a projection with cqrs.views.read()',
-    async t => {
+    async (t) => {
       await wait(200)
       const anotherView = await cqrs.AnotherViews.read(aggregateId)
       t.ok(
@@ -206,7 +206,7 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async t => {
    */
   await t.test(
     'read ThirdProjection as a projection with cqrs.views.read() should still be of initial state',
-    async t => {
+    async (t) => {
       await wait(200)
       const ThirdProjection = await cqrs.ThirdProjection.read(aggregateId)
       t.ok(

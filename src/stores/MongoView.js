@@ -21,7 +21,7 @@ module.exports = class MongoView {
   async createIndex() {
     await this._collection
       .createIndex({ id: 1 }, { unique: true, sparse: true })
-      .catch(e => {})
+      .catch((e) => {})
   }
 
   /**
@@ -29,7 +29,7 @@ module.exports = class MongoView {
    */
   once(eventType) {
     assert.string(eventType, 'eventType')
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       this._emitter.once(eventType, resolve)
     })
   }
@@ -69,13 +69,13 @@ module.exports = class MongoView {
    * atomically update exiting records.
    * `$set: value` should only update given attributes
    */
-  update(id, value) {
+  update(id, value, upsert = false) {
     assert.ok(id)
     assert.object(value)
     return this.collection.findOneAndUpdate(
       { id },
       { $set: value, $currentDate: { modified: true } },
-      { returnOriginal: false, upsert: false }
+      { returnOriginal: false, upsert }
     )
   }
 

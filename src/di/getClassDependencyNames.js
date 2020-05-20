@@ -78,14 +78,14 @@ module.exports = function getClassDependencyNames(type) {
       args
         .replace(/^{|}$/g, '')
         .split(',')
-        .map(n => n.trim())
+        .map((n) => n.trim())
     ]
   } else {
     const parameters = match[1]
       .split(',')
-      .map(n => n.trim())
-      .filter(n => n)
-    return parameters.map(parameterName => {
+      .map((n) => n.trim())
+      .filter((n) => n)
+    return parameters.map((parameterName) => {
       /* istanbul ignore else: @TODO needs unit test */
       if (parameterName === PARAMETER_OBJECT_NAME) {
         const constructorBodyOffset = match.index + match[0].length

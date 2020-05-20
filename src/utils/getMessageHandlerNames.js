@@ -7,7 +7,7 @@ const KNOWN_METHOD_NAMES = new Set(['subscribe'])
 /**
  * getInheritedPropertyNames
  */
-const getInheritedPropertyNames = prototype => {
+const getInheritedPropertyNames = (prototype) => {
   const parentPrototype = prototype && Object.getPrototypeOf(prototype)
   if (!parentPrototype) return []
 
@@ -21,7 +21,7 @@ const getInheritedPropertyNames = prototype => {
  * Get message handler names from a command/event handler class.
  * Assumes all private method names start from underscore ("_").
  */
-const getMessageHandlerNames = observerInstanceOrClass => {
+const getMessageHandlerNames = (observerInstanceOrClass) => {
   assert.ok(observerInstanceOrClass, 'observerInstanceOrClass')
 
   const prototype =
@@ -36,7 +36,7 @@ const getMessageHandlerNames = observerInstanceOrClass => {
   const propNames = Object.keys(propDescriptors)
 
   return propNames.filter(
-    key =>
+    (key) =>
       !key.startsWith('_') &&
       !inheritedProperties.has(key) &&
       !KNOWN_METHOD_NAMES.has(key) &&

@@ -2,7 +2,7 @@ const tap = require('tap')
 const { createDomain } = require('../domain')
 const { AbstractSaga } = require('../../index')
 
-tap.test('Use Saga with default InMemoryLock', async t => {
+tap.test('Use Saga with default InMemoryLock', async (t) => {
   const { cqrs, eventsCollection } = await createDomain(t, 'sagaTest-')
   let aggregateId
 
@@ -31,7 +31,7 @@ tap.test('Use Saga with default InMemoryLock', async t => {
   /**
    * 1st create
    */
-  await t.test('write a command with cqrs.commandBus.send()', async t => {
+  await t.test('write a command with cqrs.commandBus.send()', async (t) => {
     const id = null
     const payload = { body: 'Lorem Ipsum' }
     const context = { reqId: 1234 }
@@ -65,7 +65,7 @@ tap.test('Use Saga with default InMemoryLock', async t => {
    */
   await t.test(
     'read a view from a projection with cqrs.views.read()',
-    async t => {
+    async (t) => {
       const view = await cqrs.Views.read(aggregateId)
       t.same(aggregateId, view.id, 'view id should match aggregateId')
       t.same('Lorem Ipsum', view.body, 'body should match payload')

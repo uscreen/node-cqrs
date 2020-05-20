@@ -5,7 +5,7 @@ const assert = require('assert-plus')
 /**
  * Validate event structure
  */
-module.exports = event => {
+module.exports = (event) => {
   assert.object(event, 'event')
   assert.string(event.type, 'event.type')
 

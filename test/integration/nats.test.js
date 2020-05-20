@@ -3,7 +3,7 @@ const { createDomain } = require('../domain')
 // const { wait } = require('../helper')
 const { AbstractSaga } = require('../../index')
 
-tap.test('Creating and using snapshots', async t => {
+tap.test('Creating and using snapshots', async (t) => {
   const { cqrs, eventsCollection } = await createDomain(t, 'nats-', {
     useNatsBus: true
   })
@@ -34,7 +34,7 @@ tap.test('Creating and using snapshots', async t => {
   /**
    * 1st create
    */
-  await t.test('write a command with cqrs.commandBus.send()', async t => {
+  await t.test('write a command with cqrs.commandBus.send()', async (t) => {
     const payload = { body: 'Lorem Ipsum' }
     const context = { reqId: 1234 }
     await cqrs.commandBus.send('createEvent', null, { payload, context })
@@ -68,7 +68,7 @@ tap.test('Creating and using snapshots', async t => {
    */
   await t.test(
     'read a view from a projection with cqrs.views.read()',
-    async t => {
+    async (t) => {
       const view = await cqrs.Views.read(aggregateId)
 
       t.same(aggregateId, view.id, 'view id should match aggregateId')

@@ -21,7 +21,7 @@ function createInstance(typeOrFactory, container, additionalOptions) {
     const dependencies = getClassDependencyNames(Type)
 
     const parameters = dependencies
-      ? dependencies.map(dependency => {
+      ? dependencies.map((dependency) => {
           /* istanbul ignore if: needs test */
           if (typeof dependency === 'string') {
             return container[dependency]
@@ -31,7 +31,7 @@ function createInstance(typeOrFactory, container, additionalOptions) {
           if (Array.isArray(dependency)) {
             const options = Object.assign({}, additionalOptions)
             dependency.forEach(
-              key => options[key] || (options[key] = container[key])
+              (key) => options[key] || (options[key] = container[key])
             )
             return options
           }
@@ -86,7 +86,7 @@ class Container {
       'exposeMap argument, when provided, must be a function'
     )
 
-    const factory = container => container.createInstance(typeOrFactory)
+    const factory = (container) => container.createInstance(typeOrFactory)
 
     if (exposeAs) {
       const getOrCreate = () => {

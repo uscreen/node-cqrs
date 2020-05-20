@@ -5,7 +5,7 @@ const assert = require('assert-plus')
 /**
  * Ensure provided eventStorage matches expected interface
  */
-module.exports = storage => {
+module.exports = (storage) => {
   assert.object(storage, 'storage')
   assert.func(storage.commitEvents, 'storage.commitEvents')
   assert.func(storage.getEvents, 'storage.getEvents')

@@ -3,6 +3,6 @@
 /**
  *
  */
-module.exports = arr => {
+module.exports = (arr) => {
   return [...new Set(arr)]
 }

@@ -5,7 +5,7 @@ const { RedisLock } = require('../../index')
 
 // passed
 
-tap.test('RedisLock', async t => {
+tap.test('RedisLock', async (t) => {
   const redis = new Redis({
     host: config.redisHost
   })
@@ -18,7 +18,7 @@ tap.test('RedisLock', async t => {
 
   await t.test(
     'should lock and execute in sequence when used on same keys',
-    async t => {
+    async (t) => {
       const order = []
       const results = await Promise.all([
         locker.locked('sameKey', async () => {
@@ -51,7 +51,7 @@ tap.test('RedisLock', async t => {
 
   await t.test(
     'should lock and execute in parallel when used on different keys',
-    async t => {
+    async (t) => {
       const order = []
       const results = await Promise.all([
         locker.locked('myKey-1', async () => {

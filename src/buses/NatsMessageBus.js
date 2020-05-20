@@ -115,7 +115,7 @@ module.exports = class NatsMessageBus {
     // start sagas on events
     const sagaHandlers = Array.from(
       this._queues.values()
-    ).map(namedQueue => e => namedQueue.publish(e))
-    return Promise.all(sagaHandlers.map(handler => handler(event)))
+    ).map((namedQueue) => (e) => namedQueue.publish(e))
+    return Promise.all(sagaHandlers.map((handler) => handler(event)))
   }
 }

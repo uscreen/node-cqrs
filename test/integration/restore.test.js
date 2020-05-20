@@ -3,14 +3,14 @@ const { createDomain } = require('../domain')
 
 // passed
 
-tap.test('Creating and using snapshots', async t => {
+tap.test('Creating and using snapshots', async (t) => {
   const { cqrs, eventsCollection } = await createDomain(t, 'restore-')
   let aggregateId
 
   /**
    * 1st create
    */
-  await t.test('write a command with cqrs.commandBus.commit()', async t => {
+  await t.test('write a command with cqrs.commandBus.commit()', async (t) => {
     const payload = { body: 'Lorem Ipsum' }
     const context = { reqId: 1234 }
     await cqrs.commandBus.commit('createEvent', null, { payload, context })
@@ -30,7 +30,7 @@ tap.test('Creating and using snapshots', async t => {
   /**
    * 1st update
    */
-  await t.test('commit a change with cqrs.commandBus.commit()', async t => {
+  await t.test('commit a change with cqrs.commandBus.commit()', async (t) => {
     const payload = { body: 'Baba Luga' }
     const context = { reqId: 5678 }
     await cqrs.commandBus.commit('changeEvent', aggregateId, {
@@ -53,7 +53,7 @@ tap.test('Creating and using snapshots', async t => {
    */
   await t.test(
     'deleted views should get restored by cqrs.Views.restore()',
-    async t => {
+    async (t) => {
       await cqrs.Views.clear()
       await cqrs.Views.restore()
 
