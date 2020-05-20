@@ -66,24 +66,23 @@ class AbstractAggregate {
    */
   constructor(options) {
     const { state, events } = options
-    assert.object(state, 'state')
     assert.optionalArray(events, 'events')
 
-    const id = options.id || uuidv4()
+    const id = options.id || `${this.name}-${uuidv4()}`
 
-    this[_id] = id.startsWith(`${this.name}-`) ? id : `${this.name}-${id}`
+    this[_id] = id
     this[_changes] = []
     this[_version] = 0
     this[_snapshotVersion] = 0
 
     validateHandlers(this)
 
-    this.state = state
-    if (events) events.forEach(event => this.mutate(event))
+    this.state = state || new (class State {})()
+    assert.object(this.state, 'state')
+    if (events) events.forEach((event) => this.mutate(event))
   }
 
-  /**
-   * Pass command to command handler
+  /* (event)* Pass command to command handler
    */
   handle(command) {
     assert.ok(command, 'command')
