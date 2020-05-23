@@ -12,19 +12,20 @@ module.exports = class NatsMessageBus {
   /**
    * Creates an instance of NatsMessageBus
    */
-  constructor({ name, natsClient }) {
+  constructor({ name, natsClient, natsQueueGroup }) {
     this._name = name
     this._handlers = new Map()
     this._queues = new Map()
     this._nats = natsClient
+    this._natsQueueGroup = natsQueueGroup || ''
   }
 
   _publish(type, event) {
-    this._nats.publish(type, event)
+    this._nats.publish(`${this._natsQueueGroup}${type}`, event)
   }
 
   _subscribe(type, handler) {
-    this._nats.subscribe(type, handler)
+    this._nats.subscribe(`${this._natsQueueGroup}${type}`, handler)
   }
 
   /**
