@@ -53,12 +53,10 @@ tap.test('Creating and using snapshots', async (t) => {
       found.aggregateId,
       'event should have been stored with given id'
     )
-    t.same(0, found.aggregateVersion, 'aggregateVersion should be 0')
+
     t.same('EventCreated', found.type, 'type should be "EventCreated"')
     t.same({ body: 'Lorem Ipsum' }, found.payload, 'body should match payload')
     t.same({ reqId: 1234 }, found.context, 'context should have provided data')
-    t.ok(found.sagaId, 'event should have been stored with a sagaId')
-    t.same(0, found.sagaVersion, 'sagaVersion should be 0')
 
     t.end()
   })

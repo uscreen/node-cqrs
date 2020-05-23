@@ -2,7 +2,7 @@
 
 const assert = require('assert-plus')
 
-const InMemoryMessageBus = require('./InMemoryMessageBus')
+// const InMemoryMessageBus = require('./InMemoryMessageBus')
 
 /**
  * Default implementation of the message bus.
@@ -12,10 +12,11 @@ module.exports = class NatsMessageBus {
   /**
    * Creates an instance of NatsMessageBus
    */
-  constructor({ name, natsClient, natsQueueGroup }) {
+  constructor({ name, natsClient, natsQueueGroup, uniqueEventHandlers }) {
     this._name = name
     this._handlers = new Map()
     this._queues = new Map()
+    this._uniqueEventHandlers = uniqueEventHandlers || false
     this._nats = natsClient
     this._natsQueueGroup = natsQueueGroup || ''
   }
@@ -38,7 +39,12 @@ module.exports = class NatsMessageBus {
     if (!this._queues.has(name)) {
       this._queues.set(
         name,
-        new InMemoryMessageBus({ name, uniqueEventHandlers: true })
+        new NatsMessageBus({
+          name,
+          natsClient: this._nats,
+          natsQueueGroup: this._natsQueueGroup,
+          uniqueEventHandlers: true
+        })
       )
     }
 
@@ -112,11 +118,5 @@ module.exports = class NatsMessageBus {
     assert.object(event, 'event')
     assert.string(event.type, 'event.type')
     this._publish(event.type, event)
-
-    // start sagas on events
-    const sagaHandlers = Array.from(
-      this._queues.values()
-    ).map((namedQueue) => (e) => namedQueue.publish(e))
-    return Promise.all(sagaHandlers.map((handler) => handler(event)))
   }
 }

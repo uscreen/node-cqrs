@@ -1,6 +1,7 @@
 'use strict'
 
 const assert = require('assert-plus')
+const { v4: uuidv4 } = require('uuid')
 
 const { subscribe } = require('./utils')
 
@@ -49,6 +50,13 @@ class SagaEventHandler {
   async handle(event) {
     assert.ok(event, 'event')
     assert.ok(event.type, 'event.type')
+
+    if (this._startsWith.includes(event.type)) {
+      // looks like we started
+      event.sagaId = event.sagaId || `${this._queueName}-${uuidv4()}`
+      event.sagaVersion = event.sagaVersion || 0
+    }
+
     assert.ok(event.sagaId, 'event.sagaId')
 
     const saga = await this._restoreSaga(event)

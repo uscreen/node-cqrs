@@ -2,7 +2,6 @@
 
 const EventEmitter = require('events')
 const assert = require('assert-plus')
-const { v4: uuidv4 } = require('uuid')
 
 const {
   validateEvent,
@@ -96,42 +95,9 @@ class EventStore {
    */
   async commit(events) {
     assert.array(events, 'events')
-
-    const augmentedEvents = await this._attachSagaIdToSagaStarterEvents(events)
-    const eventStreamWithoutSnapshots = await this.save(augmentedEvents)
+    const eventStreamWithoutSnapshots = await this.save(events)
     await this.publish(eventStreamWithoutSnapshots)
-
     return eventStreamWithoutSnapshots
-  }
-
-  /**
-   * Generate and attach sagaId to events that start new sagas
-   * @TODO rework a bit
-   */
-  async _attachSagaIdToSagaStarterEvents(events) {
-    const r = []
-
-    const containsSagaStarters =
-      this._sagaStarters.length &&
-      events.some((e) => this._sagaStarters.includes(e.type))
-
-    for (const event of events) {
-      if (containsSagaStarters && this._sagaStarters.includes(event.type)) {
-        assert.ok(
-          !event.sagaId,
-          `Event "${event.type}" already contains sagaId. Multiple sagas with same event type are not supported`
-        )
-        r.push(
-          Object.assign(event, {
-            sagaId: uuidv4(),
-            sagaVersion: 0
-          })
-        )
-      } else {
-        r.push(event)
-      }
-    }
-    return new EventStream(r)
   }
 
   /**
