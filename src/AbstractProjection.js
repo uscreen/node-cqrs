@@ -82,6 +82,7 @@ module.exports = class AbstractProjection {
     return this.locker.locked(`project-${event.aggregateId}`, async () => {
       const result = await this._project(event)
       this.view._emitter.emit(event.type, result)
+      this.view._emitter.emit('afterChange', event)
       return result
     })
   }

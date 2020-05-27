@@ -83,20 +83,23 @@ class AbstractSaga {
     assert(event.type, 'event.type')
 
     const handler = getHandler(this, event.type)
-    assert.func(
-      handler,
-      `'${event.type}' handler is not defined or not a function`
-    )
 
-    const r = handler.call(this, event)
-    /* istanbul ignore next */
-    if (r instanceof Promise) {
-      return r.then(() => {
-        this[_version] += 1
-      })
+    if (handler && typeof handler === 'function') {
+      assert.func(
+        handler,
+        `'${event.type}' handler is not defined or not a function`
+      )
+
+      const r = handler.call(this, event)
+      /* istanbul ignore next */
+      if (r instanceof Promise) {
+        return r.then(() => {
+          this[_version] += 1
+        })
+      }
+
+      this[_version] += 1
     }
-
-    this[_version] += 1
     return undefined
   }
 
