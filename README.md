@@ -1,7 +1,6 @@
 # @uscreen.de/cqrs-kit
 
 [![Build Status](https://travis-ci.com/uscreen/node-cqrs.svg?branch=master)](https://travis-ci.com/uscreen/node-cqrs)
-
 [![Known Vulnerabilities](https://snyk.io/test/github/uscreen/node-cqrs/badge.svg?targetFile=package.json)](https://snyk.io/test/github/uscreen/node-cqrs?targetFile=package.json)
 
 > CQRS Starter Kit to start fast into DDD. Eventsourcing included. Some soldering required.
