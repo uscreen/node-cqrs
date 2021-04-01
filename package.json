@@ -1,6 +1,6 @@
 {
   "name": "@uscreen.de/cqrs-kit",
-  "version": "0.34.6",
+  "version": "0.34.7",
   "description": "CQRS Starter Kit to start fast into DDD. Eventsourcing included. Some soldering required.",
   "main": "index.js",
   "repository": {
@@ -46,7 +46,6 @@
     ]
   },
   "dependencies": {
-    "@uscreen.de/dev-service": "0.8.1",
     "assert-plus": "^1.0.0",
     "lock": "^1.1.0",
     "nats": "^1.4.12",
@@ -56,6 +55,7 @@
     "uuid": "^8.3.1"
   },
   "devDependencies": {
+    "@uscreen.de/dev-service": "0.8.1",
     "@uscreen.de/eslint-config-prettystandard-node": "^0.1.2",
     "env-schema": "^3.0.1",
     "ioredis": "^4.24.6",
