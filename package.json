@@ -30,9 +30,9 @@
   },
   "scripts": {
     "lint": "eslint '**/*.js' --fix",
-    "test": "tap test/**/*.test.js",
-    "test:cov": "tap --coverage-report=html test/**/*.test.js",
-    "test:ci": "tap --coverage-report=text-summary test/**/*.test.js",
+    "test": "tap --no-check-coverage test/**/*.test.js",
+    "test:cov": "tap --no-check-coverage --coverage-report=html test/**/*.test.js",
+    "test:ci": "tap --no-check-coverage --coverage-report=text-summary test/**/*.test.js",
     "snyk-protect": "snyk protect",
     "prepare": "yarn run snyk-protect"
   },
@@ -62,7 +62,7 @@
     "lint-staged": "^10.5.4",
     "mongodb": "^3.6.5",
     "prettier": "^2.1.2",
-    "tap": "^14.10.8",
+    "tap": "^15.0.1",
     "yorkie": "^2.0.0"
   },
   "snyk": true
