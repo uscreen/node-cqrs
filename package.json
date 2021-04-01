@@ -46,19 +46,19 @@
     ]
   },
   "dependencies": {
-    "@uscreen.de/dev-service": "0.8.0",
+    "@uscreen.de/dev-service": "0.8.1",
     "assert-plus": "^1.0.0",
     "lock": "^1.1.0",
     "nats": "^1.4.12",
     "redis-lock": "^0.1.4",
     "rfdc": "^1.3.0",
-    "snyk": "^1.518.0",
+    "snyk": "^1.521.0",
     "uuid": "^8.3.1"
   },
   "devDependencies": {
     "@uscreen.de/eslint-config-prettystandard-node": "^0.1.2",
     "env-schema": "^3.0.1",
-    "ioredis": "^4.24.5",
+    "ioredis": "^4.24.6",
     "lint-staged": "^10.5.4",
     "mongodb": "^3.6.5",
     "prettier": "^2.1.2",

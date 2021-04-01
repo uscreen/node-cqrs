@@ -23,7 +23,11 @@ const createDomain = async (
   const redis = new Redis({
     host: config.redisHost
   })
-  const client = await MongoClient.connect(config.mongoUri)
+
+  const client = await MongoClient.connect(config.mongoUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  })
   const db = client.db()
   const eventsCollection = db.collection(`${ns}-events`)
   const snapshotsCollection = db.collection(`${ns}-snapshots`)
