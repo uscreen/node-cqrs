@@ -32,9 +32,7 @@
     "lint": "eslint '**/*.js' --fix",
     "test": "tap --no-check-coverage test/**/*.test.js",
     "test:cov": "tap --no-check-coverage --coverage-report=html test/**/*.test.js",
-    "test:ci": "tap --no-check-coverage --coverage-report=text-summary test/**/*.test.js",
-    "snyk-protect": "snyk protect",
-    "prepare": "yarn run snyk-protect"
+    "test:ci": "tap --no-check-coverage --coverage-report=text-summary test/**/*.test.js"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
@@ -64,6 +62,5 @@
     "prettier": "^2.1.2",
     "tap": "^15.0.1",
     "yorkie": "^2.0.0"
-  },
-  "snyk": true
+  }
 }
