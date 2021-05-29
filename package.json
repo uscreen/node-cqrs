@@ -52,15 +52,15 @@
     "uuid": "^8.3.1"
   },
   "devDependencies": {
-    "@uscreen.de/dev-service": "0.8.1",
+    "@uscreen.de/dev-service": "0.9.4",
     "@uscreen.de/eslint-config-prettystandard-node": "^0.1.3",
     "env-schema": "^3.0.1",
-    "ioredis": "^4.24.6",
-    "lint-staged": "^10.5.4",
-    "mongodb": "^3.6.5",
+    "ioredis": "^4.27.3",
+    "lint-staged": "^11.0.0",
+    "mongodb": "^3.6.9",
     "prettier": "^2.1.2",
-    "snyk": "^1.521.0",
-    "tap": "^15.0.1",
+    "snyk": "^1.618.0",
+    "tap": "^15.0.9",
     "yorkie": "^2.0.0"
   }
 }
