@@ -48,7 +48,7 @@ module.exports = class MongoEventStorage {
     return this.collection
       .find(query, {
         projection: { _id: false },
-        sort: 'aggregateVersion'
+        sort: '_id'
       })
       .toArray()
   }
@@ -68,7 +68,7 @@ module.exports = class MongoEventStorage {
     return this.collection
       .find(query, {
         projection: { _id: false },
-        sort: 'sagaVersion'
+        sort: '_id'
       })
       .toArray()
   }
@@ -80,7 +80,7 @@ module.exports = class MongoEventStorage {
     return this.collection
       .find(query, {
         projection: { _id: false },
-        sort: 'aggregateVersion'
+        sort: '_id'
       })
       .toArray()
   }
