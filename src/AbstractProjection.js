@@ -1,6 +1,7 @@
 'use strict'
 
 const assert = require('assert-plus')
+const cliProgress = require('cli-progress')
 
 const {
   getClassName,
@@ -112,6 +113,13 @@ module.exports = class AbstractProjection {
 
     const messageTypes = getHandledMessageTypes(this)
     const events = await this._eventStore.getAllEvents(messageTypes)
+    let progress = 0
+
+    // create a new progress bar instance and use shades_classic theme
+    const bar1 = new cliProgress.SingleBar(cliProgress.Presets.shades_classic)
+
+    // start the progress bar with a total value of 200 and start value of 0
+    bar1.start(events.length, 0)
 
     for (const event of events) {
       // console.log(
@@ -121,6 +129,13 @@ module.exports = class AbstractProjection {
       //   event.aggregateTimestamp
       // )
       await this._project(event)
+      progress++
+
+      // update the current value in your application..
+      bar1.update(progress)
     }
+
+    // stop the progress bar
+    bar1.stop()
   }
 }
