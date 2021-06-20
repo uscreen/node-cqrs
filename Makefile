@@ -1,3 +1,9 @@
+start:
+	service start
+
+stop:
+	service stop
+
 test:
 	yarn test
 

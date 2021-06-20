@@ -114,12 +114,12 @@ module.exports = class AbstractProjection {
     const events = await this._eventStore.getAllEvents(messageTypes)
 
     for (const event of events) {
-      console.log(
-        'CQRS-KIT',
-        event.type,
-        event.aggregateVersion,
-        event.aggregateTimestamp
-      )
+      // console.log(
+      //   'CQRS-KIT',
+      //   event.type,
+      //   event.aggregateVersion,
+      //   event.aggregateTimestamp
+      // )
       await this._project(event)
     }
   }

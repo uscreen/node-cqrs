@@ -75,7 +75,7 @@ module.exports = class MongoView {
     return this.collection.findOneAndUpdate(
       { id },
       { $set: value, $currentDate: { modified: true } },
-      { returnOriginal: false, upsert }
+      { upsert }
     )
   }
 
