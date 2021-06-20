@@ -1,6 +1,6 @@
 {
   "name": "@uscreen.de/cqrs-kit",
-  "version": "0.34.10",
+  "version": "0.34.11",
   "description": "CQRS Starter Kit to start fast into DDD. Eventsourcing included. Some soldering required.",
   "main": "index.js",
   "repository": {
@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
+    "cli-progress": "^3.9.0",
     "lock": "^1.1.0",
     "nats": "^1.4.12",
     "redis-lock": "^0.1.4",
