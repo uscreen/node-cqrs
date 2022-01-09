@@ -51,7 +51,7 @@
     "husky": ">=6",
     "ioredis": "^4.28.2",
     "lint-staged": ">=10",
-    "mongodb": "^3.6.9",
+    "mongodb": "^3.7.3",
     "tap": "^15.1.6"
   },
   "lint-staged": {
