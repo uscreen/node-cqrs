@@ -45,8 +45,8 @@
     "uuid": "^8.3.1"
   },
   "devDependencies": {
-    "@uscreen.de/dev-service": "0.11.2",
-    "@uscreen.de/eslint-config-prettystandard-node": "^0.2.0",
+    "@uscreen.de/dev-service": "0.11.3",
+    "@uscreen.de/eslint-config-prettystandard-node": "^0.2.1",
     "env-schema": "^3.5.1",
     "husky": ">=6",
     "ioredis": "^4.28.2",

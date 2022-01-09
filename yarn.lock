@@ -351,12 +351,12 @@
   resolved "https://registry.yarnpkg.com/@types/yoga-layout/-/yoga-layout-1.9.2.tgz#efaf9e991a7390dc081a0b679185979a83a9639a"
   integrity sha512-S9q47ByT2pPvD65IvrWp7qppVMpk9WGMbVq9wbWZOHg6tnXSD4vyhao6nOSBwwfDdV2p3Kx9evA9vI+XWTfDvw==
 
-"@uscreen.de/dev-service@0.11.2":
-  version "0.11.2"
-  resolved "https://registry.yarnpkg.com/@uscreen.de/dev-service/-/dev-service-0.11.2.tgz#59dbd64d60b7c23ce4819667df9c3eaab8261e97"
-  integrity sha512-3AEdcnK258l3bJCjINOwBjw1URCgIB1uRbX0rDE/RFHVdNNdurckeUyFswcxUOGVwKXvxGOBEfYTZjaESeIU7A==
+"@uscreen.de/dev-service@0.11.3":
+  version "0.11.3"
+  resolved "https://registry.yarnpkg.com/@uscreen.de/dev-service/-/dev-service-0.11.3.tgz#272ca73bf373ebd2d388d17e69d1bcbe331f0337"
+  integrity sha512-9hUPvpe0EDmkP9Fl83S9Q+6d9V+Ao58xE9I5e1uF8qJOOFT1nt78mHn/WIbm3pvVsk9b1liMVskty764DFlNHA==
   dependencies:
-    c8 "^7.8.0"
+    c8 "^7.11.0"
     commander "^8.1.0"
     fs-extra "^10.0.0"
     nanoid "^3.1.23"
@@ -364,15 +364,15 @@
     read-pkg "^7.0.0"
     yaml "^1.10.2"
 
-"@uscreen.de/eslint-config-prettystandard-node@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@uscreen.de/eslint-config-prettystandard-node/-/eslint-config-prettystandard-node-0.2.0.tgz#82e750a26967fe49317733018890ef1e7c724715"
-  integrity sha512-Lko3toZxnUEwlEgvk7Uq4lTEKQ21Ku4BLpeSbsxJV2UKXD5aNGkDv46/5QUkLliPhJB4MhXX1p+0x5IAjsuNMQ==
+"@uscreen.de/eslint-config-prettystandard-node@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@uscreen.de/eslint-config-prettystandard-node/-/eslint-config-prettystandard-node-0.2.1.tgz#b292ef323071ecf5d9a3857cc5b49dfb1a91ac2f"
+  integrity sha512-CrD8khrmQLu6LogE+YBn7FjnXtkF8k5d4jo8YhoStuV1LIOaW0TYeY51QaM4jRLDaN1fv+1dCsCSENVs3xbi9w==
   dependencies:
-    eslint "^8.5.0"
+    eslint "^8.6.0"
     eslint-config-prettier "^8.3.0"
     eslint-config-standard "^16.0.3"
-    eslint-plugin-import "^2.25.3"
+    eslint-plugin-import "^2.25.4"
     eslint-plugin-node "^11.1.0"
     eslint-plugin-prettier "^4.0.0"
     eslint-plugin-promise "^6.0.0"
@@ -627,7 +627,7 @@ buffer-from@^1.0.0:
   resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.2.tgz#2b146a6fd72e80b4f55d255f35ed59a3a9a41bd5"
   integrity sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==
 
-c8@^7.8.0:
+c8@^7.11.0:
   version "7.11.0"
   resolved "https://registry.yarnpkg.com/c8/-/c8-7.11.0.tgz#b3ab4e9e03295a102c47ce11d4ef6d735d9a9ac9"
   integrity sha512-XqPyj1uvlHMr+Y1IeRndC2X5P7iJzJlEJwBpCdBbq2JocXOgJfr+JVfJkyNMGROke5LfKrhSFXGFXnwnRJAUJw==
@@ -1159,7 +1159,7 @@ eslint-plugin-es@^3.0.0:
     eslint-utils "^2.0.0"
     regexpp "^3.0.0"
 
-eslint-plugin-import@^2.25.3:
+eslint-plugin-import@^2.25.4:
   version "2.25.4"
   resolved "https://registry.yarnpkg.com/eslint-plugin-import/-/eslint-plugin-import-2.25.4.tgz#322f3f916a4e9e991ac7af32032c25ce313209f1"
   integrity sha512-/KJBASVFxpu0xg1kIBn9AUa8hQVnszpwgE7Ld0lKAlx7Ie87yzEzCgSkekt+le/YVhiaosO4Y14GDAOc41nfxA==
@@ -1239,7 +1239,7 @@ eslint-visitor-keys@^3.1.0:
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-3.1.0.tgz#eee4acea891814cda67a7d8812d9647dd0179af2"
   integrity sha512-yWJFpu4DtjsWKkt5GeNBBuZMlNcYVs6vRCLoCVEJrTjaSB6LC98gFipNK/erM2Heg/E8mIK+hXG/pJMLK+eRZA==
 
-eslint@^8.5.0:
+eslint@^8.6.0:
   version "8.6.0"
   resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.6.0.tgz#4318c6a31c5584838c1a2e940c478190f58d558e"
   integrity sha512-UvxdOJ7mXFlw7iuHZA4jmzPaUqIw54mZrv+XPYKNbKdLR0et4rf60lIZUU9kiNtnzzMzGWxMV+tQ7uG7JG8DPw==
