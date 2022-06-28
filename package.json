@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
-    "cli-progress": "^3.11.1",
+    "cli-progress": "^3.11.2",
     "lock": "^1.1.0",
     "nats": "^1.4.12",
     "redis-lock": "^0.1.4",
@@ -45,12 +45,12 @@
     "uuid": "^8.3.1"
   },
   "devDependencies": {
-    "@uscreen.de/dev-service": "0.11.14",
-    "@uscreen.de/eslint-config-prettystandard-node": "^0.2.4",
+    "@uscreen.de/dev-service": "0.11.15",
+    "@uscreen.de/eslint-config-prettystandard-node": "^0.2.5",
     "env-schema": "^5.0.0",
     "husky": ">=8.0.1",
-    "ioredis": "^5.0.6",
-    "lint-staged": ">=13.0.2",
+    "ioredis": "^5.1.0",
+    "lint-staged": ">=13.0.3",
     "mongodb": "^4.7.0",
     "tap": "^16.3.0"
   },
