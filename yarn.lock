@@ -412,10 +412,10 @@
   resolved "https://registry.yarnpkg.com/@types/yoga-layout/-/yoga-layout-1.9.2.tgz#efaf9e991a7390dc081a0b679185979a83a9639a"
   integrity sha512-S9q47ByT2pPvD65IvrWp7qppVMpk9WGMbVq9wbWZOHg6tnXSD4vyhao6nOSBwwfDdV2p3Kx9evA9vI+XWTfDvw==
 
-"@uscreen.de/dev-service@0.11.16":
-  version "0.11.16"
-  resolved "https://registry.yarnpkg.com/@uscreen.de/dev-service/-/dev-service-0.11.16.tgz#c9ad273d2c3a77087a7d5eafe9e51cd74bc93d47"
-  integrity sha512-kkuuYv/v0Vw5ZXAq0F+lHAimo2fB4YTAtGv8FHD+A8lqAc+JshkJxryIEr4MQTiObsSFvvKSAsFb1SP5nCbgYQ==
+"@uscreen.de/dev-service@0.11.17":
+  version "0.11.17"
+  resolved "https://registry.yarnpkg.com/@uscreen.de/dev-service/-/dev-service-0.11.17.tgz#30cb4aca694c496d13bd88fc60e46326d6b33ee4"
+  integrity sha512-FZ5XZRA7v8nY8VKe1bEBPRIDFUR/Z2wvOyY+S2UWsJy2bG8zSBv8LfMaUdeI4IkQzvyPjjuyoAQW4LrvxOpgZg==
   dependencies:
     c8 "^7.11.0"
     commander "^9.3.0"
