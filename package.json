@@ -45,13 +45,13 @@
     "uuid": "^8.3.1"
   },
   "devDependencies": {
-    "@uscreen.de/dev-service": "0.11.17",
-    "@uscreen.de/eslint-config-prettystandard-node": "^0.2.6",
+    "@uscreen.de/dev-service": "0.11.18",
+    "@uscreen.de/eslint-config-prettystandard-node": "^0.2.7",
     "env-schema": "^5.0.0",
     "husky": ">=8.0.1",
-    "ioredis": "^5.1.0",
+    "ioredis": "^5.2.2",
     "lint-staged": ">=13.0.3",
-    "mongodb": "^4.7.0",
+    "mongodb": "^4.8.1",
     "tap": "^16.3.0"
   },
   "lint-staged": {
