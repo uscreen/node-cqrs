@@ -78,7 +78,10 @@ module.exports = class MongoView {
     const update = { $set: value }
     if (!value.modified) update.$currentDate = { modified: true }
 
-    return this.collection.findOneAndUpdate({ id }, update, { upsert })
+    return this.collection.findOneAndUpdate({ id }, update, {
+      returnDocument: 'after',
+      upsert
+    })
   }
 
   /**
