@@ -45,14 +45,14 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@uscreen.de/dev-service": "0.11.19",
+    "@uscreen.de/dev-service": "0.12.2",
     "@uscreen.de/eslint-config-prettystandard-node": "^0.2.10",
     "env-schema": "^5.0.0",
     "husky": ">=8.0.1",
-    "ioredis": "^5.2.3",
+    "ioredis": "^5.2.5",
     "lint-staged": ">=13.0.3",
     "mongodb": "^4.10.0",
-    "tap": "^16.3.0"
+    "tap": "^16.3.4"
   },
   "lint-staged": {
     "*.js": "eslint --cache --fix"
