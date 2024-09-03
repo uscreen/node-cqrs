@@ -106,7 +106,7 @@ class AbstractSaga {
   /**
    * Format a command and put it to the execution queue
    */
-  enqueue(commandType, aggregateId, payload) {
+  enqueue(commandType, aggregateId, payload, context) {
     assert.string(commandType, 'commandType')
 
     assert.ok(
@@ -114,13 +114,17 @@ class AbstractSaga {
       'aggregateId argument must be either string, number or undefined'
     )
 
-    this.enqueueRaw({
+    const data = {
       aggregateId,
       sagaId: this.id,
       sagaVersion: this.version,
       type: commandType,
       payload
-    })
+    }
+
+    if (context) data.context = context
+
+    this.enqueueRaw(data)
   }
 
   /**
