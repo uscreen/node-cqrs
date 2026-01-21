@@ -1,14 +1,26 @@
 image: node:lts-alpine
 
 cache:
-  paths:
-    - node_modules/
-    - .yarn
+  - key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store
 
 variables:
   mongoServer: "mongo:27017"
   redisHost: "redis"
   natsHost: "nats"
+
+  FF_USE_FASTZIP: 1
+  CACHE_COMPRESSION_LEVEL: fast
+  COREPACK_ENABLE_AUTO_PIN: 0
+
+before_script:
+  - npm install -g corepack@latest
+  - corepack enable
+  - corepack prepare pnpm@latest-10 --activate
+  - pnpm config set store-dir .pnpm-store
 
 stages:
   - test
@@ -23,8 +35,8 @@ test:
     - redis:latest
     - nats:latest
   script:
-    - yarn install --pure-lockfile --cache-folder .yarn
-    - yarn test:ci
+    - pnpm install
+    - pnpm run test:ci
   coverage: '/^Statements\s*:\s*([^%]+)/'
 
 audit:
@@ -32,4 +44,4 @@ audit:
   only:
   - schedules
   script:
-    - yarn audit
+    - pnpm audit
