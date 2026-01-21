@@ -1,15 +1,16 @@
-const tap = require('tap')
+const { test } = require('node:test')
+const assert = require('node:assert')
 const { wait } = require('../helper')
 const { InMemoryLock } = require('../../index')
 
 // passed
 
-tap.test('InMemoryLock', async (t) => {
+test('InMemoryLock', async (t) => {
   const locker = new InMemoryLock()
 
   await t.test(
     'should lock and execute in sequence when used on same keys',
-    async (t) => {
+    async () => {
       const order = []
       const results = await Promise.all([
         locker.locked('sameKey', async () => {
@@ -33,16 +34,14 @@ tap.test('InMemoryLock', async (t) => {
         results.push(error.message)
       }
 
-      t.same(['ok1', 'ok2', 'error'], results)
-      t.same(['ok1', 'ok2', 'error'], order)
-
-      t.end()
+      assert.deepStrictEqual(results, ['ok1', 'ok2', 'error'])
+      assert.deepStrictEqual(order, ['ok1', 'ok2', 'error'])
     }
   )
 
   await t.test(
     'should lock and execute in parallel when used on different keys',
-    async (t) => {
+    async () => {
       const order = []
       const results = await Promise.all([
         locker.locked('myKey-1', async () => {
@@ -66,11 +65,8 @@ tap.test('InMemoryLock', async (t) => {
         results.push(error.message)
       }
 
-      t.same(['ok1', 'ok2', 'error'], results)
-      t.same(['ok2', 'ok1', 'error'], order)
-      t.end()
+      assert.deepStrictEqual(results, ['ok1', 'ok2', 'error'])
+      assert.deepStrictEqual(order, ['ok2', 'ok1', 'error'])
     }
   )
-
-  t.end()
 })

@@ -1,8 +1,9 @@
-const tap = require('tap')
+const { test } = require('node:test')
+const assert = require('node:assert')
 const { createDomain } = require('../domain')
 const { AbstractSaga } = require('../../index')
 
-tap.test('Use Saga with default InMemoryLock', async (t) => {
+test('Use Saga with default InMemoryLock', async (t) => {
   const { cqrs, eventsCollection } = await createDomain(t, 'sagaTest-')
   let aggregateId
 
@@ -31,7 +32,7 @@ tap.test('Use Saga with default InMemoryLock', async (t) => {
   /**
    * 1st create
    */
-  await t.test('write a command with cqrs.commandBus.send()', async (t) => {
+  await t.test('write a command with cqrs.commandBus.send()', async () => {
     const id = null
     const payload = { body: 'Lorem Ipsum' }
     const context = { reqId: 1234 }
@@ -45,18 +46,32 @@ tap.test('Use Saga with default InMemoryLock', async (t) => {
 
     const found = await eventsCollection.findOne({ aggregateId })
 
-    t.same(
-      aggregateId,
+    assert.deepStrictEqual(
       found.aggregateId,
+      aggregateId,
       'event should have been stored with given id'
     )
 
-    t.same(0, found.aggregateVersion, 'aggregateVersion should be 0')
-    t.same('EventCreated', found.type, 'type should be "EventCreated"')
-    t.same({ body: 'Lorem Ipsum' }, found.payload, 'body should match payload')
-    t.same({ reqId: 1234 }, found.context, 'context should have provided data')
-
-    t.end()
+    assert.strictEqual(
+      found.aggregateVersion,
+      0,
+      'aggregateVersion should be 0'
+    )
+    assert.strictEqual(
+      found.type,
+      'EventCreated',
+      'type should be "EventCreated"'
+    )
+    assert.deepStrictEqual(
+      found.payload,
+      { body: 'Lorem Ipsum' },
+      'body should match payload'
+    )
+    assert.deepStrictEqual(
+      found.context,
+      { reqId: 1234 },
+      'context should have provided data'
+    )
   })
 
   /**
@@ -64,23 +79,23 @@ tap.test('Use Saga with default InMemoryLock', async (t) => {
    */
   await t.test(
     'read a view from a projection with cqrs.views.read()',
-    async (t) => {
+    async () => {
       const view = await cqrs.Views.read(aggregateId)
-      t.same(aggregateId, view.id, 'view id should match aggregateId')
-      t.same('Lorem Ipsum', view.body, 'body should match payload')
-      t.ok(view.stack.includes('SomethingDone'))
-      t.ok(view.stack.includes('SomethingElseDone'))
-      t.ok(view.SomethingDone)
-      t.ok(view.SomethingElseDone)
-      t.same(
-        ['SomethingDone', 'SomethingElseDone'],
+      assert.strictEqual(
+        view.id,
+        aggregateId,
+        'view id should match aggregateId'
+      )
+      assert.strictEqual(view.body, 'Lorem Ipsum', 'body should match payload')
+      assert.ok(view.stack.includes('SomethingDone'))
+      assert.ok(view.stack.includes('SomethingElseDone'))
+      assert.ok(view.SomethingDone)
+      assert.ok(view.SomethingElseDone)
+      assert.deepStrictEqual(
         view.stack,
+        ['SomethingDone', 'SomethingElseDone'],
         'stack should be in exact order'
       )
-
-      t.end()
     }
   )
-
-  t.end()
 })

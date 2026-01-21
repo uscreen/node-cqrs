@@ -1,17 +1,18 @@
-const tap = require('tap')
+const { test } = require('node:test')
+const assert = require('node:assert')
 const { wait } = require('../helper')
 const { createDomain } = require('../domain')
 
 // passed
 
-tap.test('Use MongoEventStorage in a CRUD alike way', async (t) => {
+test('Use MongoEventStorage in a CRUD alike way', async (t) => {
   const { cqrs, eventsCollection, viewsCollection } = await createDomain(t)
   let aggregateId
 
   /**
    * 1st create
    */
-  await t.test('write a command with cqrs.commandBus.send()', async (t) => {
+  await t.test('write a command with cqrs.commandBus.send()', async () => {
     const payload = { body: 'Lorem Ipsum' }
     const context = { reqId: 1234 }
     await cqrs.commandBus.send('createEvent', null, { payload, context })
@@ -20,22 +21,32 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async (t) => {
     await cqrs.Views.once('EventCreated')
 
     const found = await eventsCollection.findOne({ aggregateId })
-    t.same(
-      aggregateId,
+    assert.deepStrictEqual(
       found.aggregateId,
+      aggregateId,
       'event should have been stored with given id'
     )
-    t.same(0, found.aggregateVersion, 'version should be 0')
-    t.ok(found.aggregateTimestamp, 'aggregateTimestamp should be present')
-    t.ok(
+    assert.deepStrictEqual(found.aggregateVersion, 0, 'version should be 0')
+    assert.ok(found.aggregateTimestamp, 'aggregateTimestamp should be present')
+    assert.ok(
       found.aggregateId.startsWith('aggregate-'),
       'aggregateId should be prefixed with aggregate name'
     )
-    t.same('EventCreated', found.type, 'type should be "EventCreated"')
-    t.same({ body: 'Lorem Ipsum' }, found.payload, 'body should match payload')
-    t.same({ reqId: 1234 }, found.context, 'context should have provided data')
-
-    t.end()
+    assert.deepStrictEqual(
+      found.type,
+      'EventCreated',
+      'type should be "EventCreated"'
+    )
+    assert.deepStrictEqual(
+      found.payload,
+      { body: 'Lorem Ipsum' },
+      'body should match payload'
+    )
+    assert.deepStrictEqual(
+      found.context,
+      { reqId: 1234 },
+      'context should have provided data'
+    )
   })
 
   /**
@@ -43,26 +54,37 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async (t) => {
    */
   await t.test(
     'read a view from a projection with cqrs.views.read()',
-    async (t) => {
+    async () => {
       const view = await cqrs.Views.read(aggregateId)
-      t.same(aggregateId, view.id, 'view id should match aggregateId')
-      t.same('Lorem Ipsum', view.body, 'body should match payload')
+      assert.deepStrictEqual(
+        view.id,
+        aggregateId,
+        'view id should match aggregateId'
+      )
+      assert.deepStrictEqual(
+        view.body,
+        'Lorem Ipsum',
+        'body should match payload'
+      )
 
       const found = await viewsCollection.findOne(
         { id: aggregateId },
         { projection: { _id: false } }
       )
 
-      t.ok(found.created, 'created should be present')
-      t.same(view, found, 'view should be the same as read raw from mongo')
-      t.end()
+      assert.ok(found.created, 'created should be present')
+      assert.deepStrictEqual(
+        view,
+        found,
+        'view should be the same as read raw from mongo'
+      )
     }
   )
 
   /**
    * 1st update
    */
-  await t.test('commit a change with cqrs.commandBus.send()', async (t) => {
+  await t.test('commit a change with cqrs.commandBus.send()', async () => {
     const payload = { body: 'Baba Luga' }
     const context = { reqId: 5678 }
     await cqrs.commandBus.send('changeEvent', aggregateId, { payload, context })
@@ -73,19 +95,41 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async (t) => {
       .find({ aggregateId }, { sort: 'aggregateVersion' })
       .toArray()
 
-    t.same(0, e[0].aggregateVersion, 'version should be 0')
-    t.same('EventCreated', e[0].type, 'type should be "EventCreated"')
-    t.same({ body: 'Lorem Ipsum' }, e[0].payload, 'body should match payload')
-    t.same({ reqId: 1234 }, e[0].context, 'context should have provided data')
+    assert.deepStrictEqual(e[0].aggregateVersion, 0, 'version should be 0')
+    assert.deepStrictEqual(
+      e[0].type,
+      'EventCreated',
+      'type should be "EventCreated"'
+    )
+    assert.deepStrictEqual(
+      e[0].payload,
+      { body: 'Lorem Ipsum' },
+      'body should match payload'
+    )
+    assert.deepStrictEqual(
+      e[0].context,
+      { reqId: 1234 },
+      'context should have provided data'
+    )
 
-    t.same(1, e[1].aggregateVersion, 'version should be 1')
-    t.same('EventChanged', e[1].type, 'type should be "EventChanged"')
-    t.same({ body: 'Baba Luga' }, e[1].payload, 'body should match payload')
-    t.same({ reqId: 5678 }, e[1].context, 'context should have provided data')
+    assert.deepStrictEqual(e[1].aggregateVersion, 1, 'version should be 1')
+    assert.deepStrictEqual(
+      e[1].type,
+      'EventChanged',
+      'type should be "EventChanged"'
+    )
+    assert.deepStrictEqual(
+      e[1].payload,
+      { body: 'Baba Luga' },
+      'body should match payload'
+    )
+    assert.deepStrictEqual(
+      e[1].context,
+      { reqId: 5678 },
+      'context should have provided data'
+    )
 
-    t.same(2, e.length, 'we should have found 2 events now')
-
-    t.end()
+    assert.deepStrictEqual(e.length, 2, 'we should have found 2 events now')
   })
 
   /**
@@ -93,36 +137,54 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async (t) => {
    */
   await t.test(
     'read that view from a projection with cqrs.views.read()',
-    async (t) => {
+    async () => {
       const view = await cqrs.Views.read(aggregateId)
-      t.same(aggregateId, view.id, 'view id should match aggregateId')
-      t.same('Baba Luga', view.body, 'body should match payload')
+      assert.deepStrictEqual(
+        view.id,
+        aggregateId,
+        'view id should match aggregateId'
+      )
+      assert.deepStrictEqual(
+        view.body,
+        'Baba Luga',
+        'body should match payload'
+      )
       const found = await viewsCollection.findOne(
         { id: aggregateId },
         { projection: { _id: false } }
       )
-      t.ok(found.modified, 'modified should be present')
-      t.ok(found.created, 'created should be present')
-      t.same(view, found, 'view should be the same as read raw from mongo')
-      t.end()
+      assert.ok(found.modified, 'modified should be present')
+      assert.ok(found.created, 'created should be present')
+      assert.deepStrictEqual(
+        view,
+        found,
+        'view should be the same as read raw from mongo'
+      )
     }
   )
 
   /**
    * 1st list
    */
-  await t.test('list all view without filter cqrs.views.list()', async (t) => {
+  await t.test('list all view without filter cqrs.views.list()', async () => {
     const views = await cqrs.Views.list()
-    t.same(1, views.length, 'we should have found 1 view now')
-    t.same(aggregateId, views[0].id, 'view id should match aggregateId')
-    t.same('Baba Luga', views[0].body, 'body should match payload')
-    t.end()
+    assert.deepStrictEqual(views.length, 1, 'we should have found 1 view now')
+    assert.deepStrictEqual(
+      views[0].id,
+      aggregateId,
+      'view id should match aggregateId'
+    )
+    assert.deepStrictEqual(
+      views[0].body,
+      'Baba Luga',
+      'body should match payload'
+    )
   })
 
   /**
    * 1st delete
    */
-  await t.test('commit a remove with cqrs.commandBus.send()', async (t) => {
+  await t.test('commit a remove with cqrs.commandBus.send()', async () => {
     const context = { reqId: 9012 }
     await cqrs.commandBus.send('deleteEvent', aggregateId, { context })
     await cqrs.eventStore.once('EventDeleted')
@@ -132,30 +194,59 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async (t) => {
       .find({ aggregateId }, { sort: 'aggregateVersion' })
       .toArray()
 
-    t.same('EventCreated', e[0].type, 'type should be "EventCreated"')
-    t.same({ body: 'Lorem Ipsum' }, e[0].payload, 'body should match payload')
-    t.same({ reqId: 1234 }, e[0].context, 'context should have provided data')
+    assert.deepStrictEqual(
+      e[0].type,
+      'EventCreated',
+      'type should be "EventCreated"'
+    )
+    assert.deepStrictEqual(
+      e[0].payload,
+      { body: 'Lorem Ipsum' },
+      'body should match payload'
+    )
+    assert.deepStrictEqual(
+      e[0].context,
+      { reqId: 1234 },
+      'context should have provided data'
+    )
 
-    t.same('EventChanged', e[1].type, 'type should be "EventChanged"')
-    t.same({ body: 'Baba Luga' }, e[1].payload, 'body should match payload')
-    t.same({ reqId: 5678 }, e[1].context, 'context should have provided data')
+    assert.deepStrictEqual(
+      e[1].type,
+      'EventChanged',
+      'type should be "EventChanged"'
+    )
+    assert.deepStrictEqual(
+      e[1].payload,
+      { body: 'Baba Luga' },
+      'body should match payload'
+    )
+    assert.deepStrictEqual(
+      e[1].context,
+      { reqId: 5678 },
+      'context should have provided data'
+    )
 
-    t.same('EventDeleted', e[2].type, 'type should be "EventDeleted"')
-    t.same(null, e[2].payload, 'body should match payload')
-    t.same({ reqId: 9012 }, e[2].context, 'context should have provided data')
+    assert.deepStrictEqual(
+      e[2].type,
+      'EventDeleted',
+      'type should be "EventDeleted"'
+    )
+    assert.deepStrictEqual(e[2].payload, null, 'body should match payload')
+    assert.deepStrictEqual(
+      e[2].context,
+      { reqId: 9012 },
+      'context should have provided data'
+    )
 
-    t.same(3, e.length, 'we should have found 3 events now')
-
-    t.end()
+    assert.deepStrictEqual(e.length, 3, 'we should have found 3 events now')
   })
 
   /**
    * 2nd list
    */
-  await t.test('list all view without filter after removal', async (t) => {
+  await t.test('list all view without filter after removal', async () => {
     const views = await cqrs.Views.list()
-    t.same(0, views.length, 'we should have found 0 view now')
-    t.end()
+    assert.deepStrictEqual(views.length, 0, 'we should have found 0 view now')
   })
 
   /**
@@ -163,14 +254,12 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async (t) => {
    */
   await t.test(
     'read that view from a projection with cqrs.views.read()',
-    async (t) => {
+    async () => {
       const view = await cqrs.Views.read(aggregateId)
-      t.same(null, view, 'no view should have been found')
+      assert.deepStrictEqual(view, null, 'no view should have been found')
 
       const found = await viewsCollection.findOne({ id: aggregateId })
-      t.same(null, found, 'no view exists in collection')
-
-      t.end()
+      assert.deepStrictEqual(found, null, 'no view exists in collection')
     }
   )
 
@@ -179,25 +268,23 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async (t) => {
    */
   await t.test(
     'read anotherView as a projection with cqrs.views.read()',
-    async (t) => {
+    async () => {
       await wait(200)
       const anotherView = await cqrs.AnotherViews.read(aggregateId)
-      t.ok(
+      assert.ok(
         anotherView,
         'anotherView should still exist, as it is not subscribed to delete event'
       )
-      t.same(
+      assert.deepStrictEqual(
         aggregateId,
         anotherView.id,
         'anotherView id should match aggregateId'
       )
-      t.same(
+      assert.deepStrictEqual(
         'Baba Luga',
         anotherView.body,
         'anotherView body should match payload'
       )
-
-      t.end()
     }
   )
 
@@ -206,32 +293,28 @@ tap.test('Use MongoEventStorage in a CRUD alike way', async (t) => {
    */
   await t.test(
     'read ThirdProjection as a projection with cqrs.views.read() should still be of initial state',
-    async (t) => {
+    async () => {
       await wait(200)
       const ThirdProjection = await cqrs.ThirdProjection.read(aggregateId)
-      t.ok(
+      assert.ok(
         ThirdProjection,
         'ThirdProjection should still exist, as it is not subscribed to delete event'
       )
-      t.same(
+      assert.deepStrictEqual(
         aggregateId,
         ThirdProjection.id,
         'ThirdProjection id should match aggregateId'
       )
-      t.same(
+      assert.deepStrictEqual(
         'Lorem Ipsum',
         ThirdProjection.body,
         'ThirdProjection body should match payload'
       )
-      t.same(
+      assert.deepStrictEqual(
         'thirdprojection',
         ThirdProjection.name,
         'ThirdProjection name should be "thirdprojection"'
       )
-
-      t.end()
     }
   )
-
-  t.end()
 })

@@ -1,16 +1,17 @@
-const tap = require('tap')
+const { test } = require('node:test')
+const assert = require('node:assert')
 const Redis = require('ioredis')
 const { config, wait } = require('../helper')
 const { RedisLock } = require('../../index')
 
 // passed
 
-tap.test('RedisLock', async (t) => {
+test('RedisLock', async (t) => {
   const redis = new Redis({
     host: config.redisHost
   })
 
-  t.teardown(() => {
+  t.after(() => {
     redis.quit()
   })
 
@@ -18,7 +19,7 @@ tap.test('RedisLock', async (t) => {
 
   await t.test(
     'should lock and execute in sequence when used on same keys',
-    async (t) => {
+    async () => {
       const order = []
       const results = await Promise.all([
         locker.locked('sameKey', async () => {
@@ -42,16 +43,14 @@ tap.test('RedisLock', async (t) => {
         results.push(error.message)
       }
 
-      t.same(['ok1', 'ok2', 'error'], results)
-      t.same(['ok1', 'ok2', 'error'], order)
-
-      t.end()
+      assert.deepStrictEqual(results, ['ok1', 'ok2', 'error'])
+      assert.deepStrictEqual(order, ['ok1', 'ok2', 'error'])
     }
   )
 
   await t.test(
     'should lock and execute in parallel when used on different keys',
-    async (t) => {
+    async () => {
       const order = []
       const results = await Promise.all([
         locker.locked('myKey-1', async () => {
@@ -75,11 +74,8 @@ tap.test('RedisLock', async (t) => {
         results.push(error.message)
       }
 
-      t.same(['ok1', 'ok2', 'error'], results)
-      t.same(['ok2', 'ok1', 'error'], order)
-      t.end()
+      assert.deepStrictEqual(results, ['ok1', 'ok2', 'error'])
+      assert.deepStrictEqual(order, ['ok2', 'ok1', 'error'])
     }
   )
-
-  t.end()
 })

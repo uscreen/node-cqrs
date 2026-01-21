@@ -51,7 +51,7 @@ const createDomain = async (
     await wait(500)
   } catch (_) {}
 
-  t.teardown(async () => {
+  t.after(async () => {
     await wait(500)
     await client.close()
     redis.quit()

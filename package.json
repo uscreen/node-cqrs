@@ -30,9 +30,9 @@
   },
   "scripts": {
     "lint": "eslint '**/*.js' --fix",
-    "test": "tap --node-arg=--no-warnings --no-check-coverage test/**/*.test.js",
-    "test:cov": "tap --node-arg=--no-warnings --no-check-coverage --coverage-report=html test/**/*.test.js",
-    "test:ci": "tap --node-arg=--no-warnings --no-check-coverage --coverage-report=text-summary test/**/*.test.js"
+    "test": "c8 node --test",
+    "test:cov": "c8 -r html -r text node --test",
+    "test:ci": "c8 -r text-summary node --test"
   },
   "dependencies": {
     "assert-plus": "^1.0.0",
@@ -46,10 +46,10 @@
   "devDependencies": {
     "@uscreen.de/dev-service": "^0.12.4",
     "@uscreen.de/eslint-config-prettystandard-node": "^0.2.11",
+    "c8": "^10.1.3",
     "env-schema": "^5.0.0",
     "ioredis": "^5.3.1",
-    "mongodb": "^5.8.1",
-    "tap": "^16.3.8"
+    "mongodb": "^5.8.1"
   },
   "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a"
 }
