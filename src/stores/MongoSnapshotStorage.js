@@ -1,6 +1,4 @@
-'use strict'
-
-module.exports = class MongoSnapshotStorage {
+export default class MongoSnapshotStorage {
   /**
    * Creates an instance of MongoSnapshotStorage
    */

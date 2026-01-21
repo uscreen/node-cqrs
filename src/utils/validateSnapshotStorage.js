@@ -1,11 +1,9 @@
-'use strict'
-
-const assert = require('assert-plus')
+import assert from 'assert-plus'
 
 /**
  * Ensure snapshotStorage matches the expected format
  */
-module.exports = (snapshotStorage) => {
+export default (snapshotStorage) => {
   assert.object(snapshotStorage, 'snapshotStorage')
   assert.func(
     snapshotStorage.getAggregateSnapshot,

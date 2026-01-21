@@ -1,6 +1,4 @@
-'use strict'
-
-const assert = require('assert-plus')
+import assert from 'assert-plus'
 
 const PARAMETER_OBJECT_NAME = 'options'
 const RX_CONSTRUCTOR =
@@ -57,7 +55,7 @@ function* getParameterObjectPropertyNames(classBody, offset) {
  * @return {string[]}      An array with dependency names. In case of parameter object,
  *                         dependency will be an array too (e.g. [["someService", "anotherService"]])
  */
-module.exports = function getClassDependencyNames(type) {
+function getClassDependencyNames(type) {
   assert.ok(type, 'type')
   assert.ok(type.prototype, 'type.prototype')
 
@@ -101,3 +99,5 @@ module.exports = function getClassDependencyNames(type) {
     })
   }
 }
+
+export default getClassDependencyNames

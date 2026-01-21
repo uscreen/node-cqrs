@@ -1,8 +1,6 @@
-'use strict'
+import assert from 'assert-plus'
 
-const assert = require('assert-plus')
-
-const { getHandler, validateHandlers } = require('./utils')
+import { getHandler, validateHandlers } from './utils/index.js'
 
 const _id = Symbol('id')
 const _version = Symbol('version')
@@ -145,4 +143,4 @@ class AbstractSaga {
   }
 }
 
-module.exports = AbstractSaga
+export default AbstractSaga

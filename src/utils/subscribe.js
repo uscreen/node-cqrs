@@ -1,13 +1,11 @@
-'use strict'
-
-const assert = require('assert-plus')
-const unique = require('./unique')
-const getHandledMessageTypes = require('./getHandledMessageTypes')
+import assert from 'assert-plus'
+import unique from './unique.js'
+import getHandledMessageTypes from './getHandledMessageTypes.js'
 
 /**
  * Subscribe observer to observable
  */
-module.exports = (observable, observer, options) => {
+export default (observable, observer, options) => {
   assert.object(observable, 'observable')
   assert.func(observable.on, 'observable.on')
   assert.object(observer, 'observer')

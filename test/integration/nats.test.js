@@ -1,8 +1,8 @@
-const { test } = require('node:test')
-const assert = require('node:assert')
-const { createDomain } = require('../domain')
-// const { wait } = require('../helper')
-const { AbstractSaga } = require('../../index')
+import { test } from 'node:test'
+import assert from 'node:assert'
+import { createDomain } from '../domain.js'
+// import { wait } from '../helper.js'
+import { AbstractSaga } from '../../index.js'
 
 test('Creating and using snapshots', async (t) => {
   const { cqrs, eventsCollection } = await createDomain(t, 'nats-', {

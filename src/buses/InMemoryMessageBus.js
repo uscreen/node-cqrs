@@ -1,12 +1,10 @@
-'use strict'
-
-const assert = require('assert-plus')
+import assert from 'assert-plus'
 
 /**
  * Default implementation of the message bus.
  * Keeps all subscriptions and messages in memory.
  */
-module.exports = class InMemoryMessageBus {
+export default class InMemoryMessageBus {
   /**
    * Creates an instance of InMemoryMessageBus
    */

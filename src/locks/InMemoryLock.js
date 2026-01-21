@@ -1,11 +1,9 @@
-'use strict'
-
-const { Lock } = require('lock')
+import { Lock } from 'lock'
 
 /**
  * Default implementation of locking
  */
-module.exports = class InMemoryLock {
+export default class InMemoryLock {
   /**
    * Creates an instance of InMemoryLock
    */

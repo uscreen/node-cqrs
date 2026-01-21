@@ -1,8 +1,8 @@
-const { test } = require('node:test')
-const assert = require('node:assert')
-const Redis = require('ioredis')
-const { config, wait } = require('../helper')
-const { RedisLock } = require('../../index')
+import { test } from 'node:test'
+import assert from 'node:assert'
+import Redis from 'ioredis'
+import { config, wait } from '../helper.js'
+import { RedisLock } from '../../index.js'
 
 // passed
 

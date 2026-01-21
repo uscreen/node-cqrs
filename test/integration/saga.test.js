@@ -1,7 +1,7 @@
-const { test } = require('node:test')
-const assert = require('node:assert')
-const { createDomain } = require('../domain')
-const { AbstractSaga } = require('../../index')
+import { test } from 'node:test'
+import assert from 'node:assert'
+import { createDomain } from '../domain.js'
+import { AbstractSaga } from '../../index.js'
 
 test('Use Saga with default InMemoryLock', async (t) => {
   const { cqrs, eventsCollection } = await createDomain(t, 'sagaTest-')

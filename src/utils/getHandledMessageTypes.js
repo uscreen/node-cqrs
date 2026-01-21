@@ -1,8 +1,6 @@
-'use strict'
+import assert from 'assert-plus'
 
-const assert = require('assert-plus')
-
-const getMessageHandlerNames = require('./getMessageHandlerNames')
+import getMessageHandlerNames from './getMessageHandlerNames.js'
 
 /**
  * Get a list of message types handled by observer
@@ -31,4 +29,4 @@ function getHandledMessageTypes(observerInstanceOrClass) {
   return getMessageHandlerNames(observerInstanceOrClass)
 }
 
-module.exports = getHandledMessageTypes
+export default getHandledMessageTypes

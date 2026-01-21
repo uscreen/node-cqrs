@@ -1,6 +1,4 @@
-'use strict'
-
-const assert = require('assert-plus')
+import assert from 'assert-plus'
 
 const KNOWN_METHOD_NAMES = new Set(['subscribe'])
 
@@ -44,4 +42,4 @@ const getMessageHandlerNames = (observerInstanceOrClass) => {
   )
 }
 
-module.exports = getMessageHandlerNames
+export default getMessageHandlerNames

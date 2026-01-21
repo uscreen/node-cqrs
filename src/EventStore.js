@@ -1,15 +1,13 @@
-'use strict'
+import { EventEmitter } from 'events'
+import assert from 'assert-plus'
 
-const EventEmitter = require('events')
-const assert = require('assert-plus')
-
-const {
+import {
   validateEvent,
   validateEventStorage,
   validateMessageBus,
   validateSnapshotStorage
-} = require('./utils')
-const EventStream = require('./EventStream')
+} from './utils/index.js'
+import EventStream from './EventStream.js'
 
 const SNAPSHOT_EVENT_TYPE = 'snapshot'
 
@@ -178,4 +176,4 @@ class EventStore {
   }
 }
 
-module.exports = EventStore
+export default EventStore

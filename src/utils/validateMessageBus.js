@@ -1,11 +1,9 @@
-'use strict'
-
-const assert = require('assert-plus')
+import assert from 'assert-plus'
 
 /**
  * Ensure messageBus matches the expected format
  */
-module.exports = (messageBus) => {
+export default (messageBus) => {
   assert.object(messageBus, 'messageBus')
   assert.func(messageBus.on, 'messageBus.on')
   assert.func(messageBus.publish, 'messageBus.publish')

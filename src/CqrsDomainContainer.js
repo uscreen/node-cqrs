@@ -1,13 +1,11 @@
-'use strict'
+import assert from 'assert-plus'
 
-const assert = require('assert-plus')
-
-const { isClass, getHandledMessageTypes } = require('./utils')
-const Container = require('./di/Container')
-const CommandBus = require('./CommandBus')
-const EventStore = require('./EventStore')
-const AggregateCommandHandler = require('./AggregateCommandHandler')
-const SagaEventHandler = require('./SagaEventHandler')
+import { isClass, getHandledMessageTypes } from './utils/index.js'
+import Container from './di/Container.js'
+import CommandBus from './CommandBus.js'
+import EventStore from './EventStore.js'
+import AggregateCommandHandler from './AggregateCommandHandler.js'
+import SagaEventHandler from './SagaEventHandler.js'
 
 /**
  * Dependency injection container with CQRS-specific methods
@@ -107,4 +105,4 @@ class CqrsDomainContainer extends Container {
   }
 }
 
-module.exports = CqrsDomainContainer
+export default CqrsDomainContainer

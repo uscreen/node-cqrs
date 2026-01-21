@@ -1,7 +1,7 @@
-const { test } = require('node:test')
-const assert = require('node:assert')
-const { wait } = require('../helper')
-const { InMemoryLock } = require('../../index')
+import { test } from 'node:test'
+import assert from 'node:assert'
+import { wait } from '../helper.js'
+import { InMemoryLock } from '../../index.js'
 
 // passed
 

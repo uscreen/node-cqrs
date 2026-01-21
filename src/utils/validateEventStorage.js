@@ -1,11 +1,9 @@
-'use strict'
-
-const assert = require('assert-plus')
+import assert from 'assert-plus'
 
 /**
  * Ensure provided eventStorage matches expected interface
  */
-module.exports = (storage) => {
+export default (storage) => {
   assert.object(storage, 'storage')
   assert.func(storage.commitEvents, 'storage.commitEvents')
   assert.func(storage.getEvents, 'storage.getEvents')

@@ -1,7 +1,7 @@
-const { MongoClient } = require('mongodb')
-const Redis = require('ioredis')
-const NATS = require('nats')
-const {
+import { MongoClient } from 'mongodb'
+import Redis from 'ioredis'
+import NATS from 'nats'
+import {
   Container,
   AbstractAggregate,
   AbstractProjection,
@@ -12,8 +12,8 @@ const {
   NatsMessageBus,
   InMemoryLock,
   RedisLock
-} = require('../index')
-const { config, wait } = require('./helper')
+} from '../index.js'
+import { config, wait } from './helper.js'
 
 const createDomain = async (
   t,
@@ -238,6 +238,4 @@ const createDomain = async (
   return { cqrs, eventsCollection, viewsCollection, snapshotsCollection }
 }
 
-module.exports = {
-  createDomain
-}
+export { createDomain }

@@ -1,5 +1,3 @@
-'use strict'
-
 /**
  * A collection of events
  */
@@ -28,4 +26,4 @@ class EventStream extends Array {
   }
 }
 
-module.exports = EventStream
+export default EventStream

@@ -1,9 +1,7 @@
-'use strict'
-
 /**
  * returns true on functions creating a class
  */
-module.exports = (func) => {
+export default (func) => {
   return (
     typeof func === 'function' &&
     Function.prototype.toString.call(func).startsWith('class')

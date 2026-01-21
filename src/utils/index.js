@@ -1,14 +1,12 @@
-'use strict'
-
-module.exports.getClassName = require('./getClassName')
-module.exports.getHandledMessageTypes = require('./getHandledMessageTypes')
-module.exports.getHandler = require('./getHandler')
-module.exports.getMessageHandlerNames = require('./getMessageHandlerNames')
-module.exports.isClass = require('./isClass')
-module.exports.subscribe = require('./subscribe')
-module.exports.unique = require('./unique')
-module.exports.validateEvent = require('./validateEvent')
-module.exports.validateEventStorage = require('./validateEventStorage')
-module.exports.validateHandlers = require('./validateHandlers')
-module.exports.validateMessageBus = require('./validateMessageBus')
-module.exports.validateSnapshotStorage = require('./validateSnapshotStorage')
+export { default as getClassName } from './getClassName.js'
+export { default as getHandledMessageTypes } from './getHandledMessageTypes.js'
+export { default as getHandler } from './getHandler.js'
+export { default as getMessageHandlerNames } from './getMessageHandlerNames.js'
+export { default as isClass } from './isClass.js'
+export { default as subscribe } from './subscribe.js'
+export { default as unique } from './unique.js'
+export { default as validateEvent } from './validateEvent.js'
+export { default as validateEventStorage } from './validateEventStorage.js'
+export { default as validateHandlers } from './validateHandlers.js'
+export { default as validateMessageBus } from './validateMessageBus.js'
+export { default as validateSnapshotStorage } from './validateSnapshotStorage.js'

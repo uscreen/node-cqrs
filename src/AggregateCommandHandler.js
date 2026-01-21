@@ -1,8 +1,6 @@
-'use strict'
+import assert from 'assert-plus'
 
-const assert = require('assert-plus')
-
-const { subscribe } = require('./utils')
+import { subscribe } from './utils/index.js'
 
 /**
  * Aggregate command handler.
@@ -70,4 +68,4 @@ class AggregateCommandHandler {
   }
 }
 
-module.exports = AggregateCommandHandler
+export default AggregateCommandHandler

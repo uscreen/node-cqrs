@@ -1,16 +1,14 @@
-'use strict'
-
 /**
  * module combines several functional validator methods
  */
 
-const assert = require('assert-plus')
-const getHandler = require('./getHandler')
+import assert from 'assert-plus'
+import getHandler from './getHandler.js'
 
 /**
  * Ensure instance has handlers declared for all handled message types
  */
-module.exports = (instance, handlesFieldName = 'handles') => {
+export default (instance, handlesFieldName = 'handles') => {
   assert.ok(instance, 'instance')
 
   const messageTypes =

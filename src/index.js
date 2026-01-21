@@ -1,49 +1,47 @@
-'use strict'
-
 /**
  * DI Container
  */
-module.exports.Container = require('./CqrsDomainContainer')
+export { default as Container } from './CqrsDomainContainer.js'
 
 /**
  * CQRS/ES: Commands & Events
  */
-module.exports.CommandBus = require('./CommandBus')
-module.exports.EventStore = require('./EventStore')
-module.exports.EventStream = require('./EventStream')
+export { default as CommandBus } from './CommandBus.js'
+export { default as EventStore } from './EventStore.js'
+export { default as EventStream } from './EventStream.js'
 
 /**
  * CQRS/ES: write
  */
-module.exports.AbstractAggregate = require('./AbstractAggregate')
-module.exports.AggregateCommandHandler = require('./AggregateCommandHandler')
+export { default as AbstractAggregate } from './AbstractAggregate.js'
+export { default as AggregateCommandHandler } from './AggregateCommandHandler.js'
 
 /**
  * CQRS/ES: read
  */
-module.exports.AbstractProjection = require('./AbstractProjection')
+export { default as AbstractProjection } from './AbstractProjection.js'
 
 /**
  * Saga
  */
-module.exports.AbstractSaga = require('./AbstractSaga')
-module.exports.SagaEventHandler = require('./SagaEventHandler')
+export { default as AbstractSaga } from './AbstractSaga.js'
+export { default as SagaEventHandler } from './SagaEventHandler.js'
 
 /**
  * Locks
  */
-module.exports.InMemoryLock = require('./locks/InMemoryLock')
-module.exports.RedisLock = require('./locks/RedisLock')
+export { default as InMemoryLock } from './locks/InMemoryLock.js'
+export { default as RedisLock } from './locks/RedisLock.js'
 
 /**
  * Busses
  */
-module.exports.InMemoryMessageBus = require('./buses/InMemoryMessageBus')
-module.exports.NatsMessageBus = require('./buses/NatsMessageBus')
+export { default as InMemoryMessageBus } from './buses/InMemoryMessageBus.js'
+export { default as NatsMessageBus } from './buses/NatsMessageBus.js'
 
 /**
  * Storages
  */
-module.exports.MongoEventStorage = require('./stores/MongoEventStorage')
-module.exports.MongoSnapshotStorage = require('./stores/MongoSnapshotStorage')
-module.exports.MongoView = require('./stores/MongoView')
+export { default as MongoEventStorage } from './stores/MongoEventStorage.js'
+export { default as MongoSnapshotStorage } from './stores/MongoSnapshotStorage.js'
+export { default as MongoView } from './stores/MongoView.js'

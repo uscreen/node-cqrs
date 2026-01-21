@@ -1,6 +1,4 @@
-'use strict'
-
-module.exports = class MongoEventStorage {
+export default class MongoEventStorage {
   constructor({ EventsCollection }) {
     this.collection = EventsCollection
     this.createIndex()

@@ -1,11 +1,9 @@
-'use strict'
-
-const Lock = require('redis-lock')
+import Lock from 'redis-lock'
 
 /**
  * Redis based implementation of locking
  */
-module.exports = class RedisLock {
+export default class RedisLock {
   /**
    * Creates an instance of RedisLock
    */

@@ -1,8 +1,6 @@
-'use strict'
-
 /**
  *
  */
-module.exports = (arr) => {
+export default (arr) => {
   return [...new Set(arr)]
 }

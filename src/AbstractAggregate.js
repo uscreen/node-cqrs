@@ -1,11 +1,11 @@
-'use strict'
+import assert from 'assert-plus'
+import rfdc from 'rfdc'
+import { v4 as uuidv4 } from 'uuid'
 
-const assert = require('assert-plus')
-const clone = require('rfdc')()
-const { v4: uuidv4 } = require('uuid')
+import { getHandler, getClassName, validateHandlers } from './utils/index.js'
+import EventStream from './EventStream.js'
 
-const { getHandler, getClassName, validateHandlers } = require('./utils')
-const EventStream = require('./EventStream')
+const clone = rfdc()
 
 const SNAPSHOT_EVENT_TYPE = 'snapshot'
 
@@ -195,4 +195,4 @@ class AbstractAggregate {
   }
 }
 
-module.exports = AbstractAggregate
+export default AbstractAggregate

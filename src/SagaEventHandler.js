@@ -1,9 +1,7 @@
-'use strict'
+import assert from 'assert-plus'
+import { v4 as uuidv4 } from 'uuid'
 
-const assert = require('assert-plus')
-const { v4: uuidv4 } = require('uuid')
-
-const { subscribe } = require('./utils')
+import { subscribe } from './utils/index.js'
 
 /**
  * Listens to Saga events,
@@ -107,4 +105,4 @@ class SagaEventHandler {
   }
 }
 
-module.exports = SagaEventHandler
+export default SagaEventHandler

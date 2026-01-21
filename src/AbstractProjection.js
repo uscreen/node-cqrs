@@ -1,21 +1,19 @@
-'use strict'
+import assert from 'assert-plus'
+import cliProgress from 'cli-progress'
 
-const assert = require('assert-plus')
-const cliProgress = require('cli-progress')
-
-const {
+import {
   getClassName,
   getHandledMessageTypes,
   getHandler,
   subscribe,
   validateHandlers
-} = require('./utils')
-const { InMemoryLock } = require('./locks')
+} from './utils/index.js'
+import { InMemoryLock } from './locks/index.js'
 
 /**
  * Base class for Projection definition
  */
-module.exports = class AbstractProjection {
+export default class AbstractProjection {
   /**
    * Name of Instance (to be used in keys, etc.)
    */

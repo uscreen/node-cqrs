@@ -1,6 +1,4 @@
-'use strict'
-
-const envSchema = require('env-schema')
+import envSchema from 'env-schema'
 
 const schema = {
   type: 'object',
@@ -30,7 +28,4 @@ config.mongoUri = `mongodb://${config.mongoServer}/${database}`
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-module.exports = {
-  config,
-  wait
-}
+export { config, wait }

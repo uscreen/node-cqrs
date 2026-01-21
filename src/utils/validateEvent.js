@@ -1,11 +1,9 @@
-'use strict'
-
-const assert = require('assert-plus')
+import assert from 'assert-plus'
 
 /**
  * Validate event structure
  */
-module.exports = (event) => {
+export default (event) => {
   assert.object(event, 'event')
   assert.string(event.type, 'event.type')
 

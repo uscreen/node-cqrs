@@ -1,6 +1,6 @@
-const { test } = require('node:test')
-const assert = require('node:assert')
-const { createDomain } = require('../domain')
+import { test } from 'node:test'
+import assert from 'node:assert'
+import { createDomain } from '../domain.js'
 
 // passed
 

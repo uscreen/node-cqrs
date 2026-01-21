@@ -1,9 +1,7 @@
-'use strict'
+import assert from 'assert-plus'
 
-const assert = require('assert-plus')
-
-const getClassDependencyNames = require('./getClassDependencyNames')
-const { isClass } = require('../utils')
+import getClassDependencyNames from './getClassDependencyNames.js'
+import { isClass } from '../utils/index.js'
 const _factories = Symbol('factories')
 const _instances = Symbol('instances')
 
@@ -153,4 +151,4 @@ class Container {
   }
 }
 
-module.exports = Container
+export default Container

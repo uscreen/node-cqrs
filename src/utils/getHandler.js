@@ -1,12 +1,10 @@
-'use strict'
-
-const assert = require('assert-plus')
+import assert from 'assert-plus'
 
 /**
  * Gets a handler for a specific message type,
  * prefers a public (w\o _ prefix) method, if available
  */
-module.exports = function getHandler(context, messageType) {
+export default function getHandler(context, messageType) {
   assert.object(context, 'context')
   assert.string(messageType, 'messageType')
 

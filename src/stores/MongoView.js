@@ -1,9 +1,7 @@
-'use strict'
+import { EventEmitter } from 'events'
+import assert from 'assert-plus'
 
-const EventEmitter = require('events')
-const assert = require('assert-plus')
-
-module.exports = class MongoView {
+export default class MongoView {
   /**
    * create a new view class
    */

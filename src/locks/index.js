@@ -1,4 +1,2 @@
-'use strict'
-
-module.exports.InMemoryLock = require('./InMemoryLock')
-module.exports.RedisLock = require('./RedisLock')
+export { default as InMemoryLock } from './InMemoryLock.js'
+export { default as RedisLock } from './RedisLock.js'

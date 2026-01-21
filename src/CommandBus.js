@@ -1,6 +1,4 @@
-'use strict'
-
-const { validateMessageBus } = require('./utils')
+import { validateMessageBus } from './utils/index.js'
 
 class CommandBus {
   /**
@@ -54,4 +52,4 @@ class CommandBus {
   }
 }
 
-module.exports = CommandBus
+export default CommandBus
