@@ -3,7 +3,8 @@
 const assert = require('assert-plus')
 
 const PARAMETER_OBJECT_NAME = 'options'
-const RX_CONSTRUCTOR = /(?:constructor|^function(?:.+\w+)?)\s?\(({?[^{})]*}?)\)\s?{/
+const RX_CONSTRUCTOR =
+  /(?:constructor|^function(?:.+\w+)?)\s?\(({?[^{})]*}?)\)\s?{/
 const RX_PARAMETER_OBJECT = new RegExp(
   PARAMETER_OBJECT_NAME + '\\.([\\w]+)',
   'g'

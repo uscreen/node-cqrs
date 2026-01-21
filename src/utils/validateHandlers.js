@@ -13,9 +13,8 @@ const getHandler = require('./getHandler')
 module.exports = (instance, handlesFieldName = 'handles') => {
   assert.ok(instance, 'instance')
 
-  const messageTypes = Object.getPrototypeOf(instance).constructor[
-    handlesFieldName
-  ]
+  const messageTypes =
+    Object.getPrototypeOf(instance).constructor[handlesFieldName]
   if (messageTypes === undefined) return
   assert.array(
     messageTypes,

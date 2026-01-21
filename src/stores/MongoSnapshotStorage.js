@@ -36,7 +36,7 @@ module.exports = class MongoSnapshotStorage {
    */
   async getAggregateSnapshot(aggregateId) {
     return this.collection.findOne(
-      { aggregateId: aggregateId },
+      { aggregateId },
       { sort: { aggregateVersion: -1 } }
     )
   }

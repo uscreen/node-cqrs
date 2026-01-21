@@ -111,8 +111,8 @@ module.exports = class InMemoryMessageBus {
 
     const handlers = [
       ...(this._handlers.get(event.type) || []),
-      ...Array.from(this._queues.values()).map((namedQueue) => (e) =>
-        namedQueue.publish(e)
+      ...Array.from(this._queues.values()).map(
+        (namedQueue) => (e) => namedQueue.publish(e)
       )
     ]
 

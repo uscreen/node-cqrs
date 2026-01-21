@@ -18,7 +18,7 @@ const schema = {
 }
 
 const config = envSchema({
-  schema: schema,
+  schema,
   dotenv: true
 })
 

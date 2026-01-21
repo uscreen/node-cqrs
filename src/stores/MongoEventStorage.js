@@ -36,7 +36,7 @@ module.exports = class MongoEventStorage {
 
   getAggregateEvents(aggregateId, { snapshot }) {
     const query = {
-      aggregateId: aggregateId
+      aggregateId
     }
 
     if (snapshot && snapshot.aggregateVersion) {
@@ -55,7 +55,7 @@ module.exports = class MongoEventStorage {
 
   getSagaEvents(sagaId, { beforeEvent }) {
     const query = {
-      sagaId: sagaId
+      sagaId
     }
 
     /* istanbul ignore if: @TODO needs test with beforeEvent.sagaVersion > 0 */
