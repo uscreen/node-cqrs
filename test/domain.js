@@ -42,22 +42,6 @@ const createDomain = async (
       })
     : null
 
-  try {
-    await eventsCollection.drop()
-    await snapshotsCollection.drop()
-    await viewsCollection.drop()
-    await anotherViewsCollection.drop()
-    await ThirdProjectionCollection.drop()
-    await wait(500)
-  } catch (_) {}
-
-  t.after(async () => {
-    await wait(500)
-    await client.close()
-    redis.quit()
-    if (useNatsBus) natsClient.close()
-  })
-
   const cqrs = new Container()
 
   cqrs.register(MongoEventStorage, 'storage')
@@ -234,6 +218,33 @@ const createDomain = async (
    */
   cqrs.createUnexposedInstances()
   cqrs.createAllInstances()
+
+  t.after(async () => {
+    // Ensure all db indexes were created before closing connection
+    await cqrs.indexesReady()
+
+    // Close NATS first (stop incoming messages)
+    if (useNatsBus) {
+      await new Promise((resolve) => natsClient.flush(resolve))
+      natsClient.close()
+    }
+
+    // Close main connections
+    await client.close()
+    await redis.quit()
+
+    // Drop test collections with a separate connection
+    const cleanupClient = new MongoClient(config.mongoUri)
+    await cleanupClient.connect()
+    const cleanupDb = cleanupClient.db()
+    await cleanupDb.collection(`${ns}-events`).drop()
+    await cleanupDb.collection(`${ns}-snapshots`).drop()
+    await cleanupDb.collection(`${ns}-views`).drop()
+    await cleanupDb.collection(`${ns}-another-views`).drop()
+    await cleanupDb.collection(`${ns}-ThirdProjection-views`).drop()
+
+    await cleanupClient.close()
+  })
 
   return { cqrs, eventsCollection, viewsCollection, snapshotsCollection }
 }

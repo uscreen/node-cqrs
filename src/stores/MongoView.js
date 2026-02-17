@@ -9,7 +9,7 @@ export default class MongoView {
     assert.object(collection, 'a "collection" is required by MongoView')
     this._collection = collection
     this._emitter = new EventEmitter()
-    this.createIndex()
+    this.indexesReady = this.createIndex() // collecting index promise for application tests
   }
 
   /**

@@ -144,6 +144,20 @@ class Container {
   }
 
   /**
+   * Waits for all async initialization (e.g., index creation) to complete
+   * Only needed to safely shut down mongo connections after tests
+   */
+  async indexesReady() {
+    const promises = []
+    for (const [, instance] of this.instances) {
+      if (instance?.indexesReady) {
+        promises.push(instance.indexesReady)
+      }
+    }
+    await Promise.all(promises)
+  }
+
+  /**
    * Creates an instance from the given type or factory using dependency injection
    */
   createInstance(typeOrFactory, additionalOptions) {

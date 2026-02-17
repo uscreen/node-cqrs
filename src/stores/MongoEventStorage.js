@@ -1,7 +1,7 @@
 export default class MongoEventStorage {
   constructor({ EventsCollection }) {
     this.collection = EventsCollection
-    this.createIndex()
+    this.indexesReady = this.createIndex() // collecting index promise for application tests
   }
 
   /**

@@ -4,7 +4,7 @@ export default class MongoSnapshotStorage {
    */
   constructor({ SnapshotsCollection }) {
     this.collection = SnapshotsCollection
-    this.createIndex()
+    this.indexesReady = this.createIndex() // collecting index promise for application tests
   }
 
   /**
