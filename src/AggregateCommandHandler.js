@@ -53,7 +53,9 @@ class AggregateCommandHandler {
       : await this._aggregateFactory.call()
 
     const handlerResponse = aggregate.handle(cmd)
-    if (handlerResponse instanceof Promise) await handlerResponse
+    if (handlerResponse instanceof Promise) {
+      await handlerResponse
+    }
 
     let events = aggregate.changes
 

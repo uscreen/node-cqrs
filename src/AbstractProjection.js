@@ -1,6 +1,7 @@
 import assert from 'assert-plus'
 import cliProgress from 'cli-progress'
 
+import { InMemoryLock } from './locks/index.js'
 import {
   getClassName,
   getHandledMessageTypes,
@@ -8,7 +9,6 @@ import {
   subscribe,
   validateHandlers
 } from './utils/index.js'
-import { InMemoryLock } from './locks/index.js'
 
 /**
  * Base class for Projection definition
@@ -71,7 +71,9 @@ export default class AbstractProjection {
     const shouldRestore = await this.shouldRestoreView
 
     /* istanbul ignore next: @TODO needs unit test  */
-    if (shouldRestore) await this.restore()
+    if (shouldRestore) {
+      await this.restore()
+    }
   }
 
   /**

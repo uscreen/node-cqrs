@@ -1,8 +1,8 @@
-import { test } from 'node:test'
 import assert from 'node:assert'
+import { test } from 'node:test'
 import Redis from 'ioredis'
-import { config, wait } from '../helper.js'
 import { RedisLock } from '../../index.js'
+import { config, wait } from '../helper.js'
 
 // passed
 
@@ -39,7 +39,8 @@ test('RedisLock', async (t) => {
           order.push('error')
           throw new Error('error')
         })
-      } catch (error) {
+      }
+      catch (error) {
         results.push(error.message)
       }
 
@@ -70,7 +71,8 @@ test('RedisLock', async (t) => {
           order.push('error')
           throw new Error('error')
         })
-      } catch (error) {
+      }
+      catch (error) {
         results.push(error.message)
       }
 

@@ -1,7 +1,7 @@
-import { test } from 'node:test'
 import assert from 'node:assert'
-import { createDomain } from '../domain.js'
+import { test } from 'node:test'
 import { AbstractSaga } from '../../index.js'
+import { createDomain } from '../domain.js'
 
 test('Use Saga with default InMemoryLock', async (t) => {
   const { cqrs, eventsCollection } = await createDomain(t, 'sagaTest-')

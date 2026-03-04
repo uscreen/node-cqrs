@@ -1,16 +1,16 @@
-import { MongoClient } from 'mongodb'
 import Redis from 'ioredis'
+import { MongoClient } from 'mongodb'
 import NATS from 'nats'
 import {
-  Container,
   AbstractAggregate,
   AbstractProjection,
-  MongoView,
+  Container,
+  InMemoryLock,
+  InMemoryMessageBus,
   MongoEventStorage,
   MongoSnapshotStorage,
-  InMemoryMessageBus,
+  MongoView,
   NatsMessageBus,
-  InMemoryLock,
   RedisLock
 } from '../index.js'
 import { config, wait } from './helper.js'
@@ -49,7 +49,8 @@ const createDomain = async (
   if (useNatsBus) {
     cqrs.registerInstance(natsClient, 'natsClient')
     cqrs.register(NatsMessageBus, 'messageBus')
-  } else {
+  }
+  else {
     cqrs.register(InMemoryMessageBus, 'messageBus')
   }
 
@@ -225,7 +226,7 @@ const createDomain = async (
 
     // Close NATS first (stop incoming messages)
     if (useNatsBus) {
-      await new Promise((resolve) => natsClient.flush(resolve))
+      await new Promise(resolve => natsClient.flush(resolve))
       natsClient.close()
     }
 

@@ -11,9 +11,11 @@ import getHandler from './getHandler.js'
 export default (instance, handlesFieldName = 'handles') => {
   assert.ok(instance, 'instance')
 
-  const messageTypes =
-    Object.getPrototypeOf(instance).constructor[handlesFieldName]
-  if (messageTypes === undefined) return
+  const messageTypes
+    = Object.getPrototypeOf(instance).constructor[handlesFieldName]
+  if (messageTypes === undefined) {
+    return
+  }
   assert.array(
     messageTypes,
     'handles getter, when defined, must return an Array of Strings'

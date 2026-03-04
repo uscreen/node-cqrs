@@ -61,7 +61,9 @@ class SagaEventHandler {
 
     const r = saga.apply(event)
     /* istanbul ignore next */
-    if (r instanceof Promise) await r
+    if (r instanceof Promise) {
+      await r
+    }
 
     while (saga.uncommittedMessages.length) {
       const commands = saga.uncommittedMessages
@@ -76,12 +78,14 @@ class SagaEventHandler {
 
         try {
           await this._commandBus.sendRaw(command)
-        } catch (err) {
+        }
+        catch (err) {
           /* istanbul ignore next */
           if (typeof saga.onError === 'function') {
             // let saga to handle the error
             saga.onError(err, { event, command })
-          } else {
+          }
+          else {
             throw err
           }
         }

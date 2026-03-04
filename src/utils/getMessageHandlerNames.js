@@ -7,7 +7,9 @@ const KNOWN_METHOD_NAMES = new Set(['subscribe'])
  */
 const getInheritedPropertyNames = (prototype) => {
   const parentPrototype = prototype && Object.getPrototypeOf(prototype)
-  if (!parentPrototype) return []
+  if (!parentPrototype) {
+    return []
+  }
 
   const propDescriptors = Object.getOwnPropertyDescriptors(parentPrototype)
   const propNames = Object.keys(propDescriptors)
@@ -22,8 +24,8 @@ const getInheritedPropertyNames = (prototype) => {
 const getMessageHandlerNames = (observerInstanceOrClass) => {
   assert.ok(observerInstanceOrClass, 'observerInstanceOrClass')
 
-  const prototype =
-    typeof observerInstanceOrClass === 'function'
+  const prototype
+    = typeof observerInstanceOrClass === 'function'
       ? observerInstanceOrClass.prototype
       : Object.getPrototypeOf(observerInstanceOrClass)
 
@@ -34,11 +36,11 @@ const getMessageHandlerNames = (observerInstanceOrClass) => {
   const propNames = Object.keys(propDescriptors)
 
   return propNames.filter(
-    (key) =>
-      !key.startsWith('_') &&
-      !inheritedProperties.has(key) &&
-      !KNOWN_METHOD_NAMES.has(key) &&
-      typeof propDescriptors[key].value === 'function'
+    key =>
+      !key.startsWith('_')
+      && !inheritedProperties.has(key)
+      && !KNOWN_METHOD_NAMES.has(key)
+      && typeof propDescriptors[key].value === 'function'
   )
 }
 

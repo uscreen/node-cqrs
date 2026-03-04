@@ -46,7 +46,8 @@ export default class InMemoryMessageBus {
     /* istanbul ignore else: @TODO needs unit test */
     if (!this._handlers.has(messageType)) {
       this._handlers.set(messageType, new Set())
-    } else if (this._uniqueEventHandlers) {
+    }
+    else if (this._uniqueEventHandlers) {
       throw new Error(
         `"${messageType}" handler is already set up on the "${this._name}" queue`
       )
@@ -69,7 +70,8 @@ export default class InMemoryMessageBus {
     /* istanbul ignore else: @TODO needs unit test */
     if (!this._handlers.has(messageType)) {
       this._handlers.set(messageType, new Set())
-    } else if (this._uniqueEventHandlers) {
+    }
+    else if (this._uniqueEventHandlers) {
       throw new Error(
         `"${messageType}" handler is already set up on the "${this._name}" queue`
       )
@@ -110,10 +112,10 @@ export default class InMemoryMessageBus {
     const handlers = [
       ...(this._handlers.get(event.type) || []),
       ...Array.from(this._queues.values()).map(
-        (namedQueue) => (e) => namedQueue.publish(e)
+        namedQueue => e => namedQueue.publish(e)
       )
     ]
 
-    return Promise.all(handlers.map((handler) => handler(event)))
+    return Promise.all(handlers.map(handler => handler(event)))
   }
 }

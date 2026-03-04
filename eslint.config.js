@@ -10,6 +10,11 @@ export default antfu({
     'AGENTS.md'
   ]
 }, {
+  files: ['README.md'],
+  rules: {
+    'markdown/no-multiple-h1': 'off'
+  }
+}, {
   rules: {
     'style/comma-dangle': ['error', 'never'],
     'curly': ['error', 'multi-line', 'consistent'],

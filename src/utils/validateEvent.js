@@ -8,8 +8,8 @@ export default (event) => {
   assert.string(event.type, 'event.type')
 
   assert.ok(
-    event.aggregateId ||
-      /* istanbul ignore next: @todo: write some unit test */ event.sagaId,
+    event.aggregateId
+    /* istanbul ignore next: @todo: write some unit test */ || event.sagaId,
     'either event.aggregateId or event.sagaId is required'
   )
 

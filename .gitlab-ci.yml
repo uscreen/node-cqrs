@@ -8,9 +8,9 @@ cache:
       - .pnpm-store
 
 variables:
-  mongoServer: "mongo:27017"
-  redisHost: "redis"
-  natsHost: "nats"
+  mongoServer: 'mongo:27017'
+  redisHost: redis
+  natsHost: nats
 
   FF_USE_FASTZIP: 1
   CACHE_COMPRESSION_LEVEL: fast
@@ -42,6 +42,6 @@ test:
 audit:
   stage: audit
   only:
-  - schedules
+    - schedules
   script:
     - pnpm audit

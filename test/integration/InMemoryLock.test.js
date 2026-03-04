@@ -1,7 +1,7 @@
-import { test } from 'node:test'
 import assert from 'node:assert'
-import { wait } from '../helper.js'
+import { test } from 'node:test'
 import { InMemoryLock } from '../../index.js'
+import { wait } from '../helper.js'
 
 // passed
 
@@ -30,7 +30,8 @@ test('InMemoryLock', async (t) => {
           order.push('error')
           throw new Error('error')
         })
-      } catch (error) {
+      }
+      catch (error) {
         results.push(error.message)
       }
 
@@ -61,7 +62,8 @@ test('InMemoryLock', async (t) => {
           order.push('error')
           throw new Error('error')
         })
-      } catch (error) {
+      }
+      catch (error) {
         results.push(error.message)
       }
 

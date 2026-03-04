@@ -1,7 +1,8 @@
 import assert from 'assert-plus'
 
-import getClassDependencyNames from './getClassDependencyNames.js'
 import { isClass } from '../utils/index.js'
+import getClassDependencyNames from './getClassDependencyNames.js'
+
 const _factories = Symbol('factories')
 const _instances = Symbol('instances')
 
@@ -29,7 +30,7 @@ function createInstance(typeOrFactory, container, additionalOptions) {
           if (Array.isArray(dependency)) {
             const options = Object.assign({}, additionalOptions)
             dependency.forEach(
-              (key) => options[key] || (options[key] = container[key])
+              key => options[key] || (options[key] = container[key])
             )
             return options
           }
@@ -84,15 +85,16 @@ class Container {
       'exposeMap argument, when provided, must be a function'
     )
 
-    const factory = (container) => container.createInstance(typeOrFactory)
+    const factory = container => container.createInstance(typeOrFactory)
 
     if (exposeAs) {
       const getOrCreate = () => {
-        if (!this.instances.has(exposeAs))
+        if (!this.instances.has(exposeAs)) {
           this.instances.set(
             exposeAs,
             exposeMap ? exposeMap(factory(this)) : factory(this)
           )
+        }
 
         return this.instances.get(exposeAs)
       }
@@ -104,7 +106,8 @@ class Container {
       })
 
       this.factories.add(getOrCreate)
-    } else {
+    }
+    else {
       factory.unexposed = true
       this.factories.add(factory)
     }

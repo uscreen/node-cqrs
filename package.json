@@ -1,19 +1,12 @@
 {
   "name": "@uscreen.de/cqrs-kit",
-  "version": "0.38.0",
-  "description": "CQRS Starter Kit to start fast into DDD. Eventsourcing included. Some soldering required.",
   "type": "module",
-  "main": "index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com:uscreen/node-cqrs.git"
-  },
+  "version": "0.38.0",
+  "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a",
+  "description": "CQRS Starter Kit to start fast into DDD. Eventsourcing included. Some soldering required.",
   "author": "Marcus Spiegel <spiegel@uscreen.de>",
   "contributors": [
     "@stas_natalenko"
-  ],
-  "files": [
-    "src"
   ],
   "services": [
     "nats",
@@ -21,10 +14,18 @@
     "redis"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com:uscreen/node-cqrs.git"
+  },
   "keywords": [
     "cqrs",
     "ddd",
     "eventsourcing"
+  ],
+  "main": "index.js",
+  "files": [
+    "src"
   ],
   "engines": {
     "node": ">=18.x"
@@ -54,6 +55,5 @@
     "eslint-plugin-format": "^1.5.0",
     "ioredis": "^5.10.0",
     "mongodb": "^5.9.2"
-  },
-  "packageManager": "pnpm@10.27.0+sha512.72d699da16b1179c14ba9e64dc71c9a40988cbdc65c264cb0e489db7de917f20dcf4d64d8723625f2969ba52d4b7e2a1170682d9ac2a5dcaeaab732b7e16f04a"
+  }
 }

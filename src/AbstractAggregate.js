@@ -2,8 +2,8 @@ import assert from 'assert-plus'
 import rfdc from 'rfdc'
 import { v4 as uuidv4 } from 'uuid'
 
-import { getHandler, getClassName, validateHandlers } from './utils/index.js'
 import EventStream from './EventStream.js'
+import { getClassName, getHandler, validateHandlers } from './utils/index.js'
 
 const clone = rfdc()
 
@@ -79,7 +79,9 @@ class AbstractAggregate {
 
     this.state = state || new (class State {})()
     assert.object(this.state, 'state')
-    if (events) events.forEach((event) => this.mutate(event))
+    if (events) {
+      events.forEach(event => this.mutate(event))
+    }
   }
 
   /* (event)* Pass command to command handler
@@ -105,9 +107,12 @@ class AbstractAggregate {
     if (event.type === SNAPSHOT_EVENT_TYPE) {
       this[_snapshotVersion] = event.aggregateVersion
       this.restoreSnapshot(event)
-    } else {
+    }
+    else {
       const handler = getHandler(this.state, event.type)
-      if (handler) handler.call(this.state, event)
+      if (handler) {
+        handler.call(this.state, event)
+      }
     }
 
     this[_version] += 1
@@ -137,9 +142,15 @@ class AbstractAggregate {
     const { context, sagaId, sagaVersion } = sourceCommand
 
     /* istanbul ignore else: @todo needs test */
-    if (context !== undefined) event.context = context
-    if (sagaId !== undefined) event.sagaId = sagaId
-    if (sagaVersion !== undefined) event.sagaVersion = sagaVersion
+    if (context !== undefined) {
+      event.context = context
+    }
+    if (sagaId !== undefined) {
+      event.sagaId = sagaId
+    }
+    if (sagaVersion !== undefined) {
+      event.sagaVersion = sagaVersion
+    }
 
     return event
   }

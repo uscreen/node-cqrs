@@ -1,10 +1,10 @@
 import assert from 'assert-plus'
 
 const PARAMETER_OBJECT_NAME = 'options'
-const RX_CONSTRUCTOR =
-  /(?:constructor|^function(?:.+\w+)?)\s?\(({?[^{})]*}?)\)\s?{/
+const RX_CONSTRUCTOR
+  = /(?:constructor|^function(?:.+\w)?)\s?\((\{?[^{})]*\}?)\)\s?\{/
 const RX_PARAMETER_OBJECT = new RegExp(
-  PARAMETER_OBJECT_NAME + '\\.([\\w]+)',
+  `${PARAMETER_OBJECT_NAME}\\.(\\w+)`,
   'g'
 )
 
@@ -14,8 +14,8 @@ function distinct(array) {
 
 /**
  * Retrieves parameter object names mentioned in constructor body (e.g. "options.someService")
- * @param {String} classBody - either ES6 class or ES5 constructor function body
- * @param {Number} offset - where class/function body starts
+ * @param {string} classBody - either ES6 class or ES5 constructor function body
+ * @param {number} offset - where class/function body starts
  * @return {Array} - a list of object names (e.g. ["someService"])
  */
 function* getParameterObjectPropertyNames(classBody, offset) {
@@ -26,7 +26,8 @@ function* getParameterObjectPropertyNames(classBody, offset) {
   for (let i = offset, openedBrackets = 1; i < classBody.length; i++) {
     if (classBody[i] === '{') {
       openedBrackets += 1
-    } else if (classBody[i] === '}' && --openedBrackets === 0) {
+    }
+    else if (classBody[i] === '}' && --openedBrackets === 0) {
       ctorBody = classBody.substr(offset, i - offset - 1)
       break
     }
@@ -38,6 +39,7 @@ function* getParameterObjectPropertyNames(classBody, offset) {
   )
 
   let match
+  // eslint-disable-next-line no-cond-assign
   while ((match = RX_PARAMETER_OBJECT.exec(ctorBody))) {
     yield match[1]
   }
@@ -48,7 +50,7 @@ function* getParameterObjectPropertyNames(classBody, offset) {
  * If parameter is a paramenter object, its property names will be returned as inner array.
  *
  * @example
- * 	class X { constructor(options, service) { this._a = options.a; } }
+ *  class X { constructor(options, service) { this._a = options.a; } }
  *  getClassDependencyNames(X) // => [["a"], "service"]
  *
  * @param  {Function} type Prototype function
@@ -75,15 +77,16 @@ function getClassDependencyNames(type) {
     // destructed parameter object
     return [
       args
-        .replace(/^{|}$/g, '')
+        .replace(/^\{|\}$/g, '')
         .split(',')
-        .map((n) => n.trim())
+        .map(n => n.trim())
     ]
-  } else {
+  }
+  else {
     const parameters = match[1]
       .split(',')
-      .map((n) => n.trim())
-      .filter((n) => n)
+      .map(n => n.trim())
+      .filter(n => n)
     return parameters.map((parameterName) => {
       /* istanbul ignore else: @TODO needs unit test */
       if (parameterName === PARAMETER_OBJECT_NAME) {
@@ -93,7 +96,8 @@ function getClassDependencyNames(type) {
             getParameterObjectPropertyNames(classBody, constructorBodyOffset)
           )
         )
-      } else {
+      }
+      else {
         return parameterName
       }
     })

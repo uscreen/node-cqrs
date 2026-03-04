@@ -1,13 +1,13 @@
-import { EventEmitter } from 'events'
+import { EventEmitter } from 'node:events'
 import assert from 'assert-plus'
 
+import EventStream from './EventStream.js'
 import {
   validateEvent,
   validateEventStorage,
   validateMessageBus,
   validateSnapshotStorage
 } from './utils/index.js'
-import EventStream from './EventStream.js'
 
 const SNAPSHOT_EVENT_TYPE = 'snapshot'
 
@@ -83,7 +83,7 @@ class EventStore {
   registerSagaStarters(eventTypes) {
     assert.arrayOfString(eventTypes, 'eventTypes')
     const uniqueEventTypes = eventTypes.filter(
-      (e) => !this._sagaStarters.includes(e)
+      e => !this._sagaStarters.includes(e)
     )
     this._sagaStarters.push(...uniqueEventTypes)
   }
@@ -104,7 +104,7 @@ class EventStore {
   async save(events) {
     assert.array(events, 'events')
 
-    const snapshotEvents = events.filter((e) => e.type === SNAPSHOT_EVENT_TYPE)
+    const snapshotEvents = events.filter(e => e.type === SNAPSHOT_EVENT_TYPE)
 
     assert.ok(
       !(snapshotEvents.length > 1),
@@ -116,7 +116,7 @@ class EventStore {
     )
 
     const snapshot = snapshotEvents[0]
-    const eventStream = new EventStream(events.filter((e) => e !== snapshot))
+    const eventStream = new EventStream(events.filter(e => e !== snapshot))
     eventStream.forEach(this._validator)
 
     await this._storage.commitEvents(eventStream)

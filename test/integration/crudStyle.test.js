@@ -1,7 +1,7 @@
-import { test } from 'node:test'
 import assert from 'node:assert'
-import { wait } from '../helper.js'
+import { test } from 'node:test'
 import { createDomain } from '../domain.js'
+import { wait } from '../helper.js'
 
 // passed
 

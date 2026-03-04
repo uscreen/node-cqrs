@@ -1,11 +1,11 @@
 import assert from 'assert-plus'
 
-import { isClass, getHandledMessageTypes } from './utils/index.js'
-import Container from './di/Container.js'
-import CommandBus from './CommandBus.js'
-import EventStore from './EventStore.js'
 import AggregateCommandHandler from './AggregateCommandHandler.js'
+import CommandBus from './CommandBus.js'
+import Container from './di/Container.js'
+import EventStore from './EventStore.js'
 import SagaEventHandler from './SagaEventHandler.js'
+import { getHandledMessageTypes, isClass } from './utils/index.js'
 
 /**
  * Dependency injection container with CQRS-specific methods
@@ -60,7 +60,7 @@ class CqrsDomainContainer extends Container {
         return projection
       },
       exposedViewName,
-      (p) => p.view
+      p => p.view
     )
   }
 
@@ -73,10 +73,10 @@ class CqrsDomainContainer extends Container {
       'AggregateType argument must be a constructor function'
     )
     this.registerCommandHandler(
-      (container) =>
+      container =>
         new AggregateCommandHandler({
           eventStore: container.eventStore,
-          aggregateType: (options) =>
+          aggregateType: options =>
             container.createInstance(AggregateType, options),
           handles: getHandledMessageTypes(AggregateType)
         })
@@ -92,11 +92,11 @@ class CqrsDomainContainer extends Container {
       'SagaType argument must be a constructor function'
     )
     this.registerEventReceptor(
-      (container) =>
+      container =>
         new SagaEventHandler({
           eventStore: container.eventStore,
           commandBus: container.commandBus,
-          sagaType: (options) => container.createInstance(SagaType, options),
+          sagaType: options => container.createInstance(SagaType, options),
           handles: SagaType.handles,
           startsWith: SagaType.startsWith,
           queueName: SagaType.name

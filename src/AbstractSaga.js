@@ -66,7 +66,7 @@ class AbstractSaga {
 
     /* istanbul ignore else */
     if (options.events) {
-      options.events.forEach((e) => this.apply(e))
+      options.events.forEach(e => this.apply(e))
       this.resetUncommittedMessages()
     }
 
@@ -120,7 +120,9 @@ class AbstractSaga {
       payload
     }
 
-    if (context) data.context = context
+    if (context) {
+      data.context = context
+    }
 
     this.enqueueRaw(data)
   }

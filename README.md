@@ -7,7 +7,7 @@
 
 This module is based on the work of and started as a fork of [snatalenko/node-cqrs](https://github.com/snatalenko/node-cqrs), so most credits go to Mr. Natalenko.
 
-> __Alpha-Warning:__ work in progress, not tested in production and subject of change in api, features and options
+> **Alpha-Warning:** work in progress, not tested in production and subject of change in api, features and options
 
 ## Abstract
 
@@ -21,14 +21,14 @@ To get to a production ready setup it should provied a working example within a 
 
 ## Assumptions
 
-* storage and message adapters SHOULD NOT handle their connections, pools, reconnections within this modules
-* storage and message adapters SHOULD reuse their clients as injected from the outside
-* storage and message adapters SHOULD be injectable (basic reference implementations inlcluded)
-* this module SHOULD NOT provide a framework,
-* this module SHOULD NOT require a specific framework,
-* this module SHOULD NOT assume any filestructure
-* this module SHOULD NOT setup a domain on it's own
-* this module SHOULD NOT depend on any given framework
+- storage and message adapters SHOULD NOT handle their connections, pools, reconnections within this modules
+- storage and message adapters SHOULD reuse their clients as injected from the outside
+- storage and message adapters SHOULD be injectable (basic reference implementations inlcluded)
+- this module SHOULD NOT provide a framework,
+- this module SHOULD NOT require a specific framework,
+- this module SHOULD NOT assume any filestructure
+- this module SHOULD NOT setup a domain on it's own
+- this module SHOULD NOT depend on any given framework
 
 As this is work in progress I'll keep the original README attached below:
 
@@ -41,7 +41,6 @@ As this is work in progress I'll keep the original README attached below:
 The package provides building blocks for making a CQRS-ES application. It was inspired by Lokad.CQRS, but not tied to a specific storage implementation or infrastructure. It favors ES6 classes and dependency injection, so any components can be modified or replaced with your own implementations without hacks to the package codebase.
 
 [Documentation at node-cqrs.org](https://www.node-cqrs.org)
-
 
 Your app is expected to operate with loosely typed commands and events that match the following interface:
 
@@ -66,7 +65,6 @@ Domain business logic should be placed in Aggregate, Saga and Projection classes
 - [Sagas](entities/Saga/README.MD) handle events and enqueue commands
 - [Projections](entities/Projection/README.md) listen to events and update views
 
-
 Message delivery is being handled by the following services (in order of appearance):
 
 - **Command Bus** delivers commands to command handlers
@@ -74,27 +72,24 @@ Message delivery is being handled by the following services (in order of appeara
 - **Event Store** persists events and deliver them to event handlers (saga event handlers, projections or any other custom services)
 - **Saga Event Handler** restores saga state and applies event
 
-
 From a high level, this is how the command/event flow looks like:
 
 ![Overview](docs/images/node-cqrs-components.png)
 
-
 ## Getting Started
 
 You can find sample code of a User domain in the **/examples** folder.
-
 
 ### Your App → Command → Aggregate
 
 Describe an aggregate that handles a command:
 
 ```js
-const { AbstractAggregate } = require('node-cqrs');
+const { AbstractAggregate } = require('node-cqrs')
 
 class UserAggregate extends AbstractAggregate {
   static get handles() {
-    return ['createUser'];
+    return ['createUser']
   }
 
   createUser(commandPayload) {
@@ -107,24 +102,24 @@ Then register aggregate in the [DI container](middleware/DIContainer.md).
 All the wiring can be done manually, without a DI container (you can find it in samples), but with container it’s just easier:
 
 ```js
-const { Container, InMemoryEventStorage } = require('node-cqrs');
+const { Container, InMemoryEventStorage } = require('node-cqrs')
 
-const container = new Container();
-container.register(InMemoryEventStorage, 'storage');
-container.registerAggregate(UserAggregate);
-container.createUnexposedInstances();
+const container = new Container()
+container.register(InMemoryEventStorage, 'storage')
+container.registerAggregate(UserAggregate)
+container.createUnexposedInstances()
 ```
 
 Then send a command:
 
 ```js
-const userAggregateId = undefined;
+const userAggregateId = undefined
 const payload = {
   username: 'john',
   password: 'test'
-};
+}
 
-container.commandBus.send('createUser', userAggregateId, { payload });
+container.commandBus.send('createUser', userAggregateId, { payload })
 ```
 
 Behind the scene, an AggregateCommandHandler will catch the command,
@@ -146,18 +141,17 @@ createUser(commandPayload) {
 
 Once the above method is executed, the emitted userCreated event will be persisted and delivered to event handlers (sagas, projections or any other custom event receptors).
 
-
 ### Aggregate → Event → Projection → View
 
 Now it’s time to work on a read model. We’ll need a projection that will handle our events. Projection must implement 2 methods: `subscribe(eventStore)` and `project(event)` .
 To make it easier, you can extend an `AbstractProjection`:
 
 ```js
-const { AbstractProjection } = require('node-cqrs');
+const { AbstractProjection } = require('node-cqrs')
 
 class UsersProjection extends AbstractProjection {
   static get handles() {
-    return ['userCreated'];
+    return ['userCreated']
   }
 
   userCreated(event) {
@@ -171,7 +165,7 @@ By default, projection uses async `InMemoryView` for inner view, but we’ll use
 ```js
 class UsersProjection extends AbstractProjection {
   get view() {
-    return this._view || (this._view = new Map());
+    return this._view || (this._view = new Map())
   }
 
   // ...
@@ -187,7 +181,7 @@ class UsersProjection extends AbstractProjection {
   userCreated(event) {
     this.view.set(event.aggregateId, {
       username: event.payload.username
-    });
+    })
   }
 }
 ```
@@ -195,7 +189,7 @@ class UsersProjection extends AbstractProjection {
 Once the projection is ready, it can be registered in the DI container:
 
 ```js
-container.registerProjection(UsersProjection, 'users');
+container.registerProjection(UsersProjection, 'users')
 ```
 
 And accessed from anywhere in your app:
@@ -207,17 +201,15 @@ container.users
 
 ## Contribution
 
-* [editorconfig](http://editorconfig.org)
-* [eslint](http://eslint.org)
-* `npm test -- --watch`
-
+- [editorconfig](http://editorconfig.org)
+- [eslint](http://eslint.org)
+- `npm test -- --watch`
 
 ## Dependencies
 
 - [node >= 7.6](https://nodejs.org)
--	[visionmedia/debug](https://github.com/visionmedia/debug) (MIT License)
-
+- [visionmedia/debug](https://github.com/visionmedia/debug) (MIT License)
 
 ## License
 
-* [MIT License](https://github.com/snatalenko/node-cqrs/blob/master/LICENSE)
+- [MIT License](https://github.com/snatalenko/node-cqrs/blob/master/LICENSE)

@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events'
+import { EventEmitter } from 'node:events'
 import assert from 'assert-plus'
 
 export default class MongoView {
@@ -19,7 +19,7 @@ export default class MongoView {
   async createIndex() {
     await this._collection
       .createIndex({ id: 1 }, { unique: true, sparse: true })
-      .catch((e) => {})
+      .catch(() => {})
   }
 
   /**
@@ -52,7 +52,9 @@ export default class MongoView {
     assert.object(value)
 
     const doc = { ...value, id }
-    if (!value.created) doc.created = new Date()
+    if (!value.created) {
+      doc.created = new Date()
+    }
 
     return this.collection.insertOne(doc)
   }
@@ -74,7 +76,9 @@ export default class MongoView {
     assert.object(value)
 
     const update = { $set: value }
-    if (!value.modified) update.$currentDate = { modified: true }
+    if (!value.modified) {
+      update.$currentDate = { modified: true }
+    }
 
     return this.collection.findOneAndUpdate({ id }, update, {
       returnDocument: 'after',

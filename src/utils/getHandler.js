@@ -15,11 +15,12 @@ export default function getHandler(context, messageType) {
   const privateHandlerName = `_${messageType}`
 
   if (
-    privateHandlerName in context &&
-    typeof context[privateHandlerName] === 'function'
+    privateHandlerName in context
+    && typeof context[privateHandlerName] === 'function'
   ) {
     return context[privateHandlerName]
-  } else {
+  }
+  else {
     return null
   }
 }

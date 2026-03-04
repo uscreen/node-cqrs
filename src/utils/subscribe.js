@@ -1,6 +1,6 @@
 import assert from 'assert-plus'
-import unique from './unique.js'
 import getHandledMessageTypes from './getHandledMessageTypes.js'
+import unique from './unique.js'
 
 /**
  * Subscribe observer to observable
@@ -26,7 +26,8 @@ export default (observable, observer, options) => {
   for (const messageType of unique(subscribeTo)) {
     if (queueName) {
       observable.queue(queueName).on(messageType, masterHandler.bind(observer))
-    } else {
+    }
+    else {
       observable.on(messageType, masterHandler.bind(observer))
     }
   }

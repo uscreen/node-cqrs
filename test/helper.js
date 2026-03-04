@@ -1,3 +1,4 @@
+import process from 'node:process'
 import envSchema from 'env-schema'
 
 const schema = {
@@ -26,6 +27,6 @@ const database = process.env.TAP
 
 config.mongoUri = `mongodb://${config.mongoServer}/${database}`
 
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export { config, wait }

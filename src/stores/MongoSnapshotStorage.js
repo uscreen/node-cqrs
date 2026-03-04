@@ -17,16 +17,16 @@ export default class MongoSnapshotStorage {
         { aggregateId: 1, aggregateVersion: 1 },
         { unique: true, sparse: true }
       )
-      .catch((e) => {})
+      .catch(() => {})
     await this.collection
       .createIndex(
         { sagaId: 1, sagaVersion: 1 },
         { unique: false, sparse: true }
       )
-      .catch((e) => {})
+      .catch(() => {})
     await this.collection
       .createIndex({ type: 1 }, { unique: false, sparse: true })
-      .catch((e) => {})
+      .catch(() => {})
   }
 
   /**
