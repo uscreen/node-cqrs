@@ -54,6 +54,6 @@
     "eslint": "^9.39.3",
     "eslint-plugin-format": "^2.0.1",
     "ioredis": "^5.10.0",
-    "mongodb": "^5.9.2"
+    "mongodb": "^6.21.0"
   }
 }
