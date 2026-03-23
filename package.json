@@ -47,13 +47,13 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^7.7.2",
+    "@antfu/eslint-config": "^7.7.3",
     "@uscreen.de/dev-service": "^0.13.1",
     "c8": "^11.0.0",
     "env-schema": "^7.0.0",
     "eslint": "^9.39.4",
     "eslint-plugin-format": "^2.0.1",
-    "ioredis": "^5.10.0",
+    "ioredis": "^5.10.1",
     "mongodb": "^7.1.0"
   }
 }
