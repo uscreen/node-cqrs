@@ -44,7 +44,7 @@
     "nats": "^1.4.12",
     "redis-lock": "^0.1.4",
     "rfdc": "^1.4.1",
-    "uuid": "^13.0.0"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^7.7.3",
